@@ -7,14 +7,15 @@ include BitVault::Bitcoin
 
 ## client side
 
-# Create a multisig-wallet from scratch with two trees.
-client_wallet = MultiWallet.generate [:live, :backup]
+# Create a multisig-wallet from scratch with two trees:
+# one for "live" use, one for backup.
+client_wallet = MultiWallet.generate [:hot, :cold]
 
 # The address for the "backup" tree should be stored offline.
-backup_address = client_wallet.private_address(:backup)
+backup_address = client_wallet.private_address(:cold)
 
 # spawn a new wallet without the "backup" tree.
-client_wallet = client_wallet.drop(:backup)
+client_wallet = client_wallet.drop(:cold)
 
 # derive the public tree addresses to provide to the server
 public_addresses = client_wallet.public_addresses
@@ -23,8 +24,9 @@ public_addresses = client_wallet.public_addresses
 
 ## server side
 
-# Create a wallet from scratch with one tree.
-server_wallet = MultiWallet.generate [:bitvault]
+# Create a wallet from scratch with one tree, to be owned and used
+# by the server.
+server_wallet = MultiWallet.generate [:warm]
 
 # Create public-trees from the public addresses sent by the client
 server_wallet.import(public_addresses)
@@ -69,12 +71,13 @@ txin = server_node.add_input transaction_2,
 
 client_node = client_wallet.path(path)
 
-# MultiWallet nodes can sign with a specified private key
-client_sig = client_node.sign(:live, txin.sig_hash)
+# Sign with the user's "live" key.
+client_sig = client_node.sign(:hot, txin.sig_hash)
 
 ## pretend the client sends back the signature
 
-# MultiWallet nodes can also sign with all their private keys
+# MultiWallet nodes can also sign with all their private keys.
+# In this case, the server wallet only has one private key.
 signatures = server_node.signatures(txin.sig_hash)
 signatures << client_sig
 
