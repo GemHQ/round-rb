@@ -6,5 +6,5 @@ end
 
 require_relative "bitcoin/mockchain"
 require_relative "bitcoin/wrappers"
-require_relative "bitcoin/multisig_wallet"
+require_relative "bitcoin/multi_wallet"
 

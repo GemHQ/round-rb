@@ -5,99 +5,86 @@ include BitVault::Bitcoin
 
 
 
-# client side
+## client side
 
-bitvault = MoneyTree::Master.new :network => :bitcoin_testnet
+# Create a multisig-wallet from scratch with two trees.
+client_wallet = MultiWallet.generate [:live, :backup]
 
-live = MoneyTree::Master.new :network => :bitcoin_testnet
-backup = MoneyTree::Master.new :network => :bitcoin_testnet
+# The address for the "backup" tree should be stored offline.
+backup_address = client_wallet.private_address(:backup)
 
-public_addresses = {
-  :live => live.to_serialized_address,
-  :backup => backup.to_serialized_address
-}
+# spawn a new wallet without the "backup" tree.
+client_wallet = client_wallet.drop(:backup)
+
+# derive the public tree addresses to provide to the server
+public_addresses = client_wallet.public_addresses
+
+## Here we pretend that we sent the server the appropriate MoneyTree addresses
+
+## server side
+
+# Create a wallet from scratch with one tree.
+server_wallet = MultiWallet.generate [:bitvault]
+
+# Create public-trees from the public addresses sent by the client
+server_wallet.import(public_addresses)
+
+# Prepare for a transaction
+
+path = "m/1/4/7" # just some numbers I like
+server_node = server_wallet.path(path)
 
 
-# server side
-wallet = Wallet.new(
-  :private => bitvault.to_serialized_address(:private),
-  :public => public_addresses
-)
-
-
-# grab a node and start to play
-path = "m/1/4/7"
-trinode = wallet.trinode(path)
-p2sh_address = trinode.script.p2sh_address
-
-puts "p2sh address: #{p2sh_address}"
-
-
-
+# Disburse some coin to this node, so we can start spending
 test_chain = TestMockchain.new
-t1 = test_chain.disburse(p2sh_address)
+transaction_1 = test_chain.disburse(server_node.p2sh_address)
 
+## Client tells the server some address to receive payment
 
-# set up third party address to receive payment
-key = Bitcoin::Key.new
-address = key.addr
+other_key = Bitcoin::Key.new
+address = other_key.addr
 
-def add_input(tx, redeem_script, options)
-  txin = Bitcoin::Protocol::TxIn.new
-  prev_tx = options[:prev]
-  index = options[:index]
-
-  txin.prev_out = prev_tx.binary_hash
-  txin.prev_out_index = index
-  tx.add_in txin
-
-  txin.sig_hash = tx.signature_hash_for_input(0, nil, redeem_script.blob)
-
-  txin
-end
 
 # server side
-t2 = Builder.build_tx do |t|
+
+value = transaction_1.outputs[0].value
+
+transaction_2 = Builder.build_tx do |t|
   t.output do |o|
-    o.value (test_chain.mining_fee / 8)
+    o.value (value)
     o.script do |s|
       s.recipient address
     end
   end
 end
 
-txin = add_input(t2, trinode.script, :prev => t1, :index => 0)
 
-# pretend we send some representation of the transaction to the client
+# the wallet node creates an input, adds it to the transaction, and
+# prepares the sig_hash.
+txin = server_node.add_input transaction_2,
+  :prev => transaction_1, :index => 0
 
-# client side
-# derive the node (how is the path communicated?)
-node = live.node_for_path(path)
-live_key = Bitcoin::Key.new(node.private_key.to_hex, node.public_key.to_hex)
-live_sig = live_key.sign(txin.sig_hash) + "\x01"
+## Pretend we send some sensible representation of the transaction to
+## the client, obviously including the wallet path.
 
-# pretend the client sends back the signature
+client_node = client_wallet.path(path)
 
-# server side
-bv_key = trinode.keys[:bitvault]
-bv_sig = bv_key.sign(txin.sig_hash) + "\x01"
+# MultiWallet nodes can sign with a specified private key
+client_sig = client_node.sign(:live, txin.sig_hash)
 
-# server side
-def p2sh_script_sig(redeem_script, *signatures)
-  multisig = Bitcoin::Script.to_multisig_script_sig(*signatures)
-  string = Script.blob(multisig).to_s
-  Bitcoin::Script.binary_from_string("#{string} #{redeem_script.hex}")
-end
+## pretend the client sends back the signature
 
-txin.script_sig = p2sh_script_sig(trinode.script, bv_sig, live_sig)
+# MultiWallet nodes can also sign with all their private keys
+signatures = server_node.signatures(txin.sig_hash)
+signatures << client_sig
+
+# the server constructs a proper p2sh script_sig from all the
+# supplied signatures.
+txin.script_sig = server_node.p2sh_script_sig(*signatures)
 
 
 # Now verify that the input is valid
-script_pubkey = t1.outputs[0].pk_script
-full_script = txin.script_sig + script_pubkey
-script = Bitcoin::Script.new(full_script)
-
-puts "valid p2sh input? #{t2.verify_input_signature(0, t1)}"
+puts "valid p2sh input? #{transaction_2.verify_input_signature(0, transaction_1)}"
 
 
 
