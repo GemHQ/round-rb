@@ -4,7 +4,6 @@ require "bitvault/bitcoin"
 include BitVault::Bitcoin
 
 
-
 ## client side
 
 # Create a multisig-wallet from scratch with two trees:
@@ -38,7 +37,7 @@ server_node = server_wallet.path(path)
 
 
 # Disburse some coin to this node, so we can start spending
-test_chain = TestMockchain.new
+test_chain = BitVaultTests::Mockchain.new
 transaction_1 = test_chain.disburse(server_node.p2sh_address)
 
 ## Client tells the server some address to receive payment
