@@ -1,4 +1,4 @@
-require_relative "setup"
+require_relative "../setup"
 
 require "bitvault/bitcoin"
 include BitVault::Bitcoin
