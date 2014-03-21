@@ -17,10 +17,11 @@ Gem::Specification.new do |s|
   ] + Dir["lib/**/*.rb"]
   s.require_path = "lib"
 
-  s.add_dependency("json", "~> 1.8.1")
   s.add_dependency("patchboard", "~> 0.4.0")
   s.add_dependency("bitcoin-ruby", "~> 0.0.5")
+  s.add_dependency("money-tree", "~> 0.0.5")
 
+  s.add_development_dependency("starter", "~> 0.1.1")
   s.add_development_dependency("minitest-reporters", "~> 1.0.2")
 end
 
