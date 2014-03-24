@@ -1,0 +1,25 @@
+
+client:
+  hot_seed: "tprv8ZgxMBicQKsPdmxYrrhagT33hn6Jzfcmbn32qVwwYnjbfuf55A4JWFd3Lf4jSA39MTAyAu7ovumLfcbdrHNYud6oSYZuQpsraAgq8gZAMsN"
+  cold_seed: "tprv8ZgxMBicQKsPdmxYrrhagT33hn6Jzfcmbn32qVwwYnjbfuf55A4JWFd3Lf4jSA39MTAyAu7ovumLfcbdrHNYud6oSYZuQpsraAgq8gZAMsN"
+  public_addresses:
+    hot: "tpubD6NzVbkrYhZ4XEzLkWNB5rhAGocF9zogB5dp81zEy4XzWPuqhYstgkEuWmjFWmFk6gEb9QuhF5sPSBytvhGYYyKDU2M2LXxXz4z2e2V3X3R"
+    cold: "tpubD6NzVbkrYhZ4YkfKKDyCLToiTJEd6iL9dQJ7fGeFf8s4RAv6qu4iGkYhZnn8Xoc14QQrTkqUBtQKxhPjXaFeGvyac2NrQ8nG9XSKsSV1pha"
+    
+  encrypted_hot_seed:
+    passphrase: "wrong pony generator brad"
+    passphrase_salt: "YHM2va48mjEn3pD5TfVqq5"
+    cipher_nonce: "9kdDRr2gcU7bMFieUeASjFYYWhibJvHF9"
+    ciphertext: "2QEAdb8V3wdDwW6Mu94q8kzrqqgQ6sUth4kS4cnjttGSeJhvo2mv7usHmpsT8hM43tNqVNvXtyG28MceUyb9QNrsRccMPrny4vmWL2SmT1G7QpWZb6YhRGwX9spuP9Uu4rWUfXZcjLuM2Kyced2deWuxVNxmb8qm19HcY6umpcvP8c"
+    
+  
+server:
+  warm_seed: "tprv8ZgxMBicQKsPdsxYJDCExqHoBg5G4MxgtiGNDtMFh9DW9TPvjv5zDpzGDsmHqYVxB8RJ4ywGpDaP4W5YYECYNVLrJ9KS7jsAi3tkR8pEQDb"
+  funding_path: "/m/1/0/1"
+  funding_address: "2MtGDsCF25XmMaroV5TXhr2Hj5FFAkdJ1FM"
+  
+network:
+  funding_transaction_1: #<Bitcoin::Protocol::Tx:0x007f895b9b6658>
+  funding_transaction_2: #<Bitcoin::Protocol::Tx:0x007f895b9f7888>
+  outgoing_transaction: #<Bitcoin::Protocol::Tx:0x007f895c810050>
+  

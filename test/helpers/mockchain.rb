@@ -10,6 +10,30 @@ module BitVaultTests
       @mining_fee = chain.coinbase_value
     end
 
+    def transaction(recipients)
+      last_transaction = @chain.last.tx.first
+
+      transaction = Builder.build_tx do |t|
+        t.input do |i|
+          i.prev_out last_transaction
+          i.prev_out_index 0
+          i.signature_key @chain.key
+        end
+
+        recipients.each do |address, value|
+          t.output do |o|
+            o.value value
+            o.script do |s|
+              s.type :address
+              s.recipient address
+            end
+          end
+        end
+
+      end
+
+    end
+
     # Disburse the coinbase value from the last block to the supplied
     # address.  Four outputs are created:  1/2 value, 1/4, 1/8, and 1/16.
     def disburse(address)

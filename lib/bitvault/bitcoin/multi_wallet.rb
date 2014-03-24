@@ -23,25 +23,26 @@ module BitVault::Bitcoin
       self.new(:full => masters)
     end
 
+    attr_reader :trees
     def initialize(options)
-      @full_nodes = {}
-      @public_nodes = {}
-      @nodes = {}
-      full_nodes = options[:full]
+      @full_trees = {}
+      @public_trees = {}
+      @trees = {}
+      full_trees = options[:full]
 
-      if !full_nodes
+      if !full_trees
         raise "Must supply :full"
       end
 
-      full_nodes.each do |name, arg|
+      full_trees.each do |name, arg|
         name = name.to_sym
-        @full_nodes[name] = @nodes[name] = self.get_node(arg)
+        @full_trees[name] = @trees[name] = self.get_node(arg)
       end
 
-      if public_nodes = options[:public]
-        public_nodes.each do |name, arg|
+      if public_trees = options[:public]
+        public_trees.each do |name, arg|
           name = name.to_sym
-          @public_nodes[name] = @nodes[name] = self.get_node(arg)
+          @public_trees[name] = @trees[name] = self.get_node(arg)
         end
       end
     end
@@ -49,12 +50,12 @@ module BitVault::Bitcoin
     def drop(*names)
       names = names.map(&:to_sym)
       options = {:full => {}, :public => {}}
-      @full_nodes.each do |name, node|
+      @full_trees.each do |name, node|
         unless names.include?(name.to_sym)
           options[:full][name] = node
         end
       end
-      @public_nodes.each do |name, node|
+      @public_trees.each do |name, node|
         unless names.include?(name.to_sym)
           options[:full][name] = node
         end
@@ -66,21 +67,21 @@ module BitVault::Bitcoin
       addresses.each do |name, address|
         node = MoneyTree::Master.from_serialized_address(address)
         if node.private_key
-          @full_nodes[name] = node
+          @full_trees[name] = node
         else
-          @public_nodes[name] = node
+          @public_trees[name] = node
         end
       end
     end
 
     def private_address(name)
-      raise "No such node: ''" unless (node = @full_nodes[name.to_sym])
+      raise "No such node: ''" unless (node = @full_trees[name.to_sym])
       node.to_serialized_address(:private)
     end
 
     def public_addresses
       out = {}
-      @full_nodes.each do |name, node|
+      @full_trees.each do |name, node|
         out[name] = node.to_serialized_address
       end
       out
@@ -103,10 +104,10 @@ module BitVault::Bitcoin
         :full => {},
         :public => {}
       }
-      @full_nodes.each do |name, node|
+      @full_trees.each do |name, node|
         options[:full][name] = node.node_for_path(path)
       end
-      @public_nodes.each do |name, node|
+      @public_trees.each do |name, node|
         options[:public][name] = node.node_for_path(path)
       end
 

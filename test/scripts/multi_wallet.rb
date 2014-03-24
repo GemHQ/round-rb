@@ -43,6 +43,7 @@ transaction_1 = test_chain.disburse(server_node.p2sh_address)
 ## Client tells the server some address to receive payment
 
 other_key = Bitcoin::Key.new
+other_key.generate
 address = other_key.addr
 
 
