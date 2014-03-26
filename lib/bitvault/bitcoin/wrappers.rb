@@ -22,6 +22,72 @@ module BitVault::Bitcoin
     end
   end
 
+  # a validator that checks syntax only, not previous outputs
+  class TransactionValidator < Bitcoin::Validation::Tx
+
+    def initialize(tx)
+      @tx, @errors = tx, []
+    end
+
+    def validate(opts = {})
+      super :rules => [:syntax]
+    end
+    
+  end
+
+
+  class Transaction
+
+    attr_reader :native
+    def initialize(&block)
+      @native = Builder.build_tx(&block)
+      @inputs = []
+      @outputs = []
+      @native.outputs.size.times do |i|
+        @outputs << Output.new(@native, i)
+      end
+    end
+
+    def modify(&block)
+      yield @native
+      @native = Bitcoin::Protocol::Tx.new @native.to_payload
+    end
+
+    def validate
+      validator = TransactionValidator.new(@native)
+      valid = validator.validate :rules => [:syntax]
+      {:valid => valid, :error => validator.error}
+    end
+
+    def add_input(input)
+      @inputs << input
+      self.modify do |native|
+        native.add_in input.native
+      end
+      input.sig_hash = self.sig_hash(input)
+    end
+
+    def to_json(*a)
+      {
+        :version => @native.ver,
+        :lock_time => @native.lock_time,
+        :hash => base58(@native.binary_hash),
+        :inputs => @inputs,
+        :outputs => @outputs,
+      }.to_json(*a)
+    end
+
+    def sig_hash(input)
+      # NOTE: we only allow SIGHASH_ALL at this time
+      # https://en.bitcoin.it/wiki/OP_CHECKSIG#Hashtype_SIGHASH_ALL_.28default.29
+      prev_out = input.output
+      @native.signature_hash_for_input(
+        prev_out.index, nil, prev_out.script.blob
+      )
+    end
+
+  end
+
   class Output
     attr_reader :native, :transaction, :index, :value, :script
     def initialize(transaction, index)
@@ -44,6 +110,7 @@ module BitVault::Bitcoin
     end
 
   end
+
 
   class Input
 
@@ -76,46 +143,6 @@ module BitVault::Bitcoin
 
   end
 
-
-  class Transaction
-    SIGHASH_ALL = 1
-
-    attr_reader :native
-    def initialize(&block)
-      @native = Builder.build_tx(&block)
-      @inputs = []
-      @outputs = []
-      @native.outputs.size.times do |i|
-        @outputs << Output.new(@native, i)
-      end
-    end
-
-    def add_input(input)
-      @inputs << input
-      @native.add_in input.native
-      input.sig_hash = self.sig_hash(input)
-    end
-
-    def to_json(*a)
-      {
-        :version => @native.ver,
-        :lock_time => @native.lock_time,
-        :hash => base58(@native.binary_hash),
-        :inputs => @inputs,
-        :outputs => @outputs,
-      }.to_json(*a)
-    end
-
-    def sig_hash(input)
-      # NOTE: we only allow SIGHASH_ALL at this time
-      # https://en.bitcoin.it/wiki/OP_CHECKSIG#Hashtype_SIGHASH_ALL_.28default.29
-      prev_out = input.output
-      @native.signature_hash_for_input(
-        prev_out.index, nil, prev_out.script.blob
-      )
-    end
-
-  end
 
   class Script
 
