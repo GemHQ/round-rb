@@ -1,13 +1,26 @@
+require "term/ansicolor"
+String.send :include, Term::ANSIColor
+
 require_relative "setup"
 
 include BitVault::Bitcoin::Encodings
+
+# colored output to make it easier to see structure
+def log(message, data)
+  if data.is_a? String
+    puts "#{message.green.underline} => #{data.dump.cyan}"
+  else
+    puts "#{message.green.underline} => #{JSON.pretty_generate(data).cyan}"
+  end
+  puts
+end
 
 BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
 client = BV.spawn
 
 # Create a user
 user = client.resources.users.create :email => "matthew-#{rand(10000)}@mail.com"
-pp user
+log "User", user.attributes
 
 # Tell the client about the authentication token
 client.context.api_token = user.api_token
@@ -36,17 +49,37 @@ wallet = user.wallets.create(
     :ciphertext => base58(ciphertext),
   }
 )
-pp :wallet => wallet.attributes
+
+log "Wallet", wallet.attributes
 puts
 
 account = wallet.accounts.create :name => "office supplies"
-pp :account => account.attributes
+log "Account", account.attributes
 
-pp :account_list => wallet.accounts.list
+list = wallet.accounts.list
 
+log "Account list", wallet.accounts.list
+
+# get an address that others can send payments to 
 address = account.addresses.create
 
-#"M/#{account.i_value}/#{int_or_ext?}/#{i_value}"
-# M/22/0/100
-pp :address => address.attributes
+log "Payment address", address[:string]
+
+unsigned_payment = account.payments.create(
+  :outputs => [
+    {
+      :amount => 600_000,
+      :payee => {:address => ""}
+    }
+  ]
+)
+log "Unsigned payment data from JSON", JSON.parse(unsigned_payment.json)
+
+blob = decode_base58(unsigned_payment.serialized)
+tx = Bitcoin::Protocol::Tx.new(blob)
+log "Unsigned payment data from serialized", tx
+
+log "sighashes", unsigned_payment.attributes.inputs
+
+
 

@@ -25,5 +25,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency("starter", "~> 0.1.1")
   s.add_development_dependency("minitest-reporters", "~> 1.0.2")
+  s.add_development_dependency("term-ansicolor")
 end
 

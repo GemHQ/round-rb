@@ -1,5 +1,5 @@
 $:.unshift "lib"
-require_relative "cson"
+
 require_relative "../setup"
 require "bitvault"
 require "rbnacl"
@@ -187,7 +187,3 @@ File.open "test/data/script.json", "w" do |f|
   f.puts JSON.pretty_generate(data)
 end
 
-# CoffeeScript Object Notation. Easy to read, easy to use in Node.js apps.
-File.open "test/data/script.cson", "w" do |f|
-  f.puts CSON.stringify(data)
-end

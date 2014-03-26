@@ -22,33 +22,100 @@ module BitVault::Bitcoin
     end
   end
 
-  #class Hash160
-    #def self.blob(blob)
-      #self.new Encodings.hex(blob)
-    #end
+  class Output
+    attr_reader :native, :transaction, :index, :value, :script
+    def initialize(transaction, index)
+      # FIXME. probably should be taking the wrapper Transaction instance
+      @transaction = transaction
+      @index = index
+      @native = transaction.outputs[index]
+      @value = @native.value
+      @script = BitVault::Bitcoin::Script.blob @native.pk_script
+      #pp @native
+    end
 
-    #def self.hex(hex)
-      #self.new(hex)
-    #end
+    def to_json(*a)
+      {
+        :transaction_hash => base58(@transaction.binary_hash),
+        :index => @index,
+        :value => @value,
+        :script => @script,
+      }.to_json(*a)
+    end
 
-    #attr_reader :hex
-    #def initialize(hex)
-      #@hex = hex
-    #end
+  end
 
-    #def to_s
-      #Bitcoin.hash160(@hex)
-    #end
+  class Input
 
-    #def to_address
-      #Bitcoin.hash160_to_address(self.to_s)
-    #end
+    attr_reader :native, :output
+    def initialize(output)
+      @native = Bitcoin::Protocol::TxIn.new
+      @output = output
 
-    #def to_p2sh_address
-      #Bitcoin.hash160_to_p2sh_address(self.to_s)
-    #end
+      @native.prev_out = @output.transaction.binary_hash
+      @native.prev_out_index = @output.index
+    end
 
-  #end
+    def sig_hash=(string)
+      @sig_hash = string
+    end
+
+    def script_sig=(string)
+      script = BitVault::Bitcoin::Script.string(string)
+      @script_sig = string
+      @native.script_sig = script.blob
+    end
+
+    def to_json(*a)
+      {
+        :output => @output,
+        :sig_hash => base58(@sig_hash || ""),
+        :script_sig => @script_sig || ""
+      }.to_json(*a)
+    end
+
+  end
+
+
+  class Transaction
+    SIGHASH_ALL = 1
+
+    attr_reader :native
+    def initialize(&block)
+      @native = Builder.build_tx(&block)
+      @inputs = []
+      @outputs = []
+      @native.outputs.size.times do |i|
+        @outputs << Output.new(@native, i)
+      end
+    end
+
+    def add_input(input)
+      @inputs << input
+      @native.add_in input.native
+      input.sig_hash = self.sig_hash(input)
+    end
+
+    def to_json(*a)
+      {
+        :version => @native.ver,
+        :lock_time => @native.lock_time,
+        :hash => base58(@native.binary_hash),
+        :inputs => @inputs,
+        :outputs => @outputs,
+      }.to_json(*a)
+    end
+
+    def sig_hash(input)
+      # NOTE: we only allow SIGHASH_ALL at this time
+      # https://en.bitcoin.it/wiki/OP_CHECKSIG#Hashtype_SIGHASH_ALL_.28default.29
+      prev_out = input.output
+      @native.signature_hash_for_input(
+        prev_out.index, nil, prev_out.script.blob
+      )
+    end
+
+  end
 
   class Script
 
@@ -75,8 +142,14 @@ module BitVault::Bitcoin
       self.native.to_string
     end
 
+    def to_json(*a)
+      {
+        :type => self.native.type,
+        :string => self.to_s
+      }.to_json(*a)
+    end
+
     def hash160
-      #Hash160.hex(@hex)
       Bitcoin.hash160(@hex)
     end
 
@@ -90,11 +163,6 @@ module BitVault::Bitcoin
 
   end
 
-  class Address
-    #def hash160
-      #Bitcoin.hash160_from_address(@data)
-    #end
-  end
 
 end
 

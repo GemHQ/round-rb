@@ -27,7 +27,7 @@ module BitVault::Bitcoin
 
     attr_reader :key, :store, :last, :coinbase_value
 
-    def initialize(config)
+    def initialize(config={})
       @key = Bitcoin::Key.new
       @key.generate
       @config = config
@@ -43,6 +43,8 @@ module BitVault::Bitcoin
         else
           self.reset
         end
+      else
+        self.reset
       end
     end
 
@@ -87,6 +89,30 @@ module BitVault::Bitcoin
       @store.store_block(block) if @store
       @last = block
       block
+    end
+
+    def transaction(recipients)
+      last_transaction = @last.tx.first
+
+      transaction = Builder.build_tx do |t|
+        t.input do |i|
+          i.prev_out last_transaction
+          i.prev_out_index 0
+          i.signature_key @key
+        end
+
+        recipients.each do |address, value|
+          t.output do |o|
+            o.value value
+            o.script do |s|
+              s.type :address
+              s.recipient address
+            end
+          end
+        end
+
+      end
+
     end
 
 
