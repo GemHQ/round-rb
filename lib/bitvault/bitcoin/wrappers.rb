@@ -38,15 +38,38 @@ module BitVault::Bitcoin
 
   class Transaction
 
-    attr_reader :native
-    def initialize(&block)
-      @native = Builder.build_tx(&block)
+    def self.build_outputs(&block)
+      native = Builder.build_tx(&block)
+      self.new(native)
+    end
+
+    attr_reader :native, :inputs, :outputs
+
+    def initialize(native=nil)
+      @native = native || Bitcoin::Protocol::Tx.new
       @inputs = []
+      @native.inputs.each_with_index do |input, i|
+        tx_hash = input.prev_out
+        index = input.prev_out_index
+        output = SparseOutput.new tx_hash, index
+        @inputs << Input.new(output)
+      end
+
       @outputs = []
-      @native.outputs.size.times do |i|
-        @outputs << Output.new(@native, i)
+      @native.outputs.each_with_index do |output, i|
+        @outputs << Output.new(native, i)
       end
     end
+
+
+    #def initialize(&block)
+      #@native = Builder.build_tx(&block)
+      #@inputs = []
+      #@outputs = []
+      #@native.outputs.size.times do |i|
+        #@outputs << Output.new(@native, i)
+      #end
+    #end
 
     def modify(&block)
       yield @native
@@ -88,21 +111,44 @@ module BitVault::Bitcoin
 
   end
 
-  class Output
-    attr_reader :native, :transaction, :index, :value, :script
-    def initialize(transaction, index)
-      # FIXME. probably should be taking the wrapper Transaction instance
-      @transaction = transaction
-      @index = index
-      @native = transaction.outputs[index]
-      @value = @native.value
-      @script = BitVault::Bitcoin::Script.blob @native.pk_script
-      #pp @native
+  class SparseOutput
+    attr_reader :transaction_hash, :index
+    def initialize(transaction_hash, index)
+      @transaction_hash, @index = transaction_hash, index
     end
 
     def to_json(*a)
       {
-        :transaction_hash => base58(@transaction.binary_hash),
+        :transaction_hash => base58(self.transaction_hash),
+        :index => @index,
+      }.to_json(*a)
+    end
+  end
+
+  class Output
+
+    def self.find(transaction_hash, index)
+      raise "Unimplemented"
+      self.new(native_transaction, index)
+    end
+
+    attr_reader :native, :transaction, :index, :value, :script
+    def initialize(native_transaction, index)
+      # FIXME. probably should be taking the wrapper Transaction instance
+      @transaction = native_transaction
+      @index = index
+      @native = transaction.outputs[index]
+      @value = @native.value
+      @script = BitVault::Bitcoin::Script.blob @native.pk_script
+    end
+
+    def transaction_hash
+      @transaction.binary_hash
+    end
+
+    def to_json(*a)
+      {
+        :transaction_hash => base58(self.transaction_hash),
         :index => @index,
         :value => @value,
         :script => @script,
@@ -119,7 +165,7 @@ module BitVault::Bitcoin
       @native = Bitcoin::Protocol::TxIn.new
       @output = output
 
-      @native.prev_out = @output.transaction.binary_hash
+      @native.prev_out = @output.transaction_hash
       @native.prev_out_index = @output.index
     end
 
