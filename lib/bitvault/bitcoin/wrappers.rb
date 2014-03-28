@@ -22,20 +22,6 @@ module BitVault::Bitcoin
     end
   end
 
-  # a validator that checks syntax only, not previous outputs
-  class TransactionValidator < Bitcoin::Validation::Tx
-
-    def initialize(tx)
-      @tx, @errors = tx, []
-    end
-
-    def validate(opts = {})
-      super :rules => [:syntax]
-    end
-    
-  end
-
-
   class Transaction
 
     def self.build_outputs(&block)
@@ -61,23 +47,13 @@ module BitVault::Bitcoin
       end
     end
 
-
-    #def initialize(&block)
-      #@native = Builder.build_tx(&block)
-      #@inputs = []
-      #@outputs = []
-      #@native.outputs.size.times do |i|
-        #@outputs << Output.new(@native, i)
-      #end
-    #end
-
     def modify(&block)
       yield @native
       @native = Bitcoin::Protocol::Tx.new @native.to_payload
     end
 
     def validate
-      validator = TransactionValidator.new(@native)
+      validator = Bitcoin::Validation::Tx.new(@native, nil)
       valid = validator.validate :rules => [:syntax]
       {:valid => valid, :error => validator.error}
     end
