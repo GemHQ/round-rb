@@ -29,21 +29,44 @@ module BitVault::Bitcoin
       self.new(native)
     end
 
+    def self.json(string)
+      data = JSON.parse(string, :symbolize_names => true)
+      version, lock_time, hash, inputs, outputs =
+        data.values_at :ver, :lock_time, :hash, :inputs, :outputs
+
+      native = Bitcoin::Protocol::Tx.new
+
+      native.ver = version
+      native.lock_time = lock_time
+      native.hash = hash
+
+      tx = self.new(native)
+      outputs.each do |params|
+        output = Output.new(
+          :index => params[:index],
+          :value => params[:value],
+          :script => params[:script][:string],
+        )
+        tx.add_output(output)
+      end
+
+    end
+
+
     attr_reader :native, :inputs, :outputs
 
     def initialize(native=nil)
+
       @native = native || Bitcoin::Protocol::Tx.new
       @inputs = []
+      @outputs = []
+
       @native.inputs.each_with_index do |input, i|
-        tx_hash = input.prev_out
-        index = input.prev_out_index
-        output = SparseOutput.new tx_hash, index
-        @inputs << Input.new(output)
+        @inputs << SparseInput.new(input.prev_out, input.prev_out_index)
       end
 
-      @outputs = []
       @native.outputs.each_with_index do |output, i|
-        @outputs << Output.new(native, i)
+        @outputs << Output.native(native, i)
       end
     end
 
@@ -64,6 +87,13 @@ module BitVault::Bitcoin
         native.add_in input.native
       end
       input.sig_hash = self.sig_hash(input)
+    end
+
+    def add_output(output)
+      @outputs << output
+      self.modify do |native|
+        native.add_out(output.native)
+      end
     end
 
     def to_json(*a)
@@ -87,39 +117,49 @@ module BitVault::Bitcoin
 
   end
 
-  class SparseOutput
-    attr_reader :transaction_hash, :index
-    def initialize(transaction_hash, index)
-      @transaction_hash, @index = transaction_hash, index
-    end
-
-    def to_json(*a)
-      {
-        :transaction_hash => base58(self.transaction_hash),
-        :index => @index,
-      }.to_json(*a)
-    end
-  end
-
   class Output
 
-    def self.find(transaction_hash, index)
-      raise "Unimplemented"
-      self.new(native_transaction, index)
+    def self.native(native_transaction, index)
+      native_output = native_transaction.outputs[index]
+
+      output = self.new(
+        :index => index,
+        :native => {
+          :transaction => native_transaction,
+          :output => native_output
+        }
+      )
     end
 
     attr_reader :native, :transaction, :index, :value, :script
-    def initialize(native_transaction, index)
-      # FIXME. probably should be taking the wrapper Transaction instance
-      @transaction = native_transaction
-      @index = index
-      @native = transaction.outputs[index]
-      @value = @native.value
-      @script = BitVault::Bitcoin::Script.blob @native.pk_script
+
+    def initialize(options)
+      @index = options[:index]
+      if natives = options[:native]
+        @native_transaction = natives[:transaction]
+        @native = natives[:output]
+        @value = @native.value
+        @script = BitVault::Bitcoin::Script.blob @native.pk_script
+      else
+        @native = Bitcoin::Protocol::Tx.new
+        @value = options[:value]
+        @script = BitVault::Bitcoin::Script.string(options[:script])
+      end
     end
 
+    def transaction=(transaction)
+      @transaction = transaction
+      @native_transaction = @transaction.native
+      # do the tx.add_out here, or in the Transaction method?
+    end
+
+
     def transaction_hash
-      @transaction.binary_hash
+      if @native_transaction
+        @native_transaction.binary_hash
+      else
+        raise "This output has not been assigned to a transaction"
+      end
     end
 
     def to_json(*a)
@@ -133,6 +173,22 @@ module BitVault::Bitcoin
 
   end
 
+  class SparseInput
+
+    def initialize(transaction_hash, index)
+      @output = {
+        :transaction_hash => base58(transaction_hash),
+        :index => index,
+      }
+    end
+
+    def to_json(*a)
+      {
+        :output => @output,
+      }.to_json(*a)
+    end
+
+  end
 
   class Input
 
