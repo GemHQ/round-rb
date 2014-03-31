@@ -19,7 +19,11 @@ BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Con
 client = BV.spawn
 
 # Create a user
-user = client.resources.users.create :email => "matthew-#{rand(10000)}@mail.com"
+user = client.resources.users.create(
+  :email => "matthew-#{rand(10000)}@mail.com",
+  :first_name => "Matthew",
+  :last_name => "King"
+)
 log "User", user.attributes
 
 # Tell the client about the authentication token
@@ -61,24 +65,30 @@ list = wallet.accounts.list
 log "Account list", wallet.accounts.list
 
 # get an address that others can send payments to 
-address = account.addresses.create
+incoming_address = account.addresses.create
 
-log "Payment address", address[:string]
+log "Payment address", incoming_address[:string]
+
+# Request a payment to someone else's address
+
+other_key = Bitcoin::Key.new
+other_key.generate
+other_address = other_key.addr
 
 unsigned_payment = account.payments.create(
   :outputs => [
     {
       :amount => 600_000,
-      :payee => {:address => ""}
+      :payee => {:address => other_address}
     }
   ]
 )
-log "Unsigned payment data from JSON", JSON.parse(unsigned_payment.json)
+pp unsigned_payment[:hash]
+log "Unsigned payment data from JSON", unsigned_payment.attributes
 
-blob = decode_base58(unsigned_payment.serialized)
-tx = Bitcoin::Protocol::Tx.new(blob)
+exit
+
 log "Unsigned payment data from serialized", tx
-
 log "sighashes", unsigned_payment.attributes.inputs
 
 
