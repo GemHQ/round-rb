@@ -29,33 +29,6 @@ module BitVault::Bitcoin
       self.new(native)
     end
 
-    # Expects symbols as keys
-    def self.data(data)
-      version, lock_time, hash, inputs, outputs =
-        data.values_at :version, :lock_time, :hash, :inputs, :outputs
-
-      native = Bitcoin::Protocol::Tx.new
-      native.ver = version
-      native.lock_time = lock_time
-
-      transaction = self.new(native)
-
-      inputs.each do |params|
-      end
-
-      outputs.each do |params|
-        output = Output.new(
-          :index => params[:index],
-          :value => params[:value],
-          :script => params[:script][:string],
-        )
-        tx.add_output(output)
-      end
-
-      transaction
-    end
-
-
     attr_reader :native, :inputs, :outputs
 
     def initialize(native=nil)
@@ -116,17 +89,25 @@ module BitVault::Bitcoin
       Encodings.base58(self.binary_hash)
     end
 
+    def version
+      @native.ver
+    end
+
+    def lock_time
+      @native.lock_time
+    end
+
     def to_json(*a)
       self.to_hash.to_json(*a)
     end
 
     def to_hash
       {
-        :version => @native.ver,
-        :lock_time => @native.lock_time,
+        :version => self.version,
+        :lock_time => self.lock_time,
         :hash => Encodings.base58(self.binary_hash),
-        :inputs => @inputs,
-        :outputs => @outputs,
+        :inputs => self.inputs,
+        :outputs => self.outputs,
       }
     end
 
@@ -178,9 +159,9 @@ module BitVault::Bitcoin
     def to_hash
       {
         :transaction_hash => self.transaction_hash,
-        :index => @index,
-        :value => @value,
-        :script => @script,
+        :index => self.index,
+        :value => self.value,
+        :script => self.script,
       }
     end
 
@@ -209,7 +190,7 @@ module BitVault::Bitcoin
 
   class Input
 
-    attr_reader :native, :output, :sig_hash
+    attr_reader :native, :output, :sig_hash, :script_sig
     def initialize(output)
       @native = Bitcoin::Protocol::TxIn.new
       @output = output
@@ -230,9 +211,9 @@ module BitVault::Bitcoin
 
     def to_json(*a)
       {
-        :output => @output,
-        :sig_hash => Encodings.base58(@sig_hash || ""),
-        :script_sig => @script_sig || ""
+        :output => self.output,
+        :sig_hash => Encodings.base58(self.sig_hash || ""),
+        :script_sig => self.script_sig || ""
       }.to_json(*a)
     end
 
