@@ -29,18 +29,20 @@ module BitVault::Bitcoin
       self.new(native)
     end
 
-    def self.json(string)
-      data = JSON.parse(string, :symbolize_names => true)
+    # Expects symbols as keys
+    def self.data(data)
       version, lock_time, hash, inputs, outputs =
-        data.values_at :ver, :lock_time, :hash, :inputs, :outputs
+        data.values_at :version, :lock_time, :hash, :inputs, :outputs
 
       native = Bitcoin::Protocol::Tx.new
-
       native.ver = version
       native.lock_time = lock_time
-      native.hash = hash
 
-      tx = self.new(native)
+      transaction = self.new(native)
+
+      inputs.each do |params|
+      end
+
       outputs.each do |params|
         output = Output.new(
           :index => params[:index],
@@ -50,6 +52,7 @@ module BitVault::Bitcoin
         tx.add_output(output)
       end
 
+      transaction
     end
 
 
@@ -66,12 +69,17 @@ module BitVault::Bitcoin
       end
 
       @native.outputs.each_with_index do |output, i|
-        @outputs << Output.native(native, i)
+        @outputs << Output.new(
+          :transaction => self,
+          :index => i,
+          :value => output.value,
+          :pk_script => output.pk_script
+        )
       end
     end
 
-    def modify(&block)
-      yield @native
+    def update_native(&block)
+      yield @native if block_given?
       @native = Bitcoin::Protocol::Tx.new @native.to_payload
     end
 
@@ -83,27 +91,42 @@ module BitVault::Bitcoin
 
     def add_input(input)
       @inputs << input
-      self.modify do |native|
+      self.update_native do |native|
         native.add_in input.native
       end
       input.sig_hash = self.sig_hash(input)
     end
 
     def add_output(output)
+      index = @outputs.size
+      output.set_transaction self, index
       @outputs << output
-      self.modify do |native|
+      self.update_native do |native|
         native.add_out(output.native)
       end
     end
 
+    def binary_hash
+      update_native
+      @native.binary_hash
+    end
+
+    def base58_hash
+      Encodings.base58(self.binary_hash)
+    end
+
     def to_json(*a)
+      self.to_hash.to_json(*a)
+    end
+
+    def to_hash
       {
         :version => @native.ver,
         :lock_time => @native.lock_time,
-        :hash => base58(@native.binary_hash),
+        :hash => Encodings.base58(self.binary_hash),
         :inputs => @inputs,
         :outputs => @outputs,
-      }.to_json(*a)
+      }
     end
 
     def sig_hash(input)
@@ -119,65 +142,58 @@ module BitVault::Bitcoin
 
   class Output
 
-    def self.native(native_transaction, index)
-      native_output = native_transaction.outputs[index]
+    attr_reader :native, :value, :script, :transaction, :index
 
-      output = self.new(
-        :index => index,
-        :native => {
-          :transaction => native_transaction,
-          :output => native_output
-        }
+    def initialize(options)
+      @transaction, @index, @value =
+        options.values_at :transaction, :index, :value
+      if options[:script]
+        @script = Script.string(options[:script])
+      elsif options[:pk_script]
+        @script = Script.blob(options[:pk_script])
+      else
+        raise ArgumentError, "No script supplied"
+      end
+
+      @native = Bitcoin::Protocol::TxOut.from_hash(
+        "value" => @value.to_s,
+        "scriptPubKey" => @script.to_s
       )
     end
 
-    attr_reader :native, :transaction, :index, :value, :script
-
-    def initialize(options)
-      @index = options[:index]
-      if natives = options[:native]
-        @native_transaction = natives[:transaction]
-        @native = natives[:output]
-        @value = @native.value
-        @script = BitVault::Bitcoin::Script.blob @native.pk_script
-      else
-        @native = Bitcoin::Protocol::Tx.new
-        @value = options[:value]
-        @script = BitVault::Bitcoin::Script.string(options[:script])
-      end
+    def set_transaction(transaction, index)
+      @transaction, @index = transaction, index
     end
-
-    def transaction=(transaction)
-      @transaction = transaction
-      @native_transaction = @transaction.native
-      # do the tx.add_out here, or in the Transaction method?
-    end
-
 
     def transaction_hash
-      if @native_transaction
-        @native_transaction.binary_hash
+      if @transaction
+        Encodings.base58(@transaction.binary_hash)
       else
-        raise "This output has not been assigned to a transaction"
+        ""
       end
     end
 
-    def to_json(*a)
+
+    def to_hash
       {
-        :transaction_hash => base58(self.transaction_hash),
+        :transaction_hash => self.transaction_hash,
         :index => @index,
         :value => @value,
         :script => @script,
-      }.to_json(*a)
+      }
+    end
+
+    def to_json(*a)
+      self.to_hash.to_json(*a)
     end
 
   end
 
   class SparseInput
 
-    def initialize(transaction_hash, index)
+    def initialize(binary_hash, index)
       @output = {
-        :transaction_hash => base58(transaction_hash),
+        :transaction_hash => Encodings.base58(binary_hash),
         :index => index,
       }
     end
@@ -197,7 +213,7 @@ module BitVault::Bitcoin
       @native = Bitcoin::Protocol::TxIn.new
       @output = output
 
-      @native.prev_out = @output.transaction_hash
+      @native.prev_out = @output.binary_hash
       @native.prev_out_index = @output.index
     end
 
@@ -214,7 +230,7 @@ module BitVault::Bitcoin
     def to_json(*a)
       {
         :output => @output,
-        :sig_hash => base58(@sig_hash || ""),
+        :sig_hash => Encodings.base58(@sig_hash || ""),
         :script_sig => @script_sig || ""
       }.to_json(*a)
     end

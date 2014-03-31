@@ -6,4 +6,5 @@ $:.unshift "#{project_root}/lib"
 
 require "bitvault"
 require_relative "helpers/mockchain.rb"
+require_relative "helpers/fixtures.rb"
 
