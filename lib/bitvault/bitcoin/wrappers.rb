@@ -78,12 +78,13 @@ module BitVault::Bitcoin
       end
     end
 
-    def update_native(&block)
+    def update_native
       yield @native if block_given?
-      @native = Bitcoin::Protocol::Tx.new @native.to_payload
+      @native = Bitcoin::Protocol::Tx.new(@native.to_payload)
     end
 
     def validate
+      update_native
       validator = Bitcoin::Validation::Tx.new(@native, nil)
       valid = validator.validate :rules => [:syntax]
       {:valid => valid, :error => validator.error}
@@ -208,12 +209,12 @@ module BitVault::Bitcoin
 
   class Input
 
-    attr_reader :native, :output
+    attr_reader :native, :output, :sig_hash
     def initialize(output)
       @native = Bitcoin::Protocol::TxIn.new
       @output = output
 
-      @native.prev_out = @output.binary_hash
+      @native.prev_out = @output.transaction_hash
       @native.prev_out_index = @output.index
     end
 
