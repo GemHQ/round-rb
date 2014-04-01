@@ -68,12 +68,16 @@ module BitVault::Bitcoin
       end
 
       # TODO: figure out a way to trigger sig_hash computation
-      # so we don't have to add inputs after outputs.
+      # at the right time so we don't have to add inputs after outputs.
       inputs.each do |data|
         output = Output.new(data[:output])
-        transaction.add_input Input.new(output)
+        input = Input.new(output)
+        transaction.add_input input
+        # TODO: verify that the supplied and computed sig_hashes match
+        # puts data[:sig_hash] == input.sig_hash
       end
 
+      # TODO: validate transaction syntax
       transaction
     end
 
@@ -161,8 +165,6 @@ module BitVault::Bitcoin
       # NOTE: we only allow SIGHASH_ALL at this time
       # https://en.bitcoin.it/wiki/OP_CHECKSIG#Hashtype_SIGHASH_ALL_.28default.29
       prev_out = input.output
-      #pp @native.outputs
-      puts @native.to_json
       @native.signature_hash_for_input(
         prev_out.index, nil, prev_out.script.blob
       )
@@ -255,6 +257,7 @@ module BitVault::Bitcoin
     end
 
     attr_reader :native, :output, :sig_hash, :script_sig
+
     def initialize(output)
       @native = Bitcoin::Protocol::TxIn.new
       @output = output
@@ -264,7 +267,7 @@ module BitVault::Bitcoin
     end
 
     def sig_hash=(string)
-      @sig_hash = string
+      @sig_hash = base58(string)
     end
 
     def script_sig=(string)
@@ -276,7 +279,7 @@ module BitVault::Bitcoin
     def to_json(*a)
       {
         :output => self.output,
-        :sig_hash => Encodings.base58(self.sig_hash || ""),
+        :sig_hash => self.sig_hash || "",
         :script_sig => self.script_sig || ""
       }.to_json(*a)
     end
