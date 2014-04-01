@@ -38,11 +38,13 @@ describe "Transaction" do
 
   end
 
+  describe "created from a full Hash representation" do
+  end
+
   describe "created from a valid Bitcoin::Protocol::Tx" do
 
     def transaction
-      # disbursal_tx is defined in the fixtures
-      @transaction ||= Transaction.new(disbursal_tx)
+      @transaction ||= Transaction.native(disbursal_tx)
     end
 
     it "has binary and base58 hash values" do
@@ -90,7 +92,7 @@ describe "Transaction" do
   describe "Modifications" do
 
     def previous_transaction
-      @previous ||= Transaction.new(disbursal_tx)
+      @previous ||= Transaction.native(disbursal_tx)
     end
 
     describe "when adding inputs" do

@@ -145,7 +145,7 @@ module BitVault::Bitcoin
         s.type :multisig
         s.recipient @m, *@public_keys.map {|name, key| key.pub }
       end
-      Script.blob(blob)
+      Script.new(:blob => blob)
     end
 
     def p2sh_address
@@ -175,7 +175,7 @@ module BitVault::Bitcoin
 
     def p2sh_script_sig(*signatures)
       multisig = Bitcoin::Script.to_multisig_script_sig(*signatures)
-      string = Script.blob(multisig).to_s
+      string = Script.new(:blob => multisig).to_s
       Bitcoin::Script.binary_from_string("#{string} #{self.script.hex}")
     end
 

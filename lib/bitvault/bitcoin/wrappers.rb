@@ -26,29 +26,63 @@ module BitVault::Bitcoin
 
     def self.build_outputs(&block)
       native = Builder.build_tx(&block)
-      self.new(native)
+      self.native(native)
+    end
+
+    def self.build(&block)
+      transaction = self.new
+      yield transaction
+      transaction
+    end
+
+    def self.native(tx)
+      transaction = self.new()
+      transaction.instance_eval do
+        @native = tx
+        tx.inputs.each_with_index do |input, i|
+          @inputs << SparseInput.new(input.prev_out, input.prev_out_index)
+        end
+        tx.outputs.each_with_index do |output, i|
+          @outputs << Output.new(
+            :transaction => transaction,
+            :index => i,
+            :value => output.value,
+            :script => {:blob => output.pk_script}
+          )
+        end
+      end
+
+      transaction
+    end
+
+    def self.data(hash)
+      version, lock_time, hash, inputs, outputs = 
+        hash.values_at :version, :lock_time, :hash, :inputs, :outputs
+      transaction = self.new
+
+      outputs.each do |data|
+        transaction.add_output Output.new(
+          :value => data[:value],
+          :script => data[:script]
+        )
+      end
+
+      # TODO: figure out a way to trigger sig_hash computation
+      # so we don't have to add inputs after outputs.
+      inputs.each do |data|
+        output = Output.new(data[:output])
+        transaction.add_input Input.new(output)
+      end
+
+      transaction
     end
 
     attr_reader :native, :inputs, :outputs
 
-    def initialize(native=nil)
-
+    def initialize
       @native = native || Bitcoin::Protocol::Tx.new
       @inputs = []
       @outputs = []
-
-      @native.inputs.each_with_index do |input, i|
-        @inputs << SparseInput.new(input.prev_out, input.prev_out_index)
-      end
-
-      @native.outputs.each_with_index do |output, i|
-        @outputs << Output.new(
-          :transaction => self,
-          :index => i,
-          :value => output.value,
-          :pk_script => output.pk_script
-        )
-      end
     end
 
     def update_native
@@ -63,7 +97,15 @@ module BitVault::Bitcoin
       {:valid => valid, :error => validator.error}
     end
 
-    def add_input(input)
+    def add_input(arg)
+      # TODO: allow specifying prev_tx and index with a Hash.
+      # Possibly stop using SparseInput.
+      if arg.is_a? Output
+        input = Input.new(arg)
+      else
+        input = arg
+      end
+
       @inputs << input
       self.update_native do |native|
         native.add_in input.native
@@ -72,6 +114,10 @@ module BitVault::Bitcoin
     end
 
     def add_output(output)
+      unless output.is_a? Output
+        output = Output.new(output)
+      end
+
       index = @outputs.size
       output.set_transaction self, index
       @outputs << output
@@ -115,6 +161,8 @@ module BitVault::Bitcoin
       # NOTE: we only allow SIGHASH_ALL at this time
       # https://en.bitcoin.it/wiki/OP_CHECKSIG#Hashtype_SIGHASH_ALL_.28default.29
       prev_out = input.output
+      #pp @native.outputs
+      puts @native.to_json
       @native.signature_hash_for_input(
         prev_out.index, nil, prev_out.script.blob
       )
@@ -127,12 +175,17 @@ module BitVault::Bitcoin
     attr_reader :native, :value, :script, :transaction, :index
 
     def initialize(options)
-      @transaction, @index, @value =
-        options.values_at :transaction, :index, :value
+
+      if options[:transaction_hash]
+        @transaction_hash = options[:transaction_hash]
+      elsif options[:transaction]
+        @transaction = options[:transaction]
+      end
+
+      @index, @value = options.values_at :index, :value
+
       if options[:script]
-        @script = Script.string(options[:script])
-      elsif options[:pk_script]
-        @script = Script.blob(options[:pk_script])
+        @script = Script.new(options[:script])
       else
         raise ArgumentError, "No script supplied"
       end
@@ -144,12 +197,15 @@ module BitVault::Bitcoin
     end
 
     def set_transaction(transaction, index)
+      @transaction_hash = nil
       @transaction, @index = transaction, index
     end
 
     def transaction_hash
       if @transaction
         Encodings.base58(@transaction.binary_hash)
+      elsif @transaction_hash
+        @transaction_hash
       else
         ""
       end
@@ -190,6 +246,14 @@ module BitVault::Bitcoin
 
   class Input
 
+    def self.data(data)
+      # TODO: how to preserve the supplied sig_hash for
+      # comparison later?
+      output, sig_hash = data.values_at :output, :sig_hash
+      output = Output.data(output)
+      self.new(output)
+    end
+
     attr_reader :native, :output, :sig_hash, :script_sig
     def initialize(output)
       @native = Bitcoin::Protocol::TxIn.new
@@ -204,7 +268,7 @@ module BitVault::Bitcoin
     end
 
     def script_sig=(string)
-      script = BitVault::Bitcoin::Script.string(string)
+      script = Script.new(string)
       @script_sig = string
       @native.script_sig = script.blob
     end
@@ -222,34 +286,55 @@ module BitVault::Bitcoin
 
   class Script
 
-    def self.blob(blob)
-      self.new(blob)
-    end
+    attr_reader :hex, :blob, :native
 
-    def self.string(string)
-      blob = Bitcoin::Script.binary_from_string(string)
-      self.new(blob)
-    end
+    def initialize(options)
+      # literals
+      if options.is_a? String
+        @blob = Bitcoin::Script.binary_from_string options
+      elsif string = options[:string]
+        @blob = Bitcoin::Script.binary_from_string string
+      elsif options[:blob]
+        @blob = options[:blob]
+      # arguments for constructing
+      else
+        if address = options[:address]
+          @blob = Bitcoin::Script.to_address_script(address)
+        elsif public_key = options[:public_key]
+          @blob = Bitcoin::Script.to_pubkey_script(address)
+        elsif public_keys = options[:public_keys]
+          @blob = Bitcoin::Script.to_multisig_script(address)
+        else
+          raise ArgumentError
+        end
+      end
 
-    attr_reader :hex, :blob
-    def initialize(blob)
-      @blob = blob
       @hex = Encodings.hex(blob)
-    end
-
-    def native
-      Bitcoin::Script.new @blob
+      @native = Bitcoin::Script.new @blob
+      @string = @native.to_string
     end
 
     def to_s
-      self.native.to_string
+      @string
+    end
+
+    def type
+      if self.native.type == :hash160
+        :address
+      else
+        self.native.type
+      end
+    end
+
+    def to_hash
+      {
+        :type => self.type,
+        :string => self.to_s
+      }
     end
 
     def to_json(*a)
-      {
-        :type => self.native.type,
-        :string => self.to_s
-      }.to_json(*a)
+      self.to_hash.to_json(*a)
     end
 
     def hash160
