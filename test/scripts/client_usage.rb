@@ -83,13 +83,11 @@ unsigned_payment = account.payments.create(
     }
   ]
 )
-pp unsigned_payment[:hash]
-log "Unsigned payment data from JSON", unsigned_payment.attributes
 
-exit
+log "Unsigned payment", unsigned_payment.attributes
+transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment.attributes)
+log "Reconstructed tx", transaction
 
-log "Unsigned payment data from serialized", tx
-log "sighashes", unsigned_payment.attributes.inputs
 
 
 
