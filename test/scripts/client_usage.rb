@@ -8,9 +8,13 @@ include BitVault::Bitcoin::Encodings
 # colored output to make it easier to see structure
 def log(message, data)
   if data.is_a? String
-    puts "#{message.green.underline} => #{data.dump.cyan}"
+    puts "#{message.yellow.underline} => #{data.dump.cyan}"
   else
-    puts "#{message.green.underline} => #{JSON.pretty_generate(data).cyan}"
+    begin
+      puts "#{message.yellow.underline} => #{JSON.pretty_generate(data).cyan}"
+    rescue
+      puts "#{message.yellow.underline} => #{data.inspect.cyan}"
+    end
   end
   puts
 end
@@ -24,13 +28,13 @@ user = client.resources.users.create(
   :first_name => "Matthew",
   :last_name => "King"
 )
-log "User", user.attributes
+log "User", user
 
 # Tell the client about the authentication token
 client.context.api_token = user.api_token
 
 # Generate a wallet with new seeds
-wallet = BitVault::Bitcoin::MultiWallet.generate [:hot, :cold]
+multi_wallet = BitVault::Bitcoin::MultiWallet.generate [:hot, :cold]
 
 # Derive a secret key from a passphrase
 passphrase = BitVault::Client::Passphrase.new "this is not a secure passphrase"
@@ -38,15 +42,15 @@ key, salt = passphrase.key, passphrase.salt
 
 # Encrypt the hot seed with the secret key
 nonce = RbNaCl::Random.random_bytes(RbNaCl::SecretBox.nonce_bytes)
-hot_seed = wallet.trees[:hot].to_serialized_address(:private)
+hot_seed = multi_wallet.trees[:hot].to_serialized_address(:private)
 ciphertext = RbNaCl::SecretBox.new(key).encrypt(nonce, hot_seed)
 
 
 wallet = user.wallets.create(
   :name => "my favorite wallet",
   :network => "bitcoin_testnet",
-  :cold_address => wallet.trees[:cold].to_serialized_address,
-  :hot_address => wallet.trees[:hot].to_serialized_address,
+  :cold_address => multi_wallet.trees[:cold].to_serialized_address,
+  :hot_address => multi_wallet.trees[:hot].to_serialized_address,
   :hot_seed => {
     :passphrase_salt => base58(salt),
     :cipher_nonce => base58(nonce),
@@ -54,11 +58,12 @@ wallet = user.wallets.create(
   }
 )
 
-log "Wallet", wallet.attributes
-puts
+log "Wallet", wallet
+
+multi_wallet.import :warm => wallet.warm_address
 
 account = wallet.accounts.create :name => "office supplies"
-log "Account", account.attributes
+log "Account", account
 
 list = wallet.accounts.list
 
@@ -84,10 +89,24 @@ unsigned_payment = account.payments.create(
   ]
 )
 
-log "Unsigned payment", unsigned_payment.attributes
-transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment.attributes)
-log "Reconstructed tx", transaction
+log "Unsigned payment", unsigned_payment
+transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
+#log "Reconstructed tx", transaction
 
+
+signatures = transaction.inputs.map do |input|
+  path = input.output.metadata.wallet_path
+  node = multi_wallet.path(path)
+  signature = base58(node.sign(:hot, input.binary_sig_hash))
+  #pp :path => path, :sig_hash => input.sig_hash, :signature => signature
+end
+
+signed_payment = unsigned_payment.sign(
+  :transaction_hash => transaction.base58_hash,
+  :signatures => signatures
+)
+
+log "Signed payment", signed_payment
 
 
 
