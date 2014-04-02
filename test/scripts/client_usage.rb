@@ -19,6 +19,11 @@ def log(message, data)
   puts
 end
 
+#def log(message, data)
+  #puts "#{message} ---\n#{JSON.pretty_generate data}"
+  #puts
+#end
+
 BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
 client = BV.spawn
 
@@ -34,7 +39,7 @@ log "User", user
 client.context.api_token = user.api_token
 
 # Generate a wallet with new seeds
-multi_wallet = BitVault::Bitcoin::MultiWallet.generate [:hot, :cold]
+client_wallet = BitVault::Bitcoin::MultiWallet.generate [:hot, :cold]
 
 # Derive a secret key from a passphrase
 passphrase = BitVault::Client::Passphrase.new "this is not a secure passphrase"
@@ -42,15 +47,15 @@ key, salt = passphrase.key, passphrase.salt
 
 # Encrypt the hot seed with the secret key
 nonce = RbNaCl::Random.random_bytes(RbNaCl::SecretBox.nonce_bytes)
-hot_seed = multi_wallet.trees[:hot].to_serialized_address(:private)
+hot_seed = client_wallet.trees[:hot].to_serialized_address(:private)
 ciphertext = RbNaCl::SecretBox.new(key).encrypt(nonce, hot_seed)
 
 
 wallet = user.wallets.create(
   :name => "my favorite wallet",
   :network => "bitcoin_testnet",
-  :cold_address => multi_wallet.trees[:cold].to_serialized_address,
-  :hot_address => multi_wallet.trees[:hot].to_serialized_address,
+  :cold_address => client_wallet.trees[:cold].to_serialized_address,
+  :hot_address => client_wallet.trees[:hot].to_serialized_address,
   :hot_seed => {
     :passphrase_salt => base58(salt),
     :cipher_nonce => base58(nonce),
@@ -60,7 +65,33 @@ wallet = user.wallets.create(
 
 log "Wallet", wallet
 
-multi_wallet.import :warm => wallet.warm_address
+client_wallet.import :warm => wallet.warm_address
+
+# Use the values returned by the server to construct the wallet,
+# because it's presently serving canned values.
+
+passphrase = "wrong pony generator brad"
+salt = decode_base58(wallet.hot_seed.passphrase_salt)
+key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(
+  passphrase, salt,
+  10_000, # number of iterations
+  32      # key length in bytes
+)
+nonce = decode_base58(wallet.hot_seed.cipher_nonce)
+ciphertext = decode_base58(wallet.hot_seed.ciphertext)
+hot_seed = RbNaCl::SecretBox.new(key).decrypt(nonce, ciphertext)
+
+
+
+client_wallet = BitVault::Bitcoin::MultiWallet.new(
+  :full => {
+    :hot => hot_seed
+  },
+  :public => {
+    :warm => wallet.warm_address,
+    :cold => wallet.cold_address
+  }
+)
 
 account = wallet.accounts.create :name => "office supplies"
 log "Account", account
@@ -72,7 +103,7 @@ log "Account list", wallet.accounts.list
 # get an address that others can send payments to 
 incoming_address = account.addresses.create
 
-log "Payment address", incoming_address[:string]
+log "Payment address", incoming_address
 
 # Request a payment to someone else's address
 
@@ -96,7 +127,7 @@ transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
 
 signatures = transaction.inputs.map do |input|
   path = input.output.metadata.wallet_path
-  node = multi_wallet.path(path)
+  node = client_wallet.path(path)
   signature = base58(node.sign(:hot, input.binary_sig_hash))
   #pp :path => path, :sig_hash => input.sig_hash, :signature => signature
 end
