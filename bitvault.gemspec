@@ -17,14 +17,14 @@ Gem::Specification.new do |s|
   ] + Dir["lib/**/*.rb"]
   s.require_path = "lib"
 
-  s.add_dependency("patchboard", "~> 0.4.0")
-  s.add_dependency("bitcoin-ruby", "~> 0.0.5")
-  s.add_dependency("money-tree", "~> 0.8.6")
-  s.add_dependency("sequel", "~> 4.8.0")
-  s.add_dependency("sqlite3", "~> 1.3.9")
+  s.add_dependency("patchboard", "0.4.1")
+  s.add_dependency("bitcoin-ruby", "0.0.5")
+  s.add_dependency("money-tree", "0.8.6")
+  s.add_dependency("sequel", "~> 4.8")
+  s.add_dependency("sqlite3", "~> 1.3")
 
-  s.add_development_dependency("starter", "~> 0.1.1")
-  s.add_development_dependency("minitest-reporters", "~> 1.0.2")
+  s.add_development_dependency("starter", "0.1.11")
+  s.add_development_dependency("minitest-reporters", "~> 1.0")
   s.add_development_dependency("term-ansicolor")
 end
 
