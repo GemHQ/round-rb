@@ -24,6 +24,7 @@ module BitVault::Bitcoin
     end
 
     attr_reader :trees
+
     def initialize(options)
       @full_trees = {}
       @public_trees = {}

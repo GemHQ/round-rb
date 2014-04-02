@@ -73,8 +73,8 @@ module BitVault::Bitcoin
         output = Output.new(data[:output])
         input = Input.new(output)
         transaction.add_input input
-        # TODO: verify that the supplied and computed sig_hashes match
-        # puts data[:sig_hash] == input.sig_hash
+        # FIXME: verify that the supplied and computed sig_hashes match
+        #puts :sig_hashes_match => (data[:sig_hash] == input.sig_hash)
       end
 
       # TODO: validate transaction syntax
@@ -114,7 +114,8 @@ module BitVault::Bitcoin
       self.update_native do |native|
         native.add_in input.native
       end
-      input.sig_hash = self.sig_hash(input)
+      #input.sig_hash = self.sig_hash(input)
+      input.binary_sig_hash = self.sig_hash(input)
     end
 
     def add_output(output)
@@ -174,7 +175,8 @@ module BitVault::Bitcoin
 
   class Output
 
-    attr_reader :native, :value, :script, :transaction, :index
+    attr_accessor :metadata
+    attr_reader :native, :transaction, :index, :value, :script
 
     def initialize(options)
 
@@ -185,6 +187,7 @@ module BitVault::Bitcoin
       end
 
       @index, @value = options.values_at :index, :value
+      @metadata = options[:metadata] || {}
 
       if options[:script]
         @script = Script.new(options[:script])
@@ -220,6 +223,7 @@ module BitVault::Bitcoin
         :index => self.index,
         :value => self.value,
         :script => self.script,
+        :metadata => self.metadata
       }
     end
 
@@ -248,15 +252,8 @@ module BitVault::Bitcoin
 
   class Input
 
-    def self.data(data)
-      # TODO: how to preserve the supplied sig_hash for
-      # comparison later?
-      output, sig_hash = data.values_at :output, :sig_hash
-      output = Output.data(output)
-      self.new(output)
-    end
-
-    attr_reader :native, :output, :sig_hash, :script_sig
+    attr_reader :native, :output, :binary_sig_hash,
+      :signatures, :sig_hash, :script_sig
 
     def initialize(output)
       @native = Bitcoin::Protocol::TxIn.new
@@ -264,10 +261,12 @@ module BitVault::Bitcoin
 
       @native.prev_out = @output.transaction_hash
       @native.prev_out_index = @output.index
+      @signatures = []
     end
 
-    def sig_hash=(string)
-      @sig_hash = base58(string)
+    def binary_sig_hash=(blob)
+      @binary_sig_hash = blob
+      @sig_hash = Encodings.base58(blob)
     end
 
     def script_sig=(string)
@@ -279,6 +278,7 @@ module BitVault::Bitcoin
     def to_json(*a)
       {
         :output => self.output,
+        :signatures => self.signatures.map {|b| Encodings.base58(b) },
         :sig_hash => self.sig_hash || "",
         :script_sig => self.script_sig || ""
       }.to_json(*a)
