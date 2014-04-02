@@ -7,11 +7,6 @@ module BitVault::Bitcoin
     extend Bitcoin::Builder
   end
 
-  #multi_wallet = MultiWallet.new(
-    #:full => {},
-    #:public => {}
-  #)
-
   class MultiWallet
 
     def self.generate(names, network=:bitcoin_testnet)
