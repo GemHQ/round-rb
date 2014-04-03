@@ -37,11 +37,12 @@ module BitVault::Bitcoin
       @sig_hash = Encodings.base58(blob)
     end
 
-    def script_sig=(string)
-      script = Script.new(string)
-      @script_sig = string
-      @native.script_sig = script.blob
+    def script_sig=(blob)
+      script = Script.new(:blob => blob)
+      @script_sig = script.to_s
+      @native.script_sig = blob
     end
+
 
     def to_json(*a)
       {

@@ -146,6 +146,7 @@ module BitVault::Bitcoin
       # https://en.bitcoin.it/wiki/OP_CHECKSIG#Hashtype_SIGHASH_ALL_.28default.29
       prev_out = input.output
       @native.signature_hash_for_input(
+        # BUG to use that script value
         prev_out.index, nil, prev_out.script.blob
       )
     end

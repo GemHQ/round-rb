@@ -9,7 +9,7 @@ module BitVault::Bitcoin
     def initialize(options)
 
       if options[:transaction_hash]
-        @transaction_hash = options[:transaction_hash]
+        @transaction_hash = Encodings.decode_base58(options[:transaction_hash])
       elsif options[:transaction]
         @transaction = options[:transaction]
       end
@@ -36,7 +36,7 @@ module BitVault::Bitcoin
 
     def transaction_hash
       if @transaction
-        Encodings.base58(@transaction.binary_hash)
+        @transaction.binary_hash
       elsif @transaction_hash
         @transaction_hash
       else
@@ -47,7 +47,7 @@ module BitVault::Bitcoin
 
     def to_hash
       {
-        :transaction_hash => self.transaction_hash,
+        :transaction_hash => Encodings.base58(self.transaction_hash),
         :index => self.index,
         :value => self.value,
         :script => self.script,

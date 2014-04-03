@@ -150,6 +150,7 @@ module BitVault::Bitcoin
 
     def sign(name, value)
       raise "No such key: '#{name}'" unless (key = @keys[name.to_sym])
+      # \x01 is the hash type SIGHASH_ALL
       key.sign(value) + "\x01"
     end
 
