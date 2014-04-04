@@ -93,6 +93,10 @@ client_wallet = BitVault::Bitcoin::MultiWallet.new(
   }
 )
 
+wallet = wallet.get
+
+log "Wallet get", wallet
+
 account = wallet.accounts.create :name => "office supplies"
 log "Account", account
 
