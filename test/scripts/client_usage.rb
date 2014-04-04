@@ -45,7 +45,45 @@ client.context.api_token = user.api_token
 updated = user.update(:first_name => "Matt")
 log "User updated", updated
 
-# Generate a wallet with new seeds
+
+reset = user.reset
+
+log "User reset", {:previous_token => user.api_token,
+  :new_token => reset.api_token}
+
+
+# Application actions
+
+application = user.applications.create(
+  :name => "bitcoin_emporium"
+)
+
+log "Application", application
+
+# Verify that you can list applications
+list = user.applications.list
+
+# Verify that you can retrieve the application
+application = application.get
+
+updated = application.update(:name => "bitcoin_extravaganza")
+
+reset = application.reset
+
+log "Application reset", {:previous_token => application.api_token,
+  :new_token => reset.api_token}
+
+# At time of writing, the server is using mocked data, so this
+# doesn't actually delete anything.
+result = application.delete
+log "Application delete response status", result.response.status
+
+
+
+
+
+
+# Generate a MultiWallet with random seeds
 client_wallet = BitVault::Bitcoin::MultiWallet.generate [:primary, :backup]
 
 # Derive a secret key from a passphrase
@@ -161,31 +199,6 @@ signed_payment = unsigned_payment.sign(
 )
 
 log "Signed payment", signed_payment
-
-application = user.applications.create(
-  :name => "bitcoin_emporium"
-)
-
-log "Application", application
-
-# Verify that you can list applications
-list = user.applications.list
-
-# Verify that you can retrieve the application
-application = application.get
-
-updated = application.update(:name => "bitcoin_extravaganza")
-
-reset = application.reset
-
-log "Application reset", {:previous_token => application.api_token,
-  :new_token => reset.api_token}
-
-# At time of writing, the server is using mocked data, so this
-# doesn't actually delete anything.
-result = application.delete
-log "Application delete response status", result.response.status
-
 
 
 exit
