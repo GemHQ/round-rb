@@ -176,6 +176,13 @@ application = application.get
 
 updated = application.update(:name => "bitcoin_extravaganza")
 
+reset = application.reset
+
+log "Application reset", {:previous_token => application.api_token,
+  :new_token => reset.api_token}
+
+# At time of writing, the server is using mocked data, so this
+# doesn't actually delete anything.
 result = application.delete
 log "Application delete response status", result.response.status
 
