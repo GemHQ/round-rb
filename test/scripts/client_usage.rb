@@ -100,6 +100,11 @@ list = wallet.accounts.list
 
 log "Account list", wallet.accounts.list
 
+
+account = account.get
+
+log "Account get", account
+
 # get an address that others can send payments to 
 incoming_address = account.addresses.create
 
@@ -138,6 +143,10 @@ signed_payment = unsigned_payment.sign(
 )
 
 log "Signed payment", signed_payment
+
+exit
+signed_transaction = BitVault::Bitcoin::Transaction.data(signed_payment)
+signed_transaction.validate_signatures # vaporware
 
 
 
