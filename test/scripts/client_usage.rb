@@ -93,9 +93,12 @@ client_wallet = BitVault::Bitcoin::MultiWallet.new(
   }
 )
 
+# Verify that you can retrieve the newly created wallet
 wallet = wallet.get
 
-log "Wallet get", wallet
+# Verify that you can list wallets
+list = user.wallets.list
+
 
 account = wallet.accounts.create :name => "office supplies"
 log "Account", account
