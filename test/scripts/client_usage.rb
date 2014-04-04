@@ -29,7 +29,7 @@ client = BV.spawn
 
 # Create a user
 user = client.resources.users.create(
-  :email => "matthew-#{rand(10000)}@mail.com",
+  :email => "matthew@bitvault.io",
   :first_name => "Matthew",
   :last_name => "King"
 )
@@ -37,6 +37,12 @@ log "User", user
 
 # Tell the client about the authentication token
 client.context.api_token = user.api_token
+
+# Update a user attribute
+
+updated = user.update(:first_name => "Matt")
+log "User updated", updated
+
 
 # Generate a wallet with new seeds
 client_wallet = BitVault::Bitcoin::MultiWallet.generate [:hot, :cold]
