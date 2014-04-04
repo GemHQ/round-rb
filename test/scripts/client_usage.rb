@@ -24,6 +24,8 @@ end
   #puts
 #end
 
+#####
+
 BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
 client = BV.spawn
 
@@ -42,7 +44,6 @@ client.context.api_token = user.api_token
 
 updated = user.update(:first_name => "Matt")
 log "User updated", updated
-
 
 # Generate a wallet with new seeds
 client_wallet = BitVault::Bitcoin::MultiWallet.generate [:primary, :backup]
@@ -161,7 +162,19 @@ signed_payment = unsigned_payment.sign(
 
 log "Signed payment", signed_payment
 
+application = user.applications.create(
+  :name => "bitcoin_emporium"
+)
+
+log "Application", application
+
+# Verify that you can list applications
+list = user.applications.list
+
+
+
 exit
+# verify that the signed transaction has correct script_sigs
 signed_transaction = BitVault::Bitcoin::Transaction.data(signed_payment)
 signed_transaction.validate_signatures # vaporware
 
