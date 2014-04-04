@@ -107,10 +107,14 @@ list = wallet.accounts.list
 
 log "Account list", wallet.accounts.list
 
-
 account = account.get
 
 log "Account get", account
+
+updated = account.update(:name => "staples")
+
+log "Account updated", updated
+
 
 # get an address that others can send payments to 
 incoming_address = account.addresses.create
