@@ -171,6 +171,14 @@ log "Application", application
 # Verify that you can list applications
 list = user.applications.list
 
+# Verify that you can retrieve the application
+application = application.get
+
+updated = application.update(:name => "bitcoin_extravaganza")
+
+result = application.delete
+log "Application delete response status", result.response.status
+
 
 
 exit
