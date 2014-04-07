@@ -1,4 +1,5 @@
 require "patchboard"
+require_relative "crypto"
 
 module BitVault
 
@@ -43,4 +44,3 @@ module BitVault
 
 end
 
-require_relative "crypto"

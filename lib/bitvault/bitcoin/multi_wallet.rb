@@ -15,7 +15,7 @@ module BitVault::Bitcoin
         name = name.to_sym
         masters[name] = MoneyTree::Master.new(:network => network)
       end
-      self.new(:full => masters)
+      self.new(:private => masters)
     end
 
     attr_reader :trees
@@ -24,10 +24,10 @@ module BitVault::Bitcoin
       @full_trees = {}
       @public_trees = {}
       @trees = {}
-      full_trees = options[:full]
+      full_trees = options[:private]
 
       if !full_trees
-        raise "Must supply :full"
+        raise "Must supply :private"
       end
 
       full_trees.each do |name, arg|
@@ -45,15 +45,15 @@ module BitVault::Bitcoin
 
     def drop(*names)
       names = names.map(&:to_sym)
-      options = {:full => {}, :public => {}}
+      options = {:private => {}, :public => {}}
       @full_trees.each do |name, node|
         unless names.include?(name.to_sym)
-          options[:full][name] = node
+          options[:private][name] = node
         end
       end
       @public_trees.each do |name, node|
         unless names.include?(name.to_sym)
-          options[:full][name] = node
+          options[:private][name] = node
         end
       end
       self.class.new options
@@ -97,11 +97,11 @@ module BitVault::Bitcoin
     def path(path)
       options = {
         :path => path,
-        :full => {},
+        :private => {},
         :public => {}
       }
       @full_trees.each do |name, node|
-        options[:full][name] = node.node_for_path(path)
+        options[:private][name] = node.node_for_path(path)
       end
       @public_trees.each do |name, node|
         options[:public][name] = node.node_for_path(path)
@@ -123,10 +123,10 @@ module BitVault::Bitcoin
 
       @keys = {}
       @public_keys = {}
-      @full = options[:full]
+      @private = options[:private]
       @public = options[:public]
 
-      @full.each do |name, node|
+      @private.each do |name, node|
         key = Bitcoin::Key.new(node.private_key.to_hex)
         @keys[name] = key
         @public_keys[name] = key
@@ -166,14 +166,14 @@ module BitVault::Bitcoin
       txin.prev_out_index = index
       tx.add_in txin
 
-      txin.sig_hash = tx.signature_hash_for_input(index, nil, self.script.blob)
+      txin.sig_hash = tx.signature_hash_for_input(index, nil, self.script.to_blob)
       txin
     end
 
     def p2sh_script_sig(*signatures)
       multisig = Bitcoin::Script.to_multisig_script_sig(*signatures)
       string = Script.new(:blob => multisig).to_s
-      Bitcoin::Script.binary_from_string("#{string} #{self.script.hex}")
+      Bitcoin::Script.binary_from_string("#{string} #{self.script.to_hex}")
     end
 
   end

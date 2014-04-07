@@ -2,10 +2,11 @@
 module BitVault::Bitcoin
 
   class SparseInput
+    include BitVault::Encodings
 
     def initialize(binary_hash, index)
       @output = {
-        :transaction_hash => Encodings.base58(binary_hash),
+        :transaction_hash => base58(binary_hash),
         :index => index,
       }
     end
@@ -19,6 +20,7 @@ module BitVault::Bitcoin
   end
 
   class Input
+    include BitVault::Encodings
 
     attr_reader :native, :output, :binary_sig_hash,
       :signatures, :sig_hash, :script_sig
@@ -34,7 +36,7 @@ module BitVault::Bitcoin
 
     def binary_sig_hash=(blob)
       @binary_sig_hash = blob
-      @sig_hash = Encodings.base58(blob)
+      @sig_hash = base58(blob)
     end
 
     def script_sig=(blob)
@@ -47,7 +49,7 @@ module BitVault::Bitcoin
     def to_json(*a)
       {
         :output => self.output,
-        :signatures => self.signatures.map {|b| Encodings.base58(b) },
+        :signatures => self.signatures.map {|b| base58(b) },
         :sig_hash => self.sig_hash || "",
         :script_sig => self.script_sig || ""
       }.to_json(*a)

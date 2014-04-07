@@ -7,9 +7,9 @@ module BitVault
   end
 end
 
+require_relative "encodings"
 
 # Wrappers
-require_relative "bitcoin/encodings"
 require_relative "bitcoin/script"
 require_relative "bitcoin/output"
 require_relative "bitcoin/input"

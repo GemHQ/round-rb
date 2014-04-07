@@ -2,8 +2,9 @@
 module BitVault::Bitcoin
 
   class Script
+    include BitVault::Encodings
 
-    attr_reader :hex, :blob, :native
+    attr_reader :native
 
     def initialize(options)
       # literals
@@ -26,7 +27,7 @@ module BitVault::Bitcoin
         end
       end
 
-      @hex = Encodings.hex(blob)
+      @hex = hex(@blob)
       @native = Bitcoin::Script.new @blob
       @string = @native.to_string
     end
@@ -34,6 +35,16 @@ module BitVault::Bitcoin
     def to_s
       @string
     end
+
+    def to_hex
+      @hex
+    end
+
+    def to_blob
+      @blob
+    end
+
+    alias_method :to_binary, :to_blob
 
     def type
       if self.native.type == :hash160

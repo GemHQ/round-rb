@@ -2,6 +2,7 @@
 module BitVault::Bitcoin
 
   class Transaction
+    include BitVault::Encodings
 
     def self.build_outputs(&block)
       native = Builder.build_tx(&block)
@@ -116,7 +117,7 @@ module BitVault::Bitcoin
     end
 
     def base58_hash
-      Encodings.base58(self.binary_hash)
+      base58(self.binary_hash)
     end
 
     def version
@@ -135,7 +136,7 @@ module BitVault::Bitcoin
       {
         :version => self.version,
         :lock_time => self.lock_time,
-        :hash => Encodings.base58(self.binary_hash),
+        :hash => base58(self.binary_hash),
         :inputs => self.inputs,
         :outputs => self.outputs,
       }
@@ -147,7 +148,7 @@ module BitVault::Bitcoin
       prev_out = input.output
       @native.signature_hash_for_input(
         # BUG to use that script value
-        prev_out.index, nil, prev_out.script.blob
+        prev_out.index, nil, prev_out.script.to_blob
       )
     end
 

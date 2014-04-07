@@ -5,8 +5,8 @@ module BitVault
   module Crypto
 
     class PassphraseBox
-      include BitVault::Bitcoin::Encodings
-      extend BitVault::Bitcoin::Encodings
+      include BitVault::Encodings
+      extend BitVault::Encodings
 
       # Given passphrase and plaintext as strings, returns a Hash
       # containing the ciphertext and other values needed for later

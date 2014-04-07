@@ -1,5 +1,5 @@
 
-module BitVault::Bitcoin
+module BitVault
 
   module Encodings
     extend self
@@ -13,12 +13,13 @@ module BitVault::Bitcoin
     end
 
     def base58(blob)
-      Bitcoin.encode_base58(self.hex(blob))
+      ::Bitcoin.encode_base58(self.hex(blob))
     end
 
     def decode_base58(string)
-      self.decode_hex(Bitcoin.decode_base58(string))
+      self.decode_hex(::Bitcoin.decode_base58(string))
     end
+
   end
 
 end

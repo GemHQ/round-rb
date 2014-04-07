@@ -2,6 +2,7 @@
 module BitVault::Bitcoin
 
   class Output
+    include BitVault::Encodings
 
     attr_accessor :metadata
     attr_reader :native, :transaction, :index, :value, :script
@@ -9,7 +10,7 @@ module BitVault::Bitcoin
     def initialize(options)
 
       if options[:transaction_hash]
-        @transaction_hash = Encodings.decode_base58(options[:transaction_hash])
+        @transaction_hash = decode_base58(options[:transaction_hash])
       elsif options[:transaction]
         @transaction = options[:transaction]
       end
@@ -47,7 +48,7 @@ module BitVault::Bitcoin
 
     def to_hash
       {
-        :transaction_hash => Encodings.base58(self.transaction_hash),
+        :transaction_hash => base58(self.transaction_hash),
         :index => self.index,
         :value => self.value,
         :script => self.script,
