@@ -43,4 +43,4 @@ module BitVault
 
 end
 
-require_relative "client/passphrase"
+require_relative "crypto"

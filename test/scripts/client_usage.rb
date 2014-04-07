@@ -5,26 +5,9 @@ require_relative "setup"
 
 include BitVault::Bitcoin::Encodings
 
-# colored output to make it easier to see structure
-def log(message, data)
-  if data.is_a? String
-    puts "#{message.yellow.underline} => #{data.dump.cyan}"
-  else
-    begin
-      puts "#{message.yellow.underline} => #{JSON.pretty_generate(data).cyan}"
-    rescue
-      puts "#{message.yellow.underline} => #{data.inspect.cyan}"
-    end
-  end
-  puts
-end
+PassphraseBox = BitVault::Crypto::PassphraseBox
+MultiWallet = BitVault::Bitcoin::MultiWallet
 
-#def log(message, data)
-  #puts "#{message} ---\n#{JSON.pretty_generate data}"
-  #puts
-#end
-
-#####
 
 BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
 client = BV.spawn
@@ -37,7 +20,8 @@ user = client.resources.users.create(
 )
 log "User", user
 
-# Tell the client about the authentication token
+# Supply the client with the token needed to authenticate further requests.
+
 client.context.api_token = user.api_token
 
 # Update a user attribute
@@ -46,25 +30,28 @@ updated = user.update(:first_name => "Matt")
 log "User updated", updated
 
 
+# Reset the authentication token.
+# This has no effect on the rest of this script because the API
+# is currently suppling mock data.
+
 reset = user.reset
 
 log "User reset", {:previous_token => user.api_token,
   :new_token => reset.api_token}
 
 
-# Application actions
+# Create an application
 
 application = user.applications.create(
-  :name => "bitcoin_emporium"
+  :name => "bitcoin_emporium",
+  :callback_url => "https://api.bitcoin-emporium.io/events"
 )
 
 log "Application", application
 
-# Verify that you can list applications
-list = user.applications.list
-
-# Verify that you can retrieve the application
-application = application.get
+# List and retrieve applications
+log "Application list", user.applications.list
+log "Retrieved application", application.get
 
 updated = application.update(:name => "bitcoin_extravaganza")
 
@@ -79,57 +66,36 @@ result = application.delete
 log "Application delete response status", result.response.status
 
 
-
-
-
-
 # Generate a MultiWallet with random seeds
-client_wallet = BitVault::Bitcoin::MultiWallet.generate [:primary, :backup]
-
-# Derive a secret key from a passphrase
-passphrase = BitVault::Client::Passphrase.new "this is not a secure passphrase"
-key, salt = passphrase.key, passphrase.salt
-
-# Encrypt the primary seed with the secret key
-nonce = RbNaCl::Random.random_bytes(RbNaCl::SecretBox.nonce_bytes)
+client_wallet = MultiWallet.generate [:primary, :backup]
 primary_seed = client_wallet.trees[:primary].to_serialized_address(:private)
-ciphertext = RbNaCl::SecretBox.new(key).encrypt(nonce, primary_seed)
 
+# Encrypt the primary seed using a [key derived from a] passphrase.
+passphrase = "this is not a secure passphrase"
+encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
 
 wallet = user.wallets.create(
   :name => "my favorite wallet",
   :network => "bitcoin_testnet",
   :backup_address => client_wallet.trees[:backup].to_serialized_address,
   :primary_address => client_wallet.trees[:primary].to_serialized_address,
-  :primary_seed => {
-    :passphrase_salt => base58(salt),
-    :cipher_nonce => base58(nonce),
-    :ciphertext => base58(ciphertext),
-  }
+  :primary_seed => encrypted_seed
 )
 
 log "Wallet", wallet
 
 client_wallet.import :cosigner => wallet.cosigner_address
 
-# Use the values returned by the server to construct the wallet,
+# Use the server's response data to construct the wallet,
 # because it's presently serving canned values.
-
-passphrase = "wrong pony generator brad"
-salt = decode_base58(wallet.primary_seed.passphrase_salt)
-key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(
-  passphrase, salt,
-  10_000, # number of iterations
-  32      # key length in bytes
+primary_seed = PassphraseBox.decrypt(
+  "wrong pony generator brad", wallet.primary_seed
 )
-nonce = decode_base58(wallet.primary_seed.cipher_nonce)
-ciphertext = decode_base58(wallet.primary_seed.ciphertext)
-primary_seed = RbNaCl::SecretBox.new(key).decrypt(nonce, ciphertext)
 
 
 
-client_wallet = BitVault::Bitcoin::MultiWallet.new(
-  :full => {
+client_wallet = MultiWallet.new(
+  :private => {
     :primary => primary_seed
   },
   :public => {
@@ -168,15 +134,15 @@ log "Payment address", incoming_address
 
 # Request a payment to someone else's address
 
-other_key = Bitcoin::Key.new
-other_key.generate
-other_address = other_key.addr
+payee = Bitcoin::Key.new
+payee.generate
+payee_address = payee.addr
 
 unsigned_payment = account.payments.create(
   :outputs => [
     {
       :amount => 600_000,
-      :payee => {:address => other_address}
+      :payee => {:address => payee_address}
     }
   ]
 )
