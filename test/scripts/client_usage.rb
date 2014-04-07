@@ -42,21 +42,51 @@ user = users.create(
 
 log "User", user
 
-# Supply the client with the authentication credential
 
-client.context.api_token = user.api_token
+# Supply the client with the user password, required to operate
+# on the user and its applications.
+client.context.password = "incredibly secure"
 
 # The create action returned a User Resource which has:
 #
 # * action methods (get, update, reset)
 # * attributes (email, first_name, etc.)
-# * associated resources (wallets, applications)
+# * associated resources (applications)
 
 
 # Update some attributes for the user
 
 user = user.update(:first_name => "Matt")
 log "User updated", user
+
+
+# Create an application
+
+application = user.applications.create(
+  :name => "bitcoin_emporium",
+  :callback_url => "https://api.bitcoin-emporium.io/events"
+)
+
+log "Application", application
+
+# Supply the client with the authentication credential
+client.context.api_token = application.api_token
+
+# List and retrieve applications
+log "Application list", user.applications.list
+log "Retrieved application", application.get
+
+updated = application.update(:name => "bitcoin_extravaganza")
+
+reset = application.reset
+
+log "Application reset", {:previous_token => application.api_token,
+  :new_token => reset.api_token}
+
+# At time of writing, the server is using mocked data, so this
+# doesn't actually delete anything.
+result = application.delete
+log "Application delete response status", result.response.status
 
 
 # A MultiWallet encapsulates any number of hierarchical deterministic
@@ -84,7 +114,7 @@ primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
 passphrase = "wrong pony generator brad"
 encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
 
-wallet = user.wallets.create(
+wallet = application.wallets.create(
   :name => "my favorite wallet",
   :network => "bitcoin_testnet",
   :backup_address => new_wallet.trees[:backup].to_serialized_address,
@@ -109,7 +139,7 @@ client_wallet = MultiWallet.new(
   }
 )
 
-log "Wallet list", user.wallets.list
+log "Wallet list", application.wallets.list
 
 # Prove that you can retrieve and use the newly created wallet
 wallet = wallet.get
@@ -171,31 +201,6 @@ signed_payment = unsigned_payment.sign(
 
 log "Signed payment", signed_payment
 
-
-# Create an application
-
-application = user.applications.create(
-  :name => "bitcoin_emporium",
-  :callback_url => "https://api.bitcoin-emporium.io/events"
-)
-
-log "Application", application
-
-# List and retrieve applications
-log "Application list", user.applications.list
-log "Retrieved application", application.get
-
-updated = application.update(:name => "bitcoin_extravaganza")
-
-reset = application.reset
-
-log "Application reset", {:previous_token => application.api_token,
-  :new_token => reset.api_token}
-
-# At time of writing, the server is using mocked data, so this
-# doesn't actually delete anything.
-result = application.delete
-log "Application delete response status", result.response.status
 
 
 exit

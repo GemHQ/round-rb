@@ -19,7 +19,7 @@ module BitVault
     # other purposes.  It will be used in Patchboard#spawn, which
     # returns a "sub-client".
     class Context
-      attr_writer :api_token
+      attr_writer :password, :api_token
 
       # Provided with the authentication scheme for an Authorization
       # header, the resource instance on which an action is being called,
@@ -30,7 +30,12 @@ module BitVault
       # fancy with the authorizer.  More advanced applications, though,
       # can reflect on the arguments to do very granular authorization.
       def authorizer(scheme, resource, action)
-        @api_token
+        case scheme
+        when "Basic"
+          @password
+        when "BitVault-Token"
+          @api_token
+        end
       end
 
       def inspect
