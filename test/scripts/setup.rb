@@ -1,5 +1,8 @@
 require_relative "../setup"
 
+require "term/ansicolor"
+String.send :include, Term::ANSIColor
+
 # colored output to make it easier to see structure
 def log(message, data)
   if data.is_a? String

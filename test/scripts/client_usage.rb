@@ -1,6 +1,3 @@
-require "term/ansicolor"
-String.send :include, Term::ANSIColor
-
 require_relative "setup"
 
 include BitVault::Encodings
@@ -56,7 +53,9 @@ log "User", user
 client = BV.spawn
 
 # Supply the client with the user password, required to manage the user
-# and its applications.
+# and its applications.  The context class used here determines which
+# credential to use based on the authorization scheme.
+
 client.context.password = "incredibly secure"
 
 # Retrieve the user resource
