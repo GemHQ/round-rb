@@ -9,7 +9,7 @@ PassphraseBox = BitVault::Crypto::PassphraseBox
 MultiWallet = BitVault::Bitcoin::MultiWallet
 
 
-# API discovery:
+## API discovery
 #
 # The BitVault server provides a JSON description of its API that allows
 # the client to generate all necessary resource classes at runtime.
@@ -21,17 +21,19 @@ MultiWallet = BitVault::Bitcoin::MultiWallet
 
 BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
 
-# Create a "sub-client" with its own context
+## Create a "sub-client" with its own context
+
 client = BV.spawn
 
+
+# Create a user
+#
 # The objects in `client.resources` are resource instances created at
 # discovery-time.  Each has action methods defined based on the JSON
 # API definition.  Action methods perform the actual HTTP requests
 # and wrap the results in further resource instances when appropriate.
 
 users = client.resources.users
-
-# Create a user
 
 user = users.create(
   :email => "matthew@bitvault.io",
@@ -49,8 +51,8 @@ log "User", user
 # * associated resources (applications)
 
 
+## Simulate a later session
 
-# Simulate a later session
 client = BV.spawn
 
 # Supply the client with the user password, required to manage the user
@@ -62,13 +64,15 @@ client.context.password = "incredibly secure"
 user = client.resources.user(user.url).get
 
 
-# Update some attributes for the user
+## Update some attributes for the user
 
 user = user.update(:first_name => "Matt")
 log "User updated", user
 
 
-# Create an application.  Wallets belong to applications, not directly
+## Create an application.
+#
+# Wallets belong to applications, not directly
 # to users. The optional callback_url attribute specifies a URL where BitVault
 # can POST event information such as confirmed transactions.
 
@@ -92,6 +96,9 @@ log "Retrieved application", application.get
 
 updated = application.update(:name => "bitcoin_extravaganza")
 
+
+## Reset or delete the application
+#
 # At time of writing, the server is using mocked data, so these actions
 # do not affect the rest of the script.
 
@@ -106,6 +113,8 @@ result = application.delete
 log "Application delete response status", result.response.status
 
 
+## Generate a MultiWallet with random seeds
+#
 # A MultiWallet encapsulates any number of hierarchical deterministic
 # wallet trees (BIP 32).  Some of the trees may be public-key only.
 #
@@ -121,13 +130,12 @@ log "Application delete response status", result.response.status
 # two signatures.  Under normal circumstances, these signatures will be
 # derived from the primary and cosigner trees.
 
-
-# Generate a MultiWallet with random seeds
-
 new_wallet = MultiWallet.generate [:primary, :backup]
 primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
 
-# Encrypt the primary seed using a [key derived from a] passphrase.
+
+## Encrypt the primary seed using a passphrase-derived key
+
 passphrase = "wrong pony generator brad"
 encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
 
@@ -141,9 +149,12 @@ wallet = application.wallets.create(
 
 log "Wallet", wallet
 
-# Use the server's response data to construct a MultiWallet, as
-# would be done in any subsequent interactions.  It will be
-# used later in this script to verify and sign a transaction.
+
+## Use the server's response data to construct a MultiWallet
+#
+# This models what an application would do in any subsequent interactions.
+# The MultiWallet will be used later in this script to verify and sign a
+# transaction.
 
 primary_seed = PassphraseBox.decrypt(passphrase, wallet.primary_seed)
 client_wallet = MultiWallet.new(
@@ -158,30 +169,32 @@ client_wallet = MultiWallet.new(
 
 log "Wallet list", application.wallets.list
 
-# Prove that you can retrieve and use the newly created wallet for
-# further actions.
+
+## Retrieve and use the newly created wallet for further actions.
+
 wallet = wallet.get
 
 
+## Create an account within a wallet
+#
 # Wallets can have multiple accounts, each represented by a path in the
 # MultiWallet's deterministic trees.
-
-# Create an account within a wallet
 
 account = wallet.accounts.create :name => "office supplies"
 
 log "Account", account
 log "Account list", wallet.accounts.list
 
-# Prove you can retrieve and use the newly created account
+## Prove you can retrieve and use the newly created account
 account = account.get
 
 
 log "Account updated", account.update(:name => "rubber bands")
 
 
-# Generate an address where others can send payments.  This is a
-# BIP 16 "Pay to Script Hash" address, where the script in question
+## Generate an address where others can send payments.
+#
+# This is a BIP 16 "Pay to Script Hash" address, where the script in question
 # is a BIP 11 "multisig".
 
 incoming_address = account.addresses.create
@@ -189,7 +202,7 @@ incoming_address = account.addresses.create
 log "Payment address", incoming_address
 
 
-# Request a payment of bitcoins from this account to someone else's address.
+## Request a payment of bitcoins from this account to someone else's address.
 
 payee = Bitcoin::Key.new
 payee.generate
@@ -206,6 +219,8 @@ unsigned_payment = account.payments.create(
 
 log "Unsigned payment", unsigned_payment
 
+## Reconstruct the transaction for signing.
+#
 # The unsigned payment record contains all the information needed for the
 # client to reconstruct and sign the Bitcoin transaction without needing to
 # search the blockchain for the inputs' previous transactions.  For the
@@ -229,16 +244,39 @@ log "Unsigned payment", unsigned_payment
 # the only result of this would be to grant an exorbitant transaction fee to
 # whichever miner solves the next block.
 
-
-# Reconstruct the transaction for signing.
-
 transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
+
+
+## Sign the transaction inputs
+#
+# Transaction inputs are really references to the outputs of previous
+# transactions.  All bitcoins belonging to a BitVault account were paid
+# to P2SH-Multisig addresses generated by the three-tree MultiWallet
+# described earlier.  Thus the client must know the wallet path used
+# to generate the address for each previous output.  We include this
+# in the output metadata supplied as a part of each transaction input.
+#
+# Given an input and the corresponding wallet path, the client selects
+# the correct "primary" private key and signs the input.
 
 signatures = transaction.inputs.map do |input|
   path = input.output.metadata.wallet_path
   node = client_wallet.path(path)
   signature = base58(node.sign(:primary, input.binary_sig_hash))
 end
+
+## Send the input signatures back to the server
+#
+# When the server receives the signatures for a transaction, it will verify
+# them and check which of the MultiWallet private keys was used for each.
+# We expect the "primary" key to be used for all normal transactions;
+# when the "backup" key is used, we take that as a signal that something
+# has gone wrong, and we impose account restrictions until we have
+# communicated with the wallet owner.
+#
+# After verifying all the input signatures, the server signs each with its
+# own private "cosigner" keys, relays the transaction to the network,
+# then sends the fully signed transaction record back to the client.
 
 signed_payment = unsigned_payment.sign(
   :transaction_hash => transaction.base58_hash,
@@ -247,12 +285,11 @@ signed_payment = unsigned_payment.sign(
 
 log "Signed payment", signed_payment
 
+# The client will then be able to check the confirmation status of the signed
+# payment.  Exact API to be determined.  To mitigate the need for polling, the
+# service will post transaction statuses to the application's callback_url,
+# if supplied.
 
-
-exit
-# verify that the signed transaction has correct script_sigs
-signed_transaction = BitVault::Bitcoin::Transaction.data(signed_payment)
-signed_transaction.validate_signatures # vaporware
 
 
 
