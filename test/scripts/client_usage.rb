@@ -42,16 +42,24 @@ user = users.create(
 
 log "User", user
 
-
-# Supply the client with the user password, required to operate
-# on the user and its applications.
-client.context.password = "incredibly secure"
-
 # The create action returned a User Resource which has:
 #
 # * action methods (get, update, reset)
 # * attributes (email, first_name, etc.)
 # * associated resources (applications)
+
+
+
+# Simulate a later session
+client = BV.spawn
+
+# Supply the client with the user password, required to manage the user
+# and its applications.
+client.context.password = "incredibly secure"
+
+# Retrieve the user resource
+
+user = client.resources.user(user.url).get
 
 
 # Update some attributes for the user
@@ -60,7 +68,9 @@ user = user.update(:first_name => "Matt")
 log "User updated", user
 
 
-# Create an application
+# Create an application.  Wallets belong to applications, not directly
+# to users. The optional callback_url attribute specifies a URL where BitVault
+# can POST event information such as confirmed transactions.
 
 application = user.applications.create(
   :name => "bitcoin_emporium",
@@ -68,6 +78,10 @@ application = user.applications.create(
 )
 
 log "Application", application
+
+# Applications use API tokens for authentication, rather than
+# requiring the user password.  Tokens can be reset easily,
+# password resets pose a major inconvenience to the user.
 
 # Supply the client with the authentication credential
 client.context.api_token = application.api_token
@@ -78,13 +92,16 @@ log "Retrieved application", application.get
 
 updated = application.update(:name => "bitcoin_extravaganza")
 
+# At time of writing, the server is using mocked data, so these actions
+# do not affect the rest of the script.
+
 reset = application.reset
 
-log "Application reset", {:previous_token => application.api_token,
-  :new_token => reset.api_token}
+log "Application reset", {
+  :previous_token => application.api_token,
+  :new_token => reset.api_token
+}
 
-# At time of writing, the server is using mocked data, so this
-# doesn't actually delete anything.
 result = application.delete
 log "Application delete response status", result.response.status
 
@@ -141,7 +158,8 @@ client_wallet = MultiWallet.new(
 
 log "Wallet list", application.wallets.list
 
-# Prove that you can retrieve and use the newly created wallet
+# Prove that you can retrieve and use the newly created wallet for
+# further actions.
 wallet = wallet.get
 
 
@@ -162,13 +180,16 @@ account = account.get
 log "Account updated", account.update(:name => "rubber bands")
 
 
+# Generate an address where others can send payments.  This is a
+# BIP 16 "Pay to Script Hash" address, where the script in question
+# is a BIP 11 "multisig".
 
-# Generate an address for others to send payments to 
 incoming_address = account.addresses.create
 
 log "Payment address", incoming_address
 
-# Request a payment to someone else's address
+
+# Request a payment of bitcoins from this account to someone else's address.
 
 payee = Bitcoin::Key.new
 payee.generate
@@ -184,9 +205,34 @@ unsigned_payment = account.payments.create(
 )
 
 log "Unsigned payment", unsigned_payment
-transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
-#log "Reconstructed tx", transaction
 
+# The unsigned payment record contains all the information needed for the
+# client to reconstruct and sign the Bitcoin transaction without needing to
+# search the blockchain for the inputs' previous transactions.  For the
+# highest achievable level of security, of course, clients must search an
+# independently maintained blockchain for the previous transactions.
+#
+# In practice, some users may not judge this to be necessary.  So long as the 
+# client verifies all the output addresses and values are correct, the
+# multiple-signature approach makes it impossible for a cosigning service to
+# steal bitcoins by this approach.
+#
+# The only realistic attack by the cosigning
+# service would be to falsify the values of the inputs, which cannot plausibly
+# benefit the service.  If the selected inputs do not contain enough bitcoin
+# to fund the transaction, nothing happens except a waste of everybody's time;
+# the transaction is invalid and the Bitcoin network will reject it.
+#
+# If the selected outputs contain more substantially bitcoin than required to
+# fund the transaction, the service could report lower values, then calculate
+# the amount to send to the change address based on the falsified inputs.  But
+# the only result of this would be to grant an exorbitant transaction fee to
+# whichever miner solves the next block.
+
+
+# Reconstruct the transaction for signing.
+
+transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
 
 signatures = transaction.inputs.map do |input|
   path = input.output.metadata.wallet_path
