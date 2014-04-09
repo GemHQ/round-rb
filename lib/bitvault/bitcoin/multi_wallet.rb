@@ -110,6 +110,22 @@ module BitVault::Bitcoin
       MultiNode.new(options)
     end
 
+    def valid_output?(output)
+      if path = output.metadata.wallet_path
+        node = self.path(path)
+        node.p2sh_script.to_s == output.script.to_s
+      else
+        true
+      end
+    end
+
+    def sign(transaction)
+      transaction.inputs.map do |input|
+        path = input.output.metadata.wallet_path
+        node = self.path(path)
+        node.signatures(input.binary_sig_hash)
+      end
+    end
 
   end
 
@@ -127,7 +143,7 @@ module BitVault::Bitcoin
       @public = options[:public]
 
       @private.each do |name, node|
-        key = Bitcoin::Key.new(node.private_key.to_hex)
+        key = Bitcoin::Key.new(node.private_key.to_hex, node.public_key.to_hex)
         @keys[name] = key
         @public_keys[name] = key
       end
@@ -137,15 +153,23 @@ module BitVault::Bitcoin
     end
 
     def script
+      @public_keys.each do |name, key|
+      end
+      keys = @public_keys.sort_by {|name, key| name }.map {|name, key| key.pub }
+
       blob = Builder.script do |s|
         s.type :multisig
-        s.recipient @m, *@public_keys.map {|name, key| key.pub }
+        s.recipient @m, *keys
       end
       Script.new(:blob => blob)
     end
 
     def p2sh_address
       self.script.p2sh_address
+    end
+
+    def p2sh_script
+      Script.new(:address => self.script.p2sh_address)
     end
 
     def sign(name, value)
@@ -155,7 +179,11 @@ module BitVault::Bitcoin
     end
 
     def signatures(value)
-      @keys.map {|name, key| self.sign(name, value)}
+      out = {}
+      @keys.each do |name, key|
+        out[name] = base58(self.sign(name, value))
+      end
+      out
     end
 
     def add_input(tx, options)

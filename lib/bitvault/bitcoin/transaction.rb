@@ -41,10 +41,7 @@ module BitVault::Bitcoin
       transaction = self.new
 
       outputs.each do |data|
-        transaction.add_output Output.new(
-          :value => data[:value],
-          :script => data[:script]
-        )
+        transaction.add_output Output.new(data)
       end
 
       # TODO: figure out a way to trigger sig_hash computation

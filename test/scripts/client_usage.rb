@@ -16,7 +16,8 @@ MultiWallet = BitVault::Bitcoin::MultiWallet
 # implements a method named `authorizer`, which must return a credential
 # for use in the HTTP Authorization headers.
 
-BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
+service_url = ARGV[0] || "http://localhost:8999/"
+BV = BitVault::Client.discover(service_url) { BitVault::Client::Context.new }
 
 ## Create a "sub-client" with its own context
 
@@ -255,14 +256,16 @@ transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
 # to generate the address for each previous output.  We include this
 # in the output metadata supplied as a part of each transaction input.
 #
+# We include the wallet path in the output for the change address, as well,
+# so that the client can verify the address belongs to the correct wallet.
+#
 # Given an input and the corresponding wallet path, the client selects
 # the correct "primary" private key and signs the input.
 
-signatures = transaction.inputs.map do |input|
-  path = input.output.metadata.wallet_path
-  node = client_wallet.path(path)
-  signature = base58(node.sign(:primary, input.binary_sig_hash))
+unless client_wallet.valid_output?(transaction.outputs.last)
+  raise "bad change address"
 end
+
 
 ## Send the input signatures back to the server
 #
@@ -279,10 +282,11 @@ end
 
 signed_payment = unsigned_payment.sign(
   :transaction_hash => transaction.base58_hash,
-  :signatures => signatures
+  :inputs => client_wallet.sign(transaction)
 )
 
 log "Signed payment", signed_payment
+
 
 # The client will then be able to check the confirmation status of the signed
 # payment.  Exact API to be determined.  To mitigate the need for polling, the
@@ -290,5 +294,42 @@ log "Signed payment", signed_payment
 # if supplied.
 
 
+## Transfer money between two accounts in the same wallet
 
+unsigned_transfer = wallet.transfers.create(
+  :value => 16_000,
+  :memo => "running low",
+  :source => "URL of source account goes here",
+  :destination => "URL of destination account goes here"
+)
+
+log "Unsigned transfer", unsigned_transfer
+
+## Reconstruct the transaction for signing
+
+transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
+
+unless client_wallet.valid_output?(transaction.inputs.first.output)
+  raise "bad destination address"
+end
+
+unless client_wallet.valid_output?(transaction.outputs.last)
+  raise "bad destination address"
+end
+
+
+signatures = transaction.inputs.map do |input|
+  path = input.output.metadata.wallet_path
+  node = client_wallet.path(path)
+  signature = base58(node.sign(:primary, input.binary_sig_hash))
+end
+
+
+exit
+signed_transfer = unsigned_transfer.sign(
+  :transaction_hash => transaction.base58_hash,
+  :inputs => client_wallet.sign(transaction)
+)
+
+log "Signed transfer", signed_transfer
 
