@@ -8,6 +8,9 @@ module BitVault
       include BitVault::Encodings
       extend BitVault::Encodings
 
+      # PBKDF2 work factor
+      ITERATIONS = 100_000
+
       # Given passphrase and plaintext as strings, returns a Hash
       # containing the ciphertext and other values needed for later
       # decryption.
@@ -22,17 +25,25 @@ module BitVault
       def self.decrypt(passphrase, hash)
         salt, nonce, ciphertext =
           hash.values_at(:salt, :nonce, :ciphertext).map {|s| decode_base58(s) }
-        box = self.new(passphrase, salt)
+        box = self.new(passphrase, salt, hash[:iterations])
         box.decrypt(nonce, ciphertext)
       end
 
       attr_reader :salt
 
-      def initialize(passphrase, salt=nil)
+      # Initialize with an existing salt and iterations to allow
+      # decryption.  Otherwise, creates new values for these, meaning
+      # it creates an entirely new secret-box.
+      def initialize(passphrase, salt=nil, iterations=nil)
         @salt = salt || RbNaCl::Random.random_bytes(16)
+        @iterations = iterations || ITERATIONS
+
         key = OpenSSL::PKCS5.pbkdf2_hmac_sha1(
           passphrase, @salt,
-          10_000, # number of iterations
+          # TODO: decide on a very safe work factor
+          # https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet
+          #
+          @iterations, # number of iterations
           32      # key length in bytes
         )
         @box = RbNaCl::SecretBox.new(key)
@@ -43,6 +54,7 @@ module BitVault
         ciphertext = @box.encrypt(nonce, plaintext)
         {
           :salt => base58(@salt),
+          :iterations => @iterations,
           :nonce => base58(nonce),
           :ciphertext => base58(ciphertext)
         }
