@@ -282,7 +282,7 @@ end
 
 signed_payment = unsigned_payment.sign(
   :transaction_hash => transaction.base58_hash,
-  :inputs => client_wallet.sign(transaction)
+  :inputs => client_wallet.signatures(transaction)
 )
 
 log "Signed payment", signed_payment
@@ -317,19 +317,13 @@ unless client_wallet.valid_output?(transaction.outputs.last)
   raise "bad destination address"
 end
 
-
-signatures = transaction.inputs.map do |input|
-  path = input.output.metadata.wallet_path
-  node = client_wallet.path(path)
-  signature = base58(node.sign(:primary, input.binary_sig_hash))
-end
-
+signatures = client_wallet.signatures(transaction)
 
 exit
-signed_transfer = unsigned_transfer.sign(
-  :transaction_hash => transaction.base58_hash,
-  :inputs => client_wallet.sign(transaction)
-)
+#signed_transfer = unsigned_transfer.sign(
+  #:transaction_hash => transaction.base58_hash,
+  #:inputs => client_wallet.sign(transaction)
+#)
 
 log "Signed transfer", signed_transfer
 
