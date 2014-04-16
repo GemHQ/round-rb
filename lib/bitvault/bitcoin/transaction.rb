@@ -102,8 +102,6 @@ module BitVault::Bitcoin
       self.update_native do |native|
         native.add_in input.native
       end
-      #input.sig_hash = self.sig_hash(input)
-      #input.binary_sig_hash = self.sig_hash(input)
     end
 
     def add_output(output)

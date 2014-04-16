@@ -191,10 +191,8 @@ module BitVault::Bitcoin
       out
     end
 
-    def p2sh_script_sig(*signatures)
-      multisig = Bitcoin::Script.to_multisig_script_sig(*signatures)
-      string = Script.new(:blob => multisig).to_s
-      Bitcoin::Script.binary_from_string("#{string} #{self.script.to_hex}")
+    def script_sig(signatures)
+      self.script.p2sh_sig(:signatures => signatures)
     end
 
   end

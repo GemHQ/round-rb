@@ -22,6 +22,8 @@ module BitVault::Bitcoin
           @blob = Bitcoin::Script.to_pubkey_script(public_key)
         elsif (keys = options[:public_keys]) && (needed = options[:needed])
           @blob = Bitcoin::Script.to_multisig_script(needed, *keys)
+        elsif signatures = options[:signatures]
+          @blob = Bitcoin::Script.to_multisig_script_sig(*signatures)
         else
           raise ArgumentError
         end
@@ -78,6 +80,11 @@ module BitVault::Bitcoin
 
     def p2sh_address
       Bitcoin.hash160_to_p2sh_address(self.hash160)
+    end
+
+    def p2sh_sig(options)
+      string = Script.new(options).to_s
+      Bitcoin::Script.binary_from_string("#{string} #{self.to_hex}")
     end
 
   end
