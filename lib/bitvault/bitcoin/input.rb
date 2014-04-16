@@ -19,18 +19,20 @@ module BitVault::Bitcoin
 
   end
 
+
   class Input
     include BitVault::Encodings
 
     attr_reader :native, :output, :binary_sig_hash,
       :signatures, :sig_hash, :script_sig
 
-    def initialize(output)
+    def initialize(output, options={})
       @native = Bitcoin::Protocol::TxIn.new
       @output = output
 
       @native.prev_out = @output.transaction_hash
       @native.prev_out_index = @output.index
+
       @signatures = []
     end
 

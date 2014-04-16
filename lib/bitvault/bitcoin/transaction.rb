@@ -17,6 +17,7 @@ module BitVault::Bitcoin
 
     def self.native(tx)
       transaction = self.new()
+      # TODO: reconsider use of instance_eval
       transaction.instance_eval do
         @native = tx
         tx.inputs.each_with_index do |input, i|
@@ -69,6 +70,16 @@ module BitVault::Bitcoin
     def update_native
       yield @native if block_given?
       @native = Bitcoin::Protocol::Tx.new(@native.to_payload)
+      @inputs.each_with_index do |input, i|
+        native = @native.inputs[i]
+        # Using instance_eval here because I really don't want to expose
+        # Input#native=.  As we consume more and more of the native
+        # functionality, we can dispense with such ugliness.
+        input.instance_eval do
+          @native = native
+        end
+        # TODO: is this re-nativization necessary for outputs, too?
+      end
     end
 
     def validate
@@ -92,7 +103,7 @@ module BitVault::Bitcoin
         native.add_in input.native
       end
       #input.sig_hash = self.sig_hash(input)
-      input.binary_sig_hash = self.sig_hash(input)
+      #input.binary_sig_hash = self.sig_hash(input)
     end
 
     def add_output(output)
@@ -149,9 +160,6 @@ module BitVault::Bitcoin
       @native.signature_hash_for_input(
         prev_out.index, nil, script.to_blob
       )
-    end
-
-    def sign(signer)
     end
 
   end
