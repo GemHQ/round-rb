@@ -19,9 +19,9 @@ module BitVault::Bitcoin
         if address = options[:address]
           @blob = Bitcoin::Script.to_address_script(address)
         elsif public_key = options[:public_key]
-          @blob = Bitcoin::Script.to_pubkey_script(address)
-        elsif public_keys = options[:public_keys]
-          @blob = Bitcoin::Script.to_multisig_script(address)
+          @blob = Bitcoin::Script.to_pubkey_script(public_key)
+        elsif (keys = options[:public_keys]) && (needed = options[:needed])
+          @blob = Bitcoin::Script.to_multisig_script(needed, *keys)
         else
           raise ArgumentError
         end
@@ -47,8 +47,11 @@ module BitVault::Bitcoin
     alias_method :to_binary, :to_blob
 
     def type
-      if self.native.type == :hash160
-        :address
+      case self.native.type
+      when :hash160
+        :pubkey_hash
+      when :p2sh
+        :script_hash
       else
         self.native.type
       end

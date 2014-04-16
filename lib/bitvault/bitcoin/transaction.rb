@@ -139,14 +139,19 @@ module BitVault::Bitcoin
       }
     end
 
-    def sig_hash(input)
+    def sig_hash(input, script=nil)
       # NOTE: we only allow SIGHASH_ALL at this time
       # https://en.bitcoin.it/wiki/OP_CHECKSIG#Hashtype_SIGHASH_ALL_.28default.29
+
       prev_out = input.output
+      script ||= prev_out.script
+
       @native.signature_hash_for_input(
-        # BUG to use that script value
-        prev_out.index, nil, prev_out.script.to_blob
+        prev_out.index, nil, script.to_blob
       )
+    end
+
+    def sign(signer)
     end
 
   end

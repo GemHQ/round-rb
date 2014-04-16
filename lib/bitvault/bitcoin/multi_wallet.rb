@@ -121,7 +121,16 @@ module BitVault::Bitcoin
 
     def sign(transaction)
       transaction.inputs.map do |input|
-        path = input.output.metadata.wallet_path
+        path = input.output.metadata[:wallet_path]
+        node = self.path(path)
+        sig_hash = transaction.sig_hash(input, node.script)
+        node.signatures(sig_hash)
+      end
+    end
+
+    def signatures(transaction)
+      transaction.inputs.map do |input|
+        path = input.output.metadata[:wallet_path]
         node = self.path(path)
         node.signatures(input.binary_sig_hash)
       end
@@ -133,6 +142,7 @@ module BitVault::Bitcoin
 
     attr_reader :path, :keys, :public_keys
     def initialize(options)
+      # m of n 
       # TODO: take @m from the options
       @m = 2
       @path = options[:path]
@@ -153,15 +163,8 @@ module BitVault::Bitcoin
     end
 
     def script
-      @public_keys.each do |name, key|
-      end
       keys = @public_keys.sort_by {|name, key| name }.map {|name, key| key.pub }
-
-      blob = Builder.script do |s|
-        s.type :multisig
-        s.recipient @m, *keys
-      end
-      Script.new(:blob => blob)
+      Script.new(:public_keys => keys, :needed => @m)
     end
 
     def p2sh_address
@@ -186,17 +189,17 @@ module BitVault::Bitcoin
       out
     end
 
-    def add_input(tx, options)
-      txin = Bitcoin::Protocol::TxIn.new
-      prev_tx = options[:prev]
-      index = options[:index]
-      txin.prev_out = prev_tx.binary_hash
-      txin.prev_out_index = index
-      tx.add_in txin
+    #def add_input(tx, options)
+      #txin = Bitcoin::Protocol::TxIn.new
+      #prev_tx = options[:prev]
+      #index = options[:index]
+      #txin.prev_out = prev_tx.binary_hash
+      #txin.prev_out_index = index
+      #tx.add_in txin
 
-      txin.sig_hash = tx.signature_hash_for_input(index, nil, self.script.to_blob)
-      txin
-    end
+      #txin.sig_hash = tx.signature_hash_for_input(index, nil, self.script.to_blob)
+      #txin
+    #end
 
     def p2sh_script_sig(*signatures)
       multisig = Bitcoin::Script.to_multisig_script_sig(*signatures)
