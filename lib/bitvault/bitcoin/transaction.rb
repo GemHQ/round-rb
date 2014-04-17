@@ -33,6 +33,10 @@ module BitVault::Bitcoin
         end
       end
 
+      report = transaction.validate_syntax
+      unless report[:valid] == true
+        raise "Invalid syntax:  #{report[:errors].to_json}"
+      end
       transaction
     end
 
@@ -82,11 +86,24 @@ module BitVault::Bitcoin
       end
     end
 
-    def validate
+    def validate_syntax
       update_native
       validator = Bitcoin::Validation::Tx.new(@native, nil)
       valid = validator.validate :rules => [:syntax]
       {:valid => valid, :error => validator.error}
+    end
+
+    def validate_inputs
+      bad_inputs = []
+      valid = true
+      @inputs.each_with_index do |input, index|
+        # TODO: confirm whether we need to mess with the block_timestamp arg
+         unless self.native.verify_input_signature(index, input.output.transaction.native)
+           valid = false
+           bad_inputs << index
+         end
+      end
+      {:valid => valid, :inputs => bad_inputs}
     end
 
     def add_input(arg)
@@ -160,8 +177,13 @@ module BitVault::Bitcoin
       )
     end
 
-
     def set_script_sigs(*input_args, &block)
+      # No sense trying to authorize when the transaction isn't usable.
+      report = validate_syntax
+      unless report[:valid] == true
+        raise "Invalid syntax:  #{report[:errors].to_json}"
+      end
+      
       # Array#zip here allows us to iterate over the inputs in lockstep with any
       # number of sets of signatures.
       self.inputs.zip(*input_args) do |input, *input_arg|
