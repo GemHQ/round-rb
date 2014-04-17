@@ -26,6 +26,7 @@ module BitVault::Bitcoin
     attr_reader :native, :output, :binary_sig_hash,
       :signatures, :sig_hash, :script_sig
 
+    # TODO: change init args to be a single options Hash, as with Output.
     def initialize(output, options={})
       @native = Bitcoin::Protocol::TxIn.new
       @output = output

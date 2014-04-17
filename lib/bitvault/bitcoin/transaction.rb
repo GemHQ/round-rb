@@ -21,6 +21,9 @@ module BitVault::Bitcoin
       transaction.instance_eval do
         @native = tx
         tx.inputs.each_with_index do |input, i|
+          # We use SparseInput because it does not require the retrieval
+          # of the previous output.  Its functionality should probably be
+          # folded into the Input class.
           @inputs << SparseInput.new(input.prev_out, input.prev_out_index)
         end
         tx.outputs.each_with_index do |output, i|
@@ -93,15 +96,15 @@ module BitVault::Bitcoin
       {:valid => valid, :error => validator.error}
     end
 
-    def validate_inputs
+    def validate_script_sigs
       bad_inputs = []
       valid = true
       @inputs.each_with_index do |input, index|
         # TODO: confirm whether we need to mess with the block_timestamp arg
-         unless self.native.verify_input_signature(index, input.output.transaction.native)
-           valid = false
-           bad_inputs << index
-         end
+        unless self.native.verify_input_signature(index, input.output.transaction.native)
+          valid = false
+          bad_inputs << index
+        end
       end
       {:valid => valid, :inputs => bad_inputs}
     end
@@ -172,9 +175,7 @@ module BitVault::Bitcoin
       prev_out = input.output
       script ||= prev_out.script
 
-      @native.signature_hash_for_input(
-        prev_out.index, nil, script.to_blob
-      )
+      @native.signature_hash_for_input(prev_out.index, nil, script.to_blob)
     end
 
     def set_script_sigs(*input_args, &block)
