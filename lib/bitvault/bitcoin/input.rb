@@ -52,6 +52,8 @@ module BitVault::Bitcoin
       {
         :output => self.output,
         :signatures => self.signatures.map {|b| base58(b) },
+        # FIXME: we're probably not going to actually use
+        # sig_hash in real life.  It should be computed, not stored.
         :sig_hash => self.sig_hash || "",
         :script_sig => self.script_sig || ""
       }.to_json(*a)

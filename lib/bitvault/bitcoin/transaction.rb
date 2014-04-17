@@ -160,6 +160,16 @@ module BitVault::Bitcoin
       )
     end
 
+
+    def set_script_sigs(*input_args, &block)
+      # Array#zip here allows us to iterate over the inputs in lockstep with any
+      # number of sets of signatures.
+      self.inputs.zip(*input_args) do |input, *input_arg|
+        input.script_sig = yield input, *input_arg
+      end
+    end
+
+
   end
 
 end

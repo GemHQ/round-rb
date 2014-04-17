@@ -128,6 +128,9 @@ module BitVault::Bitcoin
       end
     end
 
+    # Takes a Transaction ready to be signed.
+    #
+    # Returns an Array of signature dictionaries.
     def signatures(transaction)
       transaction.inputs.map do |input|
         path = input.output.metadata[:wallet_path]
@@ -135,6 +138,42 @@ module BitVault::Bitcoin
         sig_hash = transaction.sig_hash(input, node.script)
         node.signatures(sig_hash)
       end
+    end
+
+
+    # Takes a Transaction and any number of Arrays of signature dictionaries.
+    # Each sig_dict in an Array corresponds to the Input with the same index.
+    #
+    # Uses the combined signatures from all the signers to generate and set
+    # the script_sig for each Input.
+    #
+    # Returns the transaction.
+    def authorize(transaction, *signers)
+      transaction.set_script_sigs *signers do |input, *sig_dicts|
+        node = self.path(input.output.metadata[:wallet_path])
+        signatures = combine_signatures(*sig_dicts)
+        node.script_sig(signatures)
+      end
+      transaction
+    end
+
+    # Takes any number of "signature dictionaries", which are Hashes where
+    # the keys are tree names, and the values are base58-encoded signatures
+    # for a single input.
+    #
+    # Returns an Array of the signatures in binary, sorted by their tree names.
+    def combine_signatures(*sig_dicts)
+      combined = {}
+      sig_dicts.each do |sig_dict|
+        sig_dict.each do |tree, signature|
+          combined[tree] = decode_base58(signature)
+        end
+      end
+
+      # Order of signatures is important for validation, so we always
+      # sort public keys and signatures by the name of the tree
+      # they belong to.
+      combined.sort_by { |tree, value| tree }.map { |tree, sig| sig }
     end
 
   end
