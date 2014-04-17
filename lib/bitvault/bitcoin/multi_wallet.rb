@@ -21,18 +21,18 @@ module BitVault::Bitcoin
     attr_reader :trees
 
     def initialize(options)
-      @full_trees = {}
+      @private_trees = {}
       @public_trees = {}
       @trees = {}
-      full_trees = options[:private]
+      private_trees = options[:private]
 
-      if !full_trees
+      if !private_trees
         raise "Must supply :private"
       end
 
-      full_trees.each do |name, arg|
+      private_trees.each do |name, arg|
         name = name.to_sym
-        @full_trees[name] = @trees[name] = self.get_node(arg)
+        @private_trees[name] = @trees[name] = self.get_node(arg)
       end
 
       if public_trees = options[:public]
@@ -46,7 +46,7 @@ module BitVault::Bitcoin
     def drop(*names)
       names = names.map(&:to_sym)
       options = {:private => {}, :public => {}}
-      @full_trees.each do |name, node|
+      @private_trees.each do |name, node|
         unless names.include?(name.to_sym)
           options[:private][name] = node
         end
@@ -62,7 +62,7 @@ module BitVault::Bitcoin
     def drop_private(*names)
       names.each do |name|
         name = name.to_sym
-        tree = @full_trees.delete(name)
+        tree = @private_trees.delete(name)
         address = tree.to_serialized_address
         @public_trees[name] = MoneyTree::Master.from_serialized_address(address)
       end
@@ -72,7 +72,7 @@ module BitVault::Bitcoin
       addresses.each do |name, address|
         node = MoneyTree::Master.from_serialized_address(address)
         if node.private_key
-          @full_trees[name] = node
+          @private_trees[name] = node
         else
           @public_trees[name] = node
         end
@@ -80,13 +80,13 @@ module BitVault::Bitcoin
     end
 
     def private_address(name)
-      raise "No such node: ''" unless (node = @full_trees[name.to_sym])
+      raise "No such node: ''" unless (node = @private_trees[name.to_sym])
       node.to_serialized_address(:private)
     end
 
     def public_addresses
       out = {}
-      @full_trees.each do |name, node|
+      @private_trees.each do |name, node|
         out[name] = node.to_serialized_address
       end
       out
@@ -109,7 +109,7 @@ module BitVault::Bitcoin
         :private => {},
         :public => {}
       }
-      @full_trees.each do |name, node|
+      @private_trees.each do |name, node|
         options[:private][name] = node.node_for_path(path)
       end
       @public_trees.each do |name, node|
