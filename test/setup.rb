@@ -4,6 +4,8 @@ project_root = File.expand_path("#{File.dirname(__FILE__)}/../")
 $:.unshift "#{project_root}/lib"
 #$:.unshift "#{project_root}/../bitcoin-ruby/lib"
 
+$:.unshift "#{project_root}/../patchboard-rb/lib"
+
 
 
 require "bitvault"

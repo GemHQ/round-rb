@@ -319,11 +319,30 @@ end
 
 signatures = client_wallet.signatures(transaction)
 
-exit
-#signed_transfer = unsigned_transfer.sign(
-  #:transaction_hash => transaction.base58_hash,
-  #:inputs => client_wallet.sign(transaction)
-#)
+signed_transfer = unsigned_transfer.sign(
+  :transaction_hash => transaction.base58_hash,
+  :inputs => client_wallet.signatures(transaction)
+)
 
 log "Signed transfer", signed_transfer
+
+# Signature verification doesn't work currently, because you need to have
+# the full previous output for each input, which requires querying the
+# blockchain in some manner.
+#
+#transaction = BitVault::Bitcoin::Transaction.data(signed_transfer)
+#pp transaction.validate_script_sigs
+
+## List the transactions for an account
+
+list = account.transactions.list
+
+log "Transactions list", list
+
+## Retrieve an individual transaction
+
+transaction = list[0].get
+
+log "Transaction get", transaction
+
 
