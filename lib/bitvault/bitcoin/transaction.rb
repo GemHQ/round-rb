@@ -9,6 +9,9 @@ module BitVault::Bitcoin
       self.native(native)
     end
 
+
+
+
     def self.build(&block)
       transaction = self.new
       yield transaction
@@ -46,23 +49,22 @@ module BitVault::Bitcoin
     def self.data(hash)
       version, lock_time, hash, inputs, outputs = 
         hash.values_at :version, :lock_time, :hash, :inputs, :outputs
+
       transaction = self.new
 
       outputs.each do |data|
         transaction.add_output Output.new(data)
       end
 
-      # TODO: figure out a way to trigger sig_hash computation
-      # at the right time so we don't have to add inputs after outputs.
-      inputs.each do |data|
-        output = Output.new(data[:output])
-        input = Input.new(output)
-        transaction.add_input input
-        # FIXME: verify that the supplied and computed sig_hashes match
+      #FIXME: we're not handling sig_scripts for already signed inputs.
+
+      inputs.each_with_index do |data, index|
+        transaction.add_input data[:output]
+
+        ## FIXME: verify that the supplied and computed sig_hashes match
         #puts :sig_hashes_match => (data[:sig_hash] == input.sig_hash)
       end
 
-      # TODO: validate transaction syntax
       transaction
     end
 
@@ -101,6 +103,7 @@ module BitVault::Bitcoin
       valid = true
       @inputs.each_with_index do |input, index|
         # TODO: confirm whether we need to mess with the block_timestamp arg
+        pp input.output.transaction
         unless self.native.verify_input_signature(index, input.output.transaction.native)
           valid = false
           bad_inputs << index
@@ -109,19 +112,30 @@ module BitVault::Bitcoin
       {:valid => valid, :inputs => bad_inputs}
     end
 
+    # Takes one of
+    #
+    # * an instance of Input
+    # * an instance of Output
+    # * a Hash describing an Output
+    #
     def add_input(arg)
       # TODO: allow specifying prev_tx and index with a Hash.
       # Possibly stop using SparseInput.
-      if arg.is_a? Output
-        input = Input.new(arg)
-      else
+      if arg.is_a? Input
         input = arg
+      else
+        input = Input.new(
+          :transaction => self,
+          :index => @inputs.size,
+          :output => arg
+        )
       end
 
       @inputs << input
       self.update_native do |native|
         native.add_in input.native
       end
+      input
     end
 
     def add_output(output)

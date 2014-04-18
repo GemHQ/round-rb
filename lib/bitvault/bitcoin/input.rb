@@ -27,9 +27,17 @@ module BitVault::Bitcoin
       :signatures, :sig_hash, :script_sig
 
     # TODO: change init args to be a single options Hash, as with Output.
-    def initialize(output, options={})
+    #def initialize(output, options={})
+    def initialize(options={})
+      @transaction, @index, @output =
+        options.values_at :transaction, :index, :output
+
+      unless @output.is_a? Output
+        @output = Output.new(@output)
+      end
+
       @native = Bitcoin::Protocol::TxIn.new
-      @output = output
+      #@output = output
 
       @native.prev_out = @output.transaction_hash
       @native.prev_out_index = @output.index
@@ -53,8 +61,6 @@ module BitVault::Bitcoin
       {
         :output => self.output,
         :signatures => self.signatures.map {|b| base58(b) },
-        # FIXME: we're probably not going to actually use
-        # sig_hash in real life.  It should be computed, not stored.
         :sig_hash => self.sig_hash || "",
         :script_sig => self.script_sig || ""
       }.to_json(*a)

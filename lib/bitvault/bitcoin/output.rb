@@ -7,8 +7,19 @@ module BitVault::Bitcoin
     attr_accessor :metadata
     attr_reader :native, :transaction, :index, :value, :script
 
+    # Takes a Hash with required keys:
+    #
+    # * either :transaction (an instance of Transaction)
+    #   or :transaction_hash (the base58-encoded hash of a Bitcoin transaction)
+    # * :index
+    # * :script
+    #
+    # optional keys:
+    #
+    # * :value
+    # * :metadata
+    # 
     def initialize(options)
-
       if options[:transaction_hash]
         @transaction_hash = decode_base58(options[:transaction_hash])
       elsif options[:transaction]

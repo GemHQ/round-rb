@@ -1,21 +1,3 @@
-# BitVault Ruby Client
-
-
-## Installation
-
-Required system dependencies are sqlite3 and libsodium.  On OS X, homebrew suffices.
-
-Developed against Ruby 2.1.x.  Rubygem dependencies can be installed by running `rake gem:deps`.
-
-
-To run the client usage script against an instance of the bitvault API
-
-    ruby test/scripts/client_usage.rb <api_url>
-
-
-## Bitcoin Wrappers
-
-```.rb
 require "bitvault/bitcoin"
 
 include BitVault::Bitcoin
@@ -55,10 +37,3 @@ puts JSON.pretty_generate(transaction)
 
 puts report = transaction.validate_syntax
 
-
-```
-
-
-
-
-## BitVault API Client
