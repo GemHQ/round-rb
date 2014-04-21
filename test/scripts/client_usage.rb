@@ -310,7 +310,7 @@ log "Unsigned transfer", unsigned_transfer
 transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
 
 unless client_wallet.valid_output?(transaction.inputs.first.output)
-  raise "bad destination address"
+  raise "bad source address"
 end
 
 unless client_wallet.valid_output?(transaction.outputs.last)
@@ -326,12 +326,21 @@ signed_transfer = unsigned_transfer.sign(
 
 log "Signed transfer", signed_transfer
 
-# Signature verification doesn't work currently, because you need to have
-# the full previous output for each input, which requires querying the
-# blockchain in some manner.
+# Because the client is not (yet) querying the block chain, it cannot
+# verify the input signatures.  When we implement block-chain querying,
+# transaction verification will look like this:
 #
-#transaction = BitVault::Bitcoin::Transaction.data(signed_transfer)
-#pp transaction.validate_script_sigs
+#   transaction = BitVault::Bitcoin::Transaction.data(signed_transfer)
+#   report = transaction.validate_script_sigs
+#   if report[:valid] == false
+#     pp report[:errors]
+#   end
+#
+# It is not strictly necessary for the client to verify the signatures.
+# The only rationale for doing so would be to detect an error in the
+# server's signatures.  Such an error would make the transaction invalid,
+# but would not put any bitcoin at risk.
+
 
 ## List the transactions for an account
 
