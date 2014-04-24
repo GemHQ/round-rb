@@ -5,7 +5,7 @@ module BitVault::Bitcoin
     include BitVault::Encodings
 
     attr_accessor :metadata
-    attr_reader :native, :transaction, :index, :value, :script
+    attr_reader :native, :transaction, :index, :value, :script, :address
 
     # Takes a Hash with required keys:
     #
@@ -22,13 +22,15 @@ module BitVault::Bitcoin
     def initialize(options)
       if options[:transaction_hash]
         @transaction_hash = decode_base58(options[:transaction_hash])
+      elsif options[:transaction_hex]
+        @transaction_hash = base58(decode_hex(options[:transaction_hex]))
       elsif options[:transaction]
         @transaction = options[:transaction]
       end
 
       # FIXME: be aware of string bitcoin values versus
       # integer satoshi values
-      @index, @value = options.values_at :index, :value
+      @index, @value, @address = options.values_at :index, :value, :address
       @metadata = options[:metadata] || {}
 
       if options[:script]
@@ -65,6 +67,7 @@ module BitVault::Bitcoin
         :index => self.index,
         :value => self.value,
         :script => self.script,
+        :address => self.address,
         :metadata => self.metadata
       }
     end

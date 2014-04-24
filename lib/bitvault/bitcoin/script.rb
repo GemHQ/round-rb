@@ -14,6 +14,8 @@ module BitVault::Bitcoin
         @blob = Bitcoin::Script.binary_from_string string
       elsif options[:blob]
         @blob = options[:blob]
+      elsif options[:hex]
+        @blob = decode_hex(options[:hex])
       # arguments for constructing
       else
         if address = options[:address]
