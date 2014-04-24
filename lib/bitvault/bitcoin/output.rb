@@ -26,6 +26,8 @@ module BitVault::Bitcoin
         @transaction = options[:transaction]
       end
 
+      # FIXME: be aware of string bitcoin values versus
+      # integer satoshi values
       @index, @value = options.values_at :index, :value
       @metadata = options[:metadata] || {}
 
