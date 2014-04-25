@@ -8,8 +8,7 @@ $:.unshift "#{project_root}/lib"
 #$LOAD_PATH.unshift "#{project_root}/../patchboard-rb/lib"
 
 
-
 require "bitvault"
 require_relative "helpers/mockchain.rb"
-require_relative "helpers/fixtures.rb"
+require_relative "helpers/bitcoin.rb"
 

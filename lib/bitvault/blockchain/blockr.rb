@@ -6,6 +6,7 @@ require_relative "../bitcoin"
 module BitVault
   module Blockchain
 
+    # Blockr.io API documentation:  http://blockr.io/documentation/api
     class Blockr
       include BitVault::Encodings
 
@@ -19,12 +20,13 @@ module BitVault
       end
 
       def unspent(addresses, confirmation_level=6)
-
         # TODO: should we impose a limit on the number of addresses?
         string = addresses.join(",")
         url = "#{@base_url}/address/unspent/#{string}"
 
         response = @http.request "GET", url, :response => :object
+        # FIXME:  rescue any JSON parsing exception and raise an
+        # exception explaining that it's blockr's fault.
         content = JSON.parse(response.body, :symbolize_names => true)
 
         if content[:status] != "success"
@@ -55,6 +57,9 @@ module BitVault
 
         outputs.sort_by {|output| -output.value }
       end
+
+
+      # Helper methods
 
       def bitcoins_to_satoshis(string)
         string.gsub(".", "").to_i

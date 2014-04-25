@@ -1,6 +1,6 @@
 module BitVaultTests
 
-  module Fixtures
+  module Bitcoin
 
     def mock_chain
       @mock_chain ||= BitVaultTests::Mockchain.new
@@ -14,6 +14,10 @@ module BitVaultTests
       end
     end
 
+    def multiwallet
+      MultiWallet.generate [:primary, :backup, :cosign]
+    end
+
     def address
       @address ||= keypair.addr
     end
@@ -25,3 +29,4 @@ module BitVaultTests
   end
 
 end
+

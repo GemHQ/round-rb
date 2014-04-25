@@ -15,7 +15,6 @@ describe "Blockr.io interface" do
       n4rYdFbkiLSTdQ3uWsG7C46nikJmHjvhuV
     ]
     puts JSON.pretty_generate(result)
-    #assert_equal result
   end
 
 end
