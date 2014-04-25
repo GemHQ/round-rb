@@ -21,6 +21,7 @@ module BitVault::Bitcoin
     attr_reader :trees
 
     def initialize(options)
+      # FIXME: must accept option for which network to use.
       @private_trees = {}
       @public_trees = {}
       @trees = {}
@@ -82,6 +83,14 @@ module BitVault::Bitcoin
     def private_address(name)
       raise "No such node: ''" unless (node = @private_trees[name.to_sym])
       node.to_serialized_address(:private)
+    end
+
+    def private_addresses
+      out = {}
+      @private_trees.each do |name, tree|
+        out[name] = self.private_address(name)
+      end
+      out
     end
 
     def public_addresses
