@@ -5,7 +5,11 @@
 
 Required system dependencies are sqlite3 and libsodium.  On OS X, homebrew suffices.
 
-Developed against Ruby 2.1.x.  Rubygem dependencies can be installed by running `rake gem:deps`.
+Developed against Ruby 2.1.x.
+
+    $ gem install starter
+
+Rubygem dependencies can then be installed by running `rake gem:deps`.
 
 
 To run the client usage script against an instance of the bitvault API
