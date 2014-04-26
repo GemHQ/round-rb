@@ -52,7 +52,6 @@ module BitVault
         data = get_response_data(:address, :balance, addresses)
         balances = {}
         data.each do |record|
-          puts "Record: #{record}"
           balances[record[:address]] = record[:balance]
         end
 
