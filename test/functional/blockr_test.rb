@@ -34,11 +34,8 @@ describe "Blockr.io interface" do
   # Test Blocker#balance
   it "can query balance by single address" do
 
-    # FIXME: currently fails due to different return types
-
-    #balances = blockr.balance "n4rYhdx8CGo5fSVGh3jpfPhdHvJu6U7EQo"
-
-    #puts JSON.pretty_generate(balances)
+  balance = blockr.balance "n4rYhdx8CGo5fSVGh3jpfPhdHvJu6U7EQo"
+  puts JSON.pretty_generate(balance)
   end
 
 end

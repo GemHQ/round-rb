@@ -48,6 +48,7 @@ module BitVault
         outputs.sort_by {|output| -output.value }
       end
 
+
       def balance(addresses)
         data = get_response_data(:address, :balance, addresses)
         balances = {}
@@ -65,29 +66,41 @@ module BitVault
         string.gsub(".", "").to_i
       end
 
-      def get_response_data(from_type, to_type, args)
+
+      def get_response_data(from_type, to_type, args, *query_parameters)
         # Queries the Blockr Bitcoin from_type => to_type API with
         # list, returning the results or throwing an exception on
         # failure.
 
-        # FIXME: Should allow optional query arguments
-        # FIXME: Make single arguments work
-
+        # Permit calling with either an array or a scalar
         if args.respond_to? :join
           args = args.join(",")
         end
         url = "#{@base_url}/#{from_type}/#{to_type}/#{args}"
 
+        # Permit query parameters such as "confirmations"
+        if query_parameters.length > 0
+          url << "?#{query_parameters.join ","}"
+        end
+
         response = @http.request "GET", url, :response => :object
         # FIXME:  rescue any JSON parsing exception and raise an
         # exception explaining that it's blockr's fault.
+        # Doesn't the "raise" below do this now? -- DLL
         content = JSON.parse(response.body, :symbolize_names => true)
 
         if content[:status] != "success"
           raise "Blockr.io failure: #{content.to_json}"
         end
 
-        content[:data]
+        data = content[:data]
+
+        # Make the return type consistent to simplify client code
+        if not data.kind_of?(Array)
+          data = [data]
+        end
+
+        data
       end
 
     end
