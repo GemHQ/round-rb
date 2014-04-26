@@ -20,21 +20,11 @@ module BitVault
       end
 
       def unspent(addresses, confirmation_level=6)
-        # TODO: should we impose a limit on the number of addresses?
-        string = addresses.join(",")
-        url = "#{@base_url}/address/unspent/#{string}"
 
-        response = @http.request "GET", url, :response => :object
-        # FIXME:  rescue any JSON parsing exception and raise an
-        # exception explaining that it's blockr's fault.
-        content = JSON.parse(response.body, :symbolize_names => true)
-
-        if content[:status] != "success"
-          raise "Blockr.io failure: #{content.to_json}"
-        end
+        data = get_response_data(:address, :unspent, addresses)
 
         outputs = []
-        content[:data].each do |record|
+        data.each do |record|
           record[:unspent].each do |output|
             address = record[:address]
 
@@ -49,7 +39,7 @@ module BitVault
                 :script => {:hex => script_hex},
                 :address => address
               )
-              
+
             end
 
           end
@@ -58,11 +48,47 @@ module BitVault
         outputs.sort_by {|output| -output.value }
       end
 
+      def balance(addresses)
+        data = get_response_data(:address, :balance, addresses)
+        balances = {}
+        data.each do |record|
+          puts "Record: #{record}"
+          balances[record[:address]] = record[:balance]
+        end
+
+        balances
+      end
+
 
       # Helper methods
 
       def bitcoins_to_satoshis(string)
         string.gsub(".", "").to_i
+      end
+
+      def get_response_data(from_type, to_type, args)
+        # Queries the Blockr Bitcoin from_type => to_type API with
+        # list, returning the results or throwing an exception on
+        # failure.
+
+        # FIXME: Should allow optional query arguments
+        # FIXME: Make single arguments work
+
+        if args.respond_to? :join
+          args = args.join(",")
+        end
+        url = "#{@base_url}/#{from_type}/#{to_type}/#{args}"
+
+        response = @http.request "GET", url, :response => :object
+        # FIXME:  rescue any JSON parsing exception and raise an
+        # exception explaining that it's blockr's fault.
+        content = JSON.parse(response.body, :symbolize_names => true)
+
+        if content[:status] != "success"
+          raise "Blockr.io failure: #{content.to_json}"
+        end
+
+        content[:data]
       end
 
     end

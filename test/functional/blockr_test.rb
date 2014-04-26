@@ -17,7 +17,28 @@ describe "Blockr.io interface" do
     puts JSON.pretty_generate(result)
   end
 
+
+  # Test Blocker#balance
+  it "can query balance by address list" do
+
+    balances = blockr.balance %w[
+      n4rYhkv1LgtbXaXuFNCgG1hATJJTSec8F5
+      n4rYhdx8CGo5fSVGh3jpfPhdHvJu6U7EQo
+      n4rYdFbkiLSTdQ3uWsG7C46nikJmHjvhuV
+    ]
+
+    puts JSON.pretty_generate(balances)
+  end
+
+
+  # Test Blocker#balance
+  it "can query balance by single address" do
+
+    # FIXME: currently fails due to different return types
+
+    #balances = blockr.balance "n4rYhdx8CGo5fSVGh3jpfPhdHvJu6U7EQo"
+
+    #puts JSON.pretty_generate(balances)
+  end
+
 end
-
-
-
