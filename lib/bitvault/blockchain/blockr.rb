@@ -60,6 +60,20 @@ module BitVault
       end
 
 
+      def transactions(tx_ids)
+        data = get_response_data(:tx, :info, tx_ids)
+
+        data
+      end
+
+
+      def address_info(addresses, confirmations="")
+        # Useful for testing transactions()
+        get_response_data("address", "info", addresses, confirmations)
+      end
+
+
+
       # Helper methods
 
       def bitcoins_to_satoshis(string)
@@ -78,8 +92,9 @@ module BitVault
         end
         url = "#{@base_url}/#{from_type}/#{to_type}/#{args}"
 
-        # Permit query parameters such as "confirmations"
-        if query_parameters.length > 0
+        # Permit query parameters such as "confirmations", but allow
+        # "" for no parameters
+        if query_parameters.length > 0 and query_parameters[0].length > 0
           url << "?#{query_parameters.join ","}"
         end
 
