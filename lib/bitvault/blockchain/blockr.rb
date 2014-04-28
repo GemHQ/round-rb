@@ -63,9 +63,8 @@ module BitVault
         results = request(:tx, :raw, tx_ids)
         results.map do |record|
           hex = record[:tx][:hex]
-          raw = decode_hex(hex)
-          tx = ::Bitcoin::Protocol::Tx.new(raw)
-          transaction = BitVault::Bitcoin::Transaction.native(tx)
+
+          transaction = BitVault::Bitcoin::Transaction.hex(hex)
         end
       end
 

@@ -46,6 +46,14 @@ module BitVault::Bitcoin
       transaction
     end
 
+    def self.raw(raw_tx)
+      self.native ::Bitcoin::Protocol::Tx.new(raw_tx)
+    end
+
+    def self.hex(hex)
+      self.raw decode_hex hex
+    end
+
     def self.data(hash)
       version, lock_time, hash, inputs, outputs = 
         hash.values_at :version, :lock_time, :hash, :inputs, :outputs
