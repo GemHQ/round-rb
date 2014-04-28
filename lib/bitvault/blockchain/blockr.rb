@@ -60,9 +60,13 @@ module BitVault
 
 
       def transactions(tx_ids)
-        data = get_response_data(:tx, :info, tx_ids)
-
-        data
+        results = request(:tx, :raw, tx_ids)
+        results.map do |record|
+          hex = record[:tx][:hex]
+          raw = decode_hex(hex)
+          tx = ::Bitcoin::Protocol::Tx.new(raw)
+          transaction = BitVault::Bitcoin::Transaction.native(tx)
+        end
       end
 
 
