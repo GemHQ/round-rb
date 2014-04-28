@@ -23,7 +23,7 @@ module BitVault::Bitcoin
       if options[:transaction_hash]
         @transaction_hash = decode_base58(options[:transaction_hash])
       elsif options[:transaction_hex]
-        @transaction_hash = base58(decode_hex(options[:transaction_hex]))
+        @transaction_hash = decode_hex(options[:transaction_hex])
       elsif options[:transaction]
         @transaction = options[:transaction]
       end
