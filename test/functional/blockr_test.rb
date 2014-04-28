@@ -17,8 +17,6 @@ describe "Blockr.io interface" do
       n4rYdFbkiLSTdQ3uWsG7C46nikJmHjvhuV
     ]
 
-    puts JSON.pretty_generate(result)
-
     assert_kind_of Array, result
 
     result.each do |output|
