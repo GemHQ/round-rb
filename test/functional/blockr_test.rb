@@ -1,5 +1,7 @@
 require_relative "setup"
 
+include BitVault::Encodings
+
 require "bitvault/blockchain/blockr"
 
 describe "Blockr.io interface" do
@@ -14,7 +16,27 @@ describe "Blockr.io interface" do
       n4rYhdx8CGo5fSVGh3jpfPhdHvJu6U7EQo
       n4rYdFbkiLSTdQ3uWsG7C46nikJmHjvhuV
     ]
+
     puts JSON.pretty_generate(result)
+
+    assert_kind_of Array, result
+
+    result.each do |output|
+      assert_kind_of BitVault::Bitcoin::Output, output
+    end
+
+    output = result[0]
+
+    assert_equal(
+      # TODO:
+      # transaction hashes should be hex, not base58.
+      # https://github.com/BitVault/bitvault-rb/issues/1
+      "EPxHetczp68LoUjU2xkEyHdDLCUPs81SAFNEbzHLtA3j",
+      base58(output.transaction_hash)
+    )
+
+    assert_equal 246, output.index
+    assert_equal 1909, output.value
   end
 
 
