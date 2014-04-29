@@ -10,8 +10,9 @@ describe "Blockr.io interface" do
     BitVault::Blockchain::Blockr.new "test"
   end
 
-  before do
-    @address_list = %w[
+
+  def address_list
+    %w[
       mfuQGZT7AFQoSEeUnqwQwuzMnzUctfmLsp
       mnUarZY2MdEXZms2wPriz6dsdmc56x4yy6
       ms85owo6iJ7RAR9yyPDMTbpWaeBmvMhnQ8
@@ -29,8 +30,11 @@ describe "Blockr.io interface" do
       mjPJaiLRQro8sZNcDJuRivMM2E4uMW86Xq
       mxpwVrLnrngnUSgXSWGSYncUK7YHT3SP7f
     ]
+  end
 
-    @expected_balances = {
+
+  def expected_balances
+    {
       "mfuQGZT7AFQoSEeUnqwQwuzMnzUctfmLsp"=> 10000000,
       "mnUarZY2MdEXZms2wPriz6dsdmc56x4yy6"=> 200000000,
       "ms85owo6iJ7RAR9yyPDMTbpWaeBmvMhnQ8"=> 0,
@@ -48,8 +52,10 @@ describe "Blockr.io interface" do
       "mjPJaiLRQro8sZNcDJuRivMM2E4uMW86Xq"=> 0,
       "mxpwVrLnrngnUSgXSWGSYncUK7YHT3SP7f"=> 750000000
     }
+  end
 
-    @transaction_list = %w[
+  def transaction_list
+    %w[
       bb95da3bc61a72016a96c6a6e09934d822ff8ce67126920ec214d0c2fbb41c62
       49d4131a3bd5436a7a3fbbca6f4abc278f7f44ede375a702dcfe5411599c2053
       48e9a6657f0b4121bd4c95ca461959f33741a921b727453ecf24267b6ea01d0c
@@ -68,7 +74,7 @@ describe "Blockr.io interface" do
 
   it "can query unspent outputs" do
 
-    result = blockr.unspent @address_list
+    result = blockr.unspent address_list
 
     assert_kind_of Array, result
 
@@ -94,10 +100,10 @@ describe "Blockr.io interface" do
   # Test Blocker#balance
   it "can query balance by address list" do
 
-    balances = blockr.balance @address_list
+    balances = blockr.balance address_list
 
     balances.each do |address, balance|
-      assert_equal balance, @expected_balances[address]
+      assert_equal balance, expected_balances[address]
     end
   end
 
@@ -105,9 +111,9 @@ describe "Blockr.io interface" do
   # Test Blocker#balance
   it "can query with a one-element address list" do
 
-    @address_list.each do |address|
+    address_list.each do |address|
       balance = blockr.balance [ address ]
-      assert_equal balance[address], @expected_balances[address]
+      assert_equal balance[address], expected_balances[address]
     end
   end
 
@@ -115,16 +121,16 @@ describe "Blockr.io interface" do
   # Test Blocker#balance
   it "can query balance by single address" do
 
-    @address_list.each do |address|
+    address_list.each do |address|
       balance = blockr.balance address
-      assert_equal balance[address], @expected_balances[address]
+      assert_equal balance[address], expected_balances[address]
     end
   end
 
   # Test Blocker#transactions
   it "can query transaction info" do
 
-    transactions = blockr.transactions @transaction_list
+    transactions = blockr.transactions transaction_list
 
     transactions.each do |tx|
       assert tx.is_a? BitVault::Bitcoin::Transaction
