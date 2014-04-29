@@ -23,9 +23,15 @@ module BitVault
       include BitVault::Encodings
 
       def initialize(net=:test)
-        net = (net.to_sym == :test) ? "testnet" : "blockchain"
-        version = "v1"
-        @base_url = "https://api.biteasy.com/#{net}/#{version}"
+        @net = (net.to_sym == :test) ? "testnet" : "blockchain"
+        @version = "v1"
+        @base_url = "https://api.biteasy.com"
+
+        # TODO: consider raising this, though the API default of 10 may
+        # be a hint that they prefer many small requests to fewer larger
+        # ones.
+        @per_page = 10
+
         @http = HTTP.with_headers(
           "User-Agent" => "bv-blockchain-worker v0.1.0",
           "Accept" => "application/json"
@@ -42,68 +48,59 @@ module BitVault
         addr_count = addr_list.length
 
         if addr_count == 0
-          # TODO: consider returning an empty data structure instead
           raise "BitEasy failure: no addresses requested"
         end
 
         addr_str = addr_list.map { |address| "address[]=#{address}" }.join("&")
-        params = "#{addr_str}&page=1&per_page=#{addr_count}"
+        params = "#{addr_str}&per_page=#@per_page"
 
-        url = "#{@base_url}/unspent-outputs?#{params}"
+        request_url = "#@base_url/#@net/#@version/unspent-outputs?#{params}"
 
-        response = @http.request "GET", url, :response => :object
-        # FIXME:  rescue any JSON parsing exception and raise an
-        # exception explaining that it's BitEasy's fault.
-        content = JSON.parse(response.body, :symbolize_names => true)
-
-        if content[:status] != 200
-          raise "Blockr.io failure: #{content.to_json}"
-        end
-
-        # TODO Check pagination data and handle multiple pages
-        data = content[:data]
-
-=begin
-        # The endpoints of the API that we use allow multiple arguments
-        # and return values, so we always return an array.
-        unless data.is_a? Array
-          data = [data]
-        end
-
-        data
-=end
-      end
-
-
-=begin
-      def unspent(addresses, confirmations=6)
-
-        result = request(
-          :address, :unspent, addresses,
-          :confirmations => confirmations
-        )
-
+        page = 1
         outputs = []
-        result.each do |record|
-          record[:unspent].each do |output|
-            address = record[:address]
+        loop do
+          page_url = "#{request_url}&page=#{page}"
 
-            transaction_hex, index, value, script_hex =
-              output.values_at :tx, :n, :amount, :script
+          response = @http.request "GET", page_url, :response => :object
+          # FIXME:  rescue any JSON parsing exception and raise an
+          # exception explaining that it's BitEasy's fault.
+          page_content = JSON.parse(response.body, :symbolize_names => true)
 
+          if page_content[:status] != 200
+            raise "BitEasy.com failure: #{page_content.to_json}"
+          end
+
+          # TODO Check pagination data and handle multiple pages
+          page_data = page_content[:data]
+          page_outputs = page_data[:outputs]
+
+          page_outputs.each do |output|
+            transaction_hex, index, value, script_hex, address =
+              output.values_at(
+                :transaction_hash,
+                :transaction_index,
+                :value,
+                :script_pub_key,
+                :to_address
+            )
             outputs << BitVault::Bitcoin::Output.new(
               :transaction_hex => transaction_hex,
               :index => index,
-              :value => bitcoins_to_satoshis(value),
-              :script => {:hex => script_hex},
-              :address => address
+              :value => value, # Seems to already be in Satoshis
+              :script => script_hex,
+              :address => address,
             )
           end
+
+          page = page_data[:pagination][:next_page]
+          break unless page
         end
 
         outputs.sort_by {|output| -output.value }
       end
 
+
+=begin
 
       def balance(addresses)
         result = request(:address, :balance, addresses)

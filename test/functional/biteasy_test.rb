@@ -76,10 +76,8 @@ describe "BitEasy.io interface" do
 
     result = biteasy.unspent address_list
 
-    #assert_kind_of Array, result
+    assert_kind_of Array, result
 
-    puts JSON.pretty_generate result
-=begin
     result.each do |output|
       assert_kind_of BitVault::Bitcoin::Output, output
     end
@@ -96,6 +94,9 @@ describe "BitEasy.io interface" do
 
     assert_equal 0, output.index
     assert_equal 1000000000, output.value
+
+    puts JSON.pretty_generate result
+=begin
 =end
   end
 
