@@ -1,5 +1,6 @@
 require "http"
 require "json"
+require 'enumerator'
 
 require_relative "../bitcoin"
 
@@ -13,6 +14,9 @@ module BitVault
       def initialize(env=:test)
         subdomain = (env.to_sym == :test) ? "tbtc" : "btc"
         @base_url = "http://#{subdomain}.blockr.io/api/v1"
+
+        @max_per_request = 10
+
         @http = HTTP.with_headers(
           "User-Agent" => "bv-blockchain-worker v0.1.0",
           "Accept" => "application/json"
@@ -94,39 +98,44 @@ module BitVault
       # list, returning the results or throwing an exception on
       # failure.
       def request(from_type, to_type, args, query=nil)
-        # Permit calling with either an array or a scalar
-        if args.respond_to? :join
-          args = args.join(",")
-        end
-        url = "#{@base_url}/#{from_type}/#{to_type}/#{args}"
 
-        # Construct query string if any params were passed.
-        if query
-          # TODO: validation.  The value of the "confirmations" parameter
-          # must be an integer.
-          params = query.map { |name, value| "#{name}=#{value}" }.join("&")
-          url = "#{url}?#{params}"
+        unless args.is_a? Array
+          args = [args]
         end
 
-        response = @http.request "GET", url, :response => :object
-        # FIXME:  rescue any JSON parsing exception and raise an
-        # exception explaining that it's blockr's fault.
-        begin
-          content = JSON.parse(response.body, :symbolize_names => true)
-        rescue JSON::ParserError => e
-          raise "Blockr returned invalid JSON: #{e}"
-        end
+        data = []
+        args.each_slice(@max_per_request) do |arg_slice|
+          # Permit calling with either an array or a scalar
+            slice_string = arg_slice.join(",")
+          url = "#{@base_url}/#{from_type}/#{to_type}/#{slice_string}"
 
-        if content[:status] != "success"
-          raise "Blockr.io failure: #{content.to_json}"
-        end
+          # Construct query string if any params were passed.
+          if query
+            # TODO: validation.  The value of the "confirmations" parameter
+            # must be an integer.
+            params = query.map { |name, value| "#{name}=#{value}" }.join("&")
+            url = "#{url}?#{params}"
+          end
 
-        data = content[:data]
+          response = @http.request "GET", url, :response => :object
+          # FIXME:  rescue any JSON parsing exception and raise an
+          # exception explaining that it's blockr's fault.
+          begin
+            content = JSON.parse(response.body, :symbolize_names => true)
+          rescue JSON::ParserError => e
+            raise "Blockr returned invalid JSON: #{e}"
+          end
 
-        # The endpoints of the API that we use allow multiple arguments
-        # and return values, so we always return an array.
-        unless data.is_a? Array
-          data = [data]
+          if content[:status] != "success"
+            raise "Blockr.io failure: #{content.to_json}"
+          end
+
+          slice_data = content[:data]
+          if content[:data].is_a? Array
+            data.concat slice_data
+          else
+            data << slice_data
+          end
         end
 
         data
