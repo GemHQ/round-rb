@@ -30,7 +30,7 @@ module BitVault
         # TODO: consider raising this, though the API default of 10 may
         # be a hint that they prefer many small requests to fewer larger
         # ones. The code works for any positive value.
-        @per_page = 10
+        @per_page = 20
 
         @http = HTTP.with_headers(
           "User-Agent" => "bv-blockchain-worker v0.1.0",
