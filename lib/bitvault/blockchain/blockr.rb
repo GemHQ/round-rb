@@ -117,8 +117,6 @@ module BitVault
           raise "Blockr returned invalid JSON: #{e}"
         end
 
-        end
-
         if content[:status] != "success"
           raise "Blockr.io failure: #{content.to_json}"
         end
