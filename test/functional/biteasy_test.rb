@@ -54,6 +54,7 @@ describe "BitEasy.io interface" do
     }
   end
 
+
   def transaction_list
     %w[
       bb95da3bc61a72016a96c6a6e09934d822ff8ce67126920ec214d0c2fbb41c62
@@ -72,9 +73,11 @@ describe "BitEasy.io interface" do
     ]
   end
 
+
   it "unspent" do
 
     result = biteasy.unspent address_list
+puts "unspent finished"
 
     assert_kind_of Array, result
 
@@ -94,10 +97,30 @@ describe "BitEasy.io interface" do
 
     assert_equal 0, output.index
     assert_equal 1000000000, output.value
-
-    puts JSON.pretty_generate result
-=begin
-=end
   end
+
+
+=begin
+  # Test BitEasy#transactions
+  it "transaction" do
+
+    transaction = biteasy.transaction transaction_list[0]
+
+    puts "*** BitEasy ***"
+    puts JSON.pretty_generate transaction
+
+    # Testing
+    require "bitvault/blockchain/blockr"
+
+    blockr = BitVault::Blockchain::Blockr.new "test"
+    tx_blockr = (blockr.transactions transaction_list[0])[0]
+    puts "**************"
+    puts
+    puts "*** Blockr ***"
+    puts JSON.pretty_generate tx_blockr
+    puts "**************"
+
+  end
+=end
 
 end

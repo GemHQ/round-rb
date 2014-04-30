@@ -111,7 +111,13 @@ module BitVault
         response = @http.request "GET", url, :response => :object
         # FIXME:  rescue any JSON parsing exception and raise an
         # exception explaining that it's blockr's fault.
-        content = JSON.parse(response.body, :symbolize_names => true)
+        begin
+          content = JSON.parse(response.body, :symbolize_names => true)
+        rescue JSON::ParserError => e
+          raise "Blockr returned invalid JSON: #{e}"
+        end
+
+        end
 
         if content[:status] != "success"
           raise "Blockr.io failure: #{content.to_json}"
