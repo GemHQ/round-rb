@@ -82,6 +82,15 @@ module BitVault
       end
 
 
+      def block_info(block_list)
+        request(:block, :info, block_list)
+      end
+
+
+      def block_txs(block_list)
+        request(:block, :txs, block_list)
+      end
+
 
       # Helper methods
 
