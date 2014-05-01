@@ -15,13 +15,18 @@ module BitVault
         subdomain = (env.to_sym == :test) ? "tbtc" : "btc"
         @base_url = "http://#{subdomain}.blockr.io/api/v1"
 
-        @max_per_request = 10
+        # Testing says 20 is the absolute max
+        @max_per_request = 20
 
         @http = HTTP.with_headers(
           "User-Agent" => "bv-blockchain-worker v0.1.0",
           "Accept" => "application/json"
         )
       end
+
+
+      attr_accessor :max_per_request
+
 
       def unspent(addresses, confirmations=6)
 
