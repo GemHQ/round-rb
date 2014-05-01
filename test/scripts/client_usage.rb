@@ -37,9 +37,8 @@ user = users.create(
   :email => "matthew@bitvault.io",
   :first_name => "Matthew",
   :last_name => "King",
-  :password => "incredibly secure"
+  :password => "incredibly_secure"
 )
-
 log "User", user
 
 # The create action returned a User Resource which has:
@@ -57,12 +56,13 @@ client = BV.spawn
 # and its applications.  The context class used here determines which
 # credential to use based on the authorization scheme.
 
-client.context.password = "incredibly secure"
+client.context.password = "incredibly_secure"
 
 # Retrieve the user resource
 
 user = client.resources.user(user.url).get
 
+exit
 
 ## Update some attributes for the user
 
