@@ -56,4 +56,34 @@ module BlockchainTest
     ]
   end
 
+
+  # Note: any stored field will be compared with the corresponding retrieved
+  # field. Remove 'confirmations', 'time', and 'days_destroyed' fields, and
+  # anything else that isn't the same forever.
+  def self.block_info
+    {
+      223212 => {
+        "status"=> "success",
+        "data"=> {
+          "nb"=> 223212,
+          "hash"=> "000000000003bb104a0e04e1dde6ba65bbe2fad093e229589b43945ce395babe",
+          "version"=> 2,
+          "nb_txs"=> 1,
+          "merkleroot"=> "66a9632d9a259cb13eadd787e3ee7fa6eef54083757aaaf39e0e3e7c8681bda0",
+          "next_block_nb"=> 223213,
+          "prev_block_nb"=> 223211,
+          "next_block_hash"=> "00000000000aaf62fb2b7405f7a38088a0a27f6ee796d0d6994b036e8edfa8ec",
+          "prev_block_hash"=> "00000000000df3bd2ac849921196586e59893022ebad3c824f17c40eeb384543",
+          "fee"=> "0.00000000",
+          "vout_sum"=> 25,
+          "size"=> "189",
+          "difficulty"=> 4096,
+          "extras"=> nil
+        },
+        "code"=> 200,
+        "message"=> ""
+      }
+    }
+  end
+
 end

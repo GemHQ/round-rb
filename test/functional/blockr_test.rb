@@ -63,6 +63,7 @@ describe "Blockr.io interface" do
     end
   end
 
+
   # Test Blocker#transactions
   it "can query transaction info" do
 
@@ -72,9 +73,35 @@ describe "Blockr.io interface" do
     transactions.each do |tx|
       assert tx.is_a? BitVault::Bitcoin::Transaction
 
-      # TODO: check that the tx id is the same as what wwe put in
+      # TODO: check that the tx id is the same as what we put in
     end
 
   end
+
+
+  # Test Blockr#block_info
+  it "can retrieve blocks" do
+
+    blockr = BlockchainTest.blockr
+
+    block_info = BlockchainTest.block_info
+
+    block_info.each do |block, stored_info|
+
+      stored = stored_info["data"]
+
+      retrieved_info = blockr.block_info block
+      retrieved = retrieved_info[0]
+
+      stored.each do |key, value|
+        assert_equal value, retrieved[key.to_sym]
+      end
+
+    end
+
+  end
+
+
+  # TODO: add tests for block_txs
 
 end
