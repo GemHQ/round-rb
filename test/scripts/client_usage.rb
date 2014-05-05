@@ -62,7 +62,6 @@ client.context.password = "incredibly_secure"
 
 user = client.resources.user(user.url).get
 
-exit
 
 ## Update some attributes for the user
 
