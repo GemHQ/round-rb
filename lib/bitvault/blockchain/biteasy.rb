@@ -4,12 +4,11 @@
 #
 # https://support.biteasy.com/kb
 #
-# Currently only supports v1 of the API
+# Only supports v1 of the API (the only one at this time)
 #
-# Need to implement:
-# Unspent outputs for multiple addresses
-# Retrieve single transaction
-# Summaries for multiple addresses
+# TODO: if we pick this up again, finish adding in the 'use_curl'
+# debugging/testing option so we can see if we're timing out when
+# curl is not.
 
 require "http"
 require "json"
@@ -40,20 +39,20 @@ module BitVault
           "User-Agent" => "bv-blockchain-worker v0.1.0",
           "Accept" => "application/json"
         )
+
+        @use_curl = false
       end
 
 
       attr_accessor :max_per_request
       attr_accessor :per_page
+      attr_accessor :use_curl
 
 
       # Return all unspent coins for each address in the list
       def unspent(addr_list)
 
         addr_count = addr_list.length
-puts "Total addresses in request: #{addr_count}"
-puts "Max per request: #@max_per_request"
-puts "Max results per page: #@per_page"
 
         if addr_count == 0
           raise "BitEasy error: no addresses requested"
@@ -85,9 +84,20 @@ puts "Max results per page: #@per_page"
       end
 
 
-      def transaction(tx_id)
+      def transaction(transactions)
 
-        request "transactions/#{tx_id}"
+        if not transactions.is_a? Array
+          transactions = [transactions]
+        end
+
+        # Sadly, we can only request a single transaction at a time
+        # from BitEasy
+        results = []
+        transactions.each do |tx|
+          results.concat (request "transactions/#{tx}")
+        end
+
+        results
       end
 
 
@@ -143,27 +153,10 @@ puts "Max results per page: #@per_page"
         page = 1
         outputs = []
         loop do
-puts
-puts "Page: #{page}"
+
           page_url = "#{url}&page=#{page}&per_page=#@per_page"
-puts "Page URL: #{page_url}"
 
-          response = @http.request "GET", page_url, :response => :object
-
-          begin
-            page_content = JSON.parse(response.body, :symbolize_names => true)
-          rescue JSON::ParserError => e
-            raise "BitEasy returned invalid JSON: #{e}"
-          end
-
-          if page_content[:status] != 200
-            raise "BitEasy.com failure: #{page_content.to_json}"
-          end
-
-          # TODO Check pagination data and handle multiple pages
-          page_data = page_content[:data]
-puts "Page data:"
-puts JSON.pretty_generate page_data
+          page_data = raw_request page_url
 
           page_outputs = page_data[:outputs]
           outputs.concat page_outputs
@@ -179,6 +172,31 @@ puts JSON.pretty_generate page_data
         end
 
         outputs
+      end
+
+
+      # Manages a single raw request with error handling for batch_request
+      def raw_request url
+
+        if @use_curl
+          response = `/usr/bin/curl -H`
+        else
+          response = @http.request "GET", url, :response => :object
+        end
+
+        begin
+          content = JSON.parse(response.body, :symbolize_names => true)
+        rescue JSON::ParserError => e
+          raise "BitEasy returned invalid JSON: #{e}"
+        end
+
+        if content[:status] != 200
+          raise "BitEasy.com failure: #{content.to_json}"
+        end
+
+        # TODO Check pagination data and handle multiple pages
+
+        data = content[:data]
       end
 
     end
