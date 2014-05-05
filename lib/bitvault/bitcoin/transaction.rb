@@ -208,12 +208,28 @@ module BitVault::Bitcoin
       unless report[:valid] == true
         raise "Invalid syntax:  #{report[:errors].to_json}"
       end
-      
+
       # Array#zip here allows us to iterate over the inputs in lockstep with any
       # number of sets of signatures.
       self.inputs.zip(*input_args) do |input, *input_arg|
         input.script_sig = yield input, *input_arg
       end
+    end
+
+
+    def suggested_fee
+      @native.minimum_block_fee
+    end
+
+
+    # Total value being spent
+    def output_value
+      total = 0
+      @outputs.each do |output|
+        total += output.value
+      end
+
+      total
     end
 
 
