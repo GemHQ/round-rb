@@ -3,66 +3,32 @@
 
 ## Installation
 
-Required system dependencies are sqlite3 and libsodium.  On OS X, homebrew suffices.
+Required system dependencies:
 
-Developed against Ruby 2.1.x.
+* libsodium
+
+Developed against Ruby 2.1.x.  To bootstrap:
 
     $ gem install starter
 
 Rubygem dependencies can then be installed by running `rake gem:deps`.
 
+To run the usage script against the demo server, check out the "development"
+branch:
 
-To run the client usage script against an instance of the bitvault API
+    git checkout development
 
-    ruby test/scripts/client_usage.rb <api_url>
+Then run this:
 
+    ruby test/scripts/client_usage.rb http://bitvault-api.pandastrike.com
 
-## Bitcoin Wrappers
+To run the usage script against an arbitrary instance of the BitVault API:
 
-```.rb
-require "bitvault/bitcoin"
+    ruby test/scripts/client_usage.rb <url>
 
-include BitVault::Bitcoin
-
-vendor_key = ::Bitcoin::Key.new
-vendor_key.generate
-vendor_address = vendor_key.addr
-
-change_key = ::Bitcoin::Key.new
-change_key.generate
-change_address = change_key.addr
-
-
-transaction = Transaction.build do |t|
-  t.add_input(
-    :transaction_hash => "7KxGcWup3dvGbms5asKi3M6s2HL998oroR9qWq4BgFsY",
-    :index => 0,
-    :script => "OP_DUP OP_HASH160 9a80c2e7792a380423f2f5a918fd139b07556fea OP_EQUALVERIFY OP_CHECKSIG"
-  )
-
-  t.add_output(
-    :value => 25_000,
-    :script => {
-      :address => vendor_address
-    }
-  )
-
-  t.add_output(
-    :value => 5_000,
-    :script => {
-      :address => change_address
-    }
-  )
-end
-
-puts JSON.pretty_generate(transaction)
-
-puts report = transaction.validate_syntax
-
-
-```
+The (very verbose) output shows the JSON for the results of API actions.
 
 
 
 
-## BitVault API Client
+
