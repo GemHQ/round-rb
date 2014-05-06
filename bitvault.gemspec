@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
   s.add_dependency("patchboard", "0.4.2")
   s.add_dependency("bitcoin-ruby", "0.0.5")
   s.add_dependency("money-tree", "0.8.6")
-  s.add_dependency("sequel", "~> 4.8")
   s.add_dependency("rbnacl", "~> 2.0")
 
   s.add_development_dependency("starter", "0.1.12")
