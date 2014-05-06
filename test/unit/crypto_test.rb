@@ -11,7 +11,7 @@ describe "PassphraseBox" do
     it "returns a Hash containing ciphertext, nonce, and salt" do
       passphrase, plaintext = "some good passphrase", "keep this string secret"
       hash = PassphraseBox.encrypt(passphrase, plaintext)
-      assert_equal [:ciphertext, :nonce, :salt], hash.keys.sort
+      assert_equal [:ciphertext, :iterations, :nonce, :salt], hash.keys.sort
       refute_equal passphrase, hash[:ciphertext]
     end
 

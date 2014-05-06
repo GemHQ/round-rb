@@ -39,7 +39,30 @@ describe "Transaction" do
   end
 
   describe "created from a full Hash representation" do
+
+    def transaction
+      @transaction ||= begin
+        keypair = ::Bitcoin::Key.new
+        address = keypair.addr
+        Transaction.data(
+          :inputs => [],
+          :outputs => [
+            :value => 1000,
+            :script => {
+              :address => address
+            }
+          ]
+        )
+      end
+    end
+
+    it "works" do
+      # TODO:  add real tests, obviously.
+      assert_equal 0, transaction.inputs.size
+    end
+
   end
+
 
   describe "created from a valid Bitcoin::Protocol::Tx" do
 
