@@ -8,7 +8,7 @@ module BitVaultTests
 
     def keypair
       @keypair ||= begin
-        key = Bitcoin::Key.new
+        key = ::Bitcoin::Key.new
         key.generate
         key
       end
