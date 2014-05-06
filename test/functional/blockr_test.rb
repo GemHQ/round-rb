@@ -1,16 +1,19 @@
 require_relative "setup"
-require_relative "blockchaintest"
-
-include BitVault::Encodings
 
 require "bitvault/blockchain/blockr"
 
+include BitVault::Encodings
+include BitVaultTests
+
 describe "Blockr.io interface" do
 
+  def blockr
+    BitVault::Blockchain::Blockr.new :test
+  end
 
   it "can query unspent outputs" do
 
-    result = BlockchainTest.blockr.unspent BlockchainTest.address_list
+    result = blockr.unspent TestnetAssets.address_list
 
     assert_kind_of Array, result
 
@@ -23,7 +26,6 @@ describe "Blockr.io interface" do
     assert_equal(
       # TODO:
       # transaction hashes should be hex, not base58.
-      # https://github.com/BitVault/bitvault-rb/issues/1
       "BcxLvpD8cYB7qQwy9Hg8KcjM1nfD4M4XrFSkn8TTk7RY",
       base58(output.transaction_hash)
     )
@@ -33,13 +35,14 @@ describe "Blockr.io interface" do
   end
 
 
+
   # Test Blocker#balance
   it "can query balance by address list" do
 
-    balances = BlockchainTest.blockr.balance BlockchainTest.address_list
+    balances = blockr.balance TestnetAssets.address_list
 
     balances.each do |address, balance|
-      assert_equal balance, BlockchainTest.expected_balances[address]
+      assert_equal balance, TestnetAssets.expected_balances[address]
     end
   end
 
@@ -47,9 +50,9 @@ describe "Blockr.io interface" do
   # Test Blocker#balance
   it "can query with a one-element address list" do
 
-    BlockchainTest.address_list.each do |address|
-      balance = BlockchainTest.blockr.balance [ address ]
-      assert_equal balance[address], BlockchainTest.expected_balances[address]
+    TestnetAssets.address_list.each do |address|
+      balance = blockr.balance [ address ]
+      assert_equal balance[address], TestnetAssets.expected_balances[address]
     end
   end
 
@@ -57,9 +60,9 @@ describe "Blockr.io interface" do
   # Test Blocker#balance
   it "can query balance by single address" do
 
-    BlockchainTest.address_list.each do |address|
-      balance = BlockchainTest.blockr.balance address
-      assert_equal balance[address], BlockchainTest.expected_balances[address]
+    TestnetAssets.address_list.each do |address|
+      balance = blockr.balance address
+      assert_equal balance[address], TestnetAssets.expected_balances[address]
     end
   end
 
@@ -68,7 +71,7 @@ describe "Blockr.io interface" do
   it "can query transaction info" do
 
     transactions =
-      BlockchainTest.blockr.transactions BlockchainTest.transaction_list
+      blockr.transactions TestnetAssets.transaction_list
 
     transactions.each do |tx|
       assert tx.is_a? BitVault::Bitcoin::Transaction
@@ -82,9 +85,7 @@ describe "Blockr.io interface" do
   # Test Blockr#block_info
   it "can retrieve blocks" do
 
-    blockr = BlockchainTest.blockr
-
-    block_info = BlockchainTest.block_info
+    block_info = TestnetAssets.block_info
 
     block_info.each do |block, stored_info|
 
