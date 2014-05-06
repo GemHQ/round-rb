@@ -87,6 +87,9 @@ module BitVault::Bitcoin
         input.instance_eval do
           @native = native
         end
+        if input.is_a? Input
+          input.binary_sig_hash = self.sig_hash(input)
+        end
         # TODO: is this re-nativization necessary for outputs, too?
       end
     end
@@ -103,7 +106,6 @@ module BitVault::Bitcoin
       valid = true
       @inputs.each_with_index do |input, index|
         # TODO: confirm whether we need to mess with the block_timestamp arg
-        pp input.output.transaction
         unless self.native.verify_input_signature(index, input.output.transaction.native)
           valid = false
           bad_inputs << index

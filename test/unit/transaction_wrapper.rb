@@ -31,7 +31,7 @@ describe "Transaction" do
     end
 
     it "fails validation" do
-      report = transaction.validate
+      report = transaction.validate_syntax
       assert_equal false, report[:valid]
       assert_equal :lists, report[:error].first
     end
@@ -77,10 +77,10 @@ describe "Transaction" do
       end
     end
 
-    #it "passes validation" do
-      #report = transaction.validate
-      #assert_equal true, report[:valid]
-    #end
+    it "passes validation" do
+      report = transaction.validate_syntax
+      assert_equal true, report[:valid]
+    end
 
     it "can be encoded as JSON" do
       # TODO: check attributes after round trip
@@ -122,7 +122,9 @@ describe "Transaction" do
       end
 
       it "computes a sig_hash for the input" do
-        assert_kind_of String, modified.inputs[0].sig_hash
+        sig_hash = modified.inputs[0].sig_hash
+        assert_kind_of String, sig_hash
+        refute_empty sig_hash
       end
 
     end
