@@ -17,5 +17,4 @@ require_relative "bitcoin/transaction"
 
 # Augmented functionality
 require_relative "bitcoin/multi_wallet"
-require_relative "bitcoin/mockchain"
 
