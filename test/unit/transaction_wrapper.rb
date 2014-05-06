@@ -47,9 +47,17 @@ describe "Transaction" do
         Transaction.data(
           :inputs => [],
           :outputs => [
-            :value => 1000,
-            :script => {
-              :address => address
+            {
+              :value => 1000,
+              :script => {
+                :address => address
+              }
+            },
+            {
+              :value => 2000,
+              :script => {
+                :address => address
+              }
             }
           ]
         )
@@ -59,6 +67,7 @@ describe "Transaction" do
     it "works" do
       # TODO:  add real tests, obviously.
       assert_equal 0, transaction.inputs.size
+      assert_equal 2, transaction.outputs.size
     end
 
   end
