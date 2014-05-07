@@ -19,7 +19,11 @@ end
 
 ## plain output for gisting
 #def log(message, data)
-  #puts "#{message} ---\n#{JSON.pretty_generate data}"
+  #begin
+    #puts "#{message} ---\n#{JSON.pretty_generate data}"
+  #rescue
+    #puts "#{message} ---\n#{data}"
+  #end
   #puts
 #end
 

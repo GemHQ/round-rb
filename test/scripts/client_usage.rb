@@ -31,6 +31,7 @@ client = BV.spawn
 # API definition.  Action methods perform the actual HTTP requests
 # and wrap the results in further resource instances when appropriate.
 
+
 users = client.resources.users
 
 user = users.create(
@@ -306,7 +307,7 @@ log "Unsigned transfer", unsigned_transfer
 
 ## Reconstruct the transaction for signing
 
-transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
+transaction = BitVault::Bitcoin::Transaction.data(unsigned_transfer)
 
 unless client_wallet.valid_output?(transaction.inputs.first.output)
   raise "bad source address"

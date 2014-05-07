@@ -20,7 +20,7 @@ branch:
 
 Then run this:
 
-    ruby test/scripts/client_usage.rb http://bitvault-api.pandastrike.com
+    ruby test/scripts/client_usage.rb http://bitvault.pandastrike.com
 
 To run the usage script against an arbitrary instance of the BitVault API:
 
