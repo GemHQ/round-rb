@@ -2,33 +2,67 @@ require_relative "setup"
 
 BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
 client = BV.spawn
-user = client.resources.users.create :email => "matthew-#{rand(10000)}@mail.com"
+context = client.context
+users = client.resources.users
+user = users.create :email => "matthew-#{rand(10000)}@mail.com"
+client.context.password = "incredibly secure"
+applications = user.applications
+application = user.applications.create(
+  :name => "bitcoin_emporium",
+  :callback_url => "https://api.bitcoin-emporium.io/events"
+)
 
 Resources = BitVault::Client::Resources
 
 
 describe "Using the BitVault API" do
 
-  def client
-    @client ||= BV.spawn
-  end
+  describe "BitVault::Client" do
 
-  def user
-    @user ||= begin
-      user = client.resources.users.create(
-        :email => "matthew-#{rand(10000)}@mail.com"
-      )
-      client.context.password = "incredibly secure"
-      user
+    specify "expected actions" do
+      assert_respond_to BitVault::Client, :discover
     end
   end
 
-  def application
-    @application ||= begin
-      user.applications.create(
-        :name => "bitcoin_emporium",
-        :callback_url => "https://api.bitcoin-emporium.io/events"
-      )
+  describe "BV" do
+
+    specify "correct class" do
+      assert_kind_of BitVault::Client, BV
+    end
+
+    specify "expected actions" do
+      assert_respond_to BV, :spawn
+    end
+  end
+
+  describe "context" do
+
+    specify "expected actions" do
+      assert_respond_to context, :authorizer
+      assert_respond_to context, :password
+      assert_respond_to context, :api_token
+      assert_respond_to context, :inspect
+    end
+  end
+
+  describe "client" do
+
+    specify "expected actions" do
+      assert_respond_to client, :resources
+    end
+  end
+
+  describe "client.resources" do
+
+    specify "expected actions" do
+      assert_respond_to client.resources, :users
+    end
+  end
+
+  describe "client.resources.users" do
+
+    specify "expected actions" do
+      assert_respond_to client.resources.users, :create
     end
   end
 
@@ -41,6 +75,7 @@ describe "Using the BitVault API" do
     specify "expected actions" do
       assert_respond_to user, :get
       assert_respond_to user, :update
+      assert_respond_to user, :reset
     end
 
     specify "expected attributes" do
