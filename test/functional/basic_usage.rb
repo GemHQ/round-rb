@@ -1,11 +1,22 @@
 require_relative "setup"
 
+# For now, put the test subjects here at global scope. They can move to
+# more appropriate inner scopes later
 BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
+
 client = BV.spawn
 context = client.context
+
 users = client.resources.users
-user = users.create :email => "matthew-#{rand(10000)}@mail.com"
+user = users.create(
+  :email => "matthew@bitvault.io",
+  :first_name => "Matthew",
+  :last_name => "King",
+  :password => "incredibly_secure"
+)
+# Specifying a password for a later session
 client.context.password = "incredibly secure"
+
 applications = user.applications
 application = user.applications.create(
   :name => "bitcoin_emporium",
@@ -14,17 +25,38 @@ application = user.applications.create(
 
 Resources = BitVault::Client::Resources
 
-
 describe "Using the BitVault API" do
 
-  describe "BitVault::Client" do
+  ######################################################################
+  # Cache and access various test objects
+  ######################################################################
 
-    specify "expected actions" do
-      assert_respond_to BitVault::Client, :discover
-    end
+  def BV
+    @BV ||= BitVault::Client.discover("http://localhost:8999/") {
+      BitVault::Client::Context.new
+    }
   end
 
-  describe "BV" do
+  def client
+    @client ||= BV.spawn
+  end
+
+  def context
+    @context ||= client.context
+  end
+
+  ######################################################################
+  # Test API discovery
+  ######################################################################
+
+  describe "BitVault API discovery" do
+
+    # N.B.: The tests reflect the API even when we know, e.g. that the function
+    # exists because we called it in the code above.
+
+    specify "expected class actions" do
+      assert_respond_to BitVault::Client, :discover
+    end
 
     specify "correct class" do
       assert_kind_of BitVault::Client, BV
@@ -35,20 +67,39 @@ describe "Using the BitVault API" do
     end
   end
 
-  describe "context" do
-
-    specify "expected actions" do
-      assert_respond_to context, :authorizer
-      assert_respond_to context, :password
-      assert_respond_to context, :api_token
-      assert_respond_to context, :inspect
-    end
-  end
+  ######################################################################
+  # Test client creation
+  ######################################################################
 
   describe "client" do
 
+    specify "correct class" do
+      assert_kind_of Patchboard::Client, client
+    end
+
     specify "expected actions" do
-      assert_respond_to client, :resources
+      [:resources, :context].each do |method|
+        assert_respond_to client, method
+      end
+    end
+  end
+
+  ######################################################################
+  # Test client creation
+  ######################################################################
+
+  describe "client.context" do
+
+    specify "expected actions" do
+      [:authorizer].each do |method|
+        assert_respond_to context, method
+      end
+
+      # These are not required according to client_usage, but exist
+      # in the code
+      [:password, :api_token, :inspect].each do |method|
+        assert_respond_to context, method
+      end
     end
   end
 
@@ -73,9 +124,9 @@ describe "Using the BitVault API" do
     end
 
     specify "expected actions" do
-      assert_respond_to user, :get
-      assert_respond_to user, :update
-      assert_respond_to user, :reset
+      [:get, :update, :reset].each do |method|
+        assert_respond_to user, method
+      end
     end
 
     specify "expected attributes" do
@@ -88,6 +139,12 @@ describe "Using the BitVault API" do
       assert_kind_of Resources::Applications, user.applications
     end
 
+    specify "expected actions" do
+      [:create, :list].each do |method|
+        assert_respond_to applications, method
+      end
+    end
+
   end
 
   describe "applications.create" do
@@ -97,8 +154,9 @@ describe "Using the BitVault API" do
     end
 
     specify "expected actions" do
-      assert_respond_to application, :get
-      assert_respond_to application, :update
+      [:get, :update, :reset, :delete].each do |method|
+        assert_respond_to application, method
+      end
     end
 
     specify "expected attributes" do
@@ -106,10 +164,6 @@ describe "Using the BitVault API" do
         assert_respond_to application, method
       end
     end
-
-    #specify "user.applications is a resource" do
-      #assert_kind_of Resources::Applications, user.applications
-    #end
 
   end
 
