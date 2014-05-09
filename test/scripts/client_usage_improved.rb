@@ -81,8 +81,16 @@ account = wallet.accounts.create(name: 'office supplies')
 account.update(name: 'rubber bands')
 
 ## Payments
+#
+# Sending payments
 
-payment = account.pay(amount: 10_000, payee: {})
+payment = account.pay(payees: { 'address1' => 10_000, 'address2' => 20_000 })
+
+# Creating addresses for receiving payments
+# This is a BIP 16 "Pay to Script Hash" address, where the script in question
+# is a BIP 11 "multisig".
+
+address = account.addresses.create
 
 ## Transfers
 
