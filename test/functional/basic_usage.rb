@@ -120,6 +120,14 @@ describe "Using the BitVault API" do
     @incoming_address ||= addresses.create
   end
 
+  def payee
+    @payee ||= begin
+                 payee = Bitcoin::Key.new
+                 payee.generate
+                 payee
+               end
+  end
+
   ######################################################################
   # Test API discovery
   ######################################################################
@@ -469,27 +477,25 @@ describe "Using the BitVault API" do
       assert_kind_of Hashie::Mash, incoming_address
     end
 
-=begin
+  end
+
+  ######################################################################
+  # Test payee creation
+  ######################################################################
+
+  describe "test payee creation" do
+
+    specify "correct type" do
+
+      assert_kind_of Bitcoin::Key, payee
+    end
+
     specify "expected actions" do
-      [:get, :update].each do |method|
-        assert_respond_to account, method
-      end
 
-      # TODO: test each method
-      assert_kind_of Resources::Account, account.get
-
-      assert_kind_of Resources::Account, account.update(:name => "rubber bands")
-    end
-
-    specify "accounts.list" do
-
-      assert_equal accounts.list.length, 1
-
-      accounts.list.each do |acct|
-        assert_kind_of Resources::Account, account
+      [:addr].each do |method|
+        assert_respond_to payee, method
       end
     end
-=end
 
   end
 
