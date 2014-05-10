@@ -11,7 +11,7 @@ MultiWallet = BitVault::Bitcoin::MultiWallet
 describe "Using the BitVault API" do
 
   ######################################################################
-  # Cache and access various test objects
+  # Cached access to various test objects
   ######################################################################
 
 =begin
@@ -81,11 +81,20 @@ describe "Using the BitVault API" do
     "wrong pony generator brad"
   end
 
+  def wallets
+    @wallets ||= begin
+      # Needed for wallets.list, wallet operations
+      client.context.api_token = application.api_token
+      application.wallets
+    end
+  end
+
   def wallet
     @wallet ||= begin
       primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
       encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
-      application.wallets.create(
+      # Must have the authentication token to create a wallet
+      wallets.create(
         :name => "my favorite wallet",
         :network => "bitcoin_testnet",
         :backup_address => new_wallet.trees[:backup].to_serialized_address,
@@ -93,6 +102,10 @@ describe "Using the BitVault API" do
         :primary_seed => encrypted_seed
       )
     end
+  end
+
+  def accounts
+    @accounts ||= wallet.accounts
   end
 
   ######################################################################
@@ -279,17 +292,42 @@ describe "Using the BitVault API" do
 
     specify "test application.reset" do
 
-      reset = application.reset
-      assert_respond_to reset, :api_token
+      # No actual reset with mock data
+      application_list.each do |app|
+          reset = app.reset
+          assert_kind_of Resources::Application, reset
+          assert_respond_to reset, :api_token
+          refute_equal reset.api_token, app.api_token
+      end
     end
 
     specify "test application.delete" do
 
+      # No actual reset with mock data
       application_list.each do |app|
         app.delete
       end
 
       # TODO: after mock-data, test that they were deleted
+    end
+
+  end
+
+  ######################################################################
+  # Test wallet creation
+  ######################################################################
+
+  describe "test application.wallets" do
+
+    specify "correct type" do
+
+      assert_kind_of Resources::Wallets, wallets
+    end
+
+    specify "expected actions" do
+      [:create, :list].each do |method|
+        assert_respond_to wallets, method
+      end
     end
 
   end
@@ -306,32 +344,18 @@ describe "Using the BitVault API" do
   end
 
   describe "test wallet creation" do
-    specify "foo" do
-      puts wallet.class
+    specify "correct type" do
+      assert_kind_of Resources::Wallet, wallet
+    end
+
+    specify "test wallets.list" do
+
+      assert_equal wallets.list.length, 1
+      wallets.list.each do |wallet|
+        assert_kind_of Resources::Wallet, wallet
+      end
     end
   end
-
-    #describe "user.wallets.create" do
-
-      #def wallet
-        #@wallet ||= begin
-          #user.wallets.create(
-            #:name => "my favorite wallet",
-            #:network => "bitcoin_testnet",
-            #:cold_pubkey => cold_pubkey,
-            #:hot_pubkey => hot_pubkey,
-            #:encrypted_hot_seed => "bogusvaluenotevenencrypted"
-          #)
-        #end
-      #end
-
-      #it "is correct type" do
-        #assert_kind_of Resources::Wallet, wallet
-      #end
-
-    #end
-
-  #end
 
 end
 
