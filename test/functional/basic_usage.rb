@@ -440,5 +440,24 @@ describe "Using the BitVault API" do
 
   end
 
+  ######################################################################
+  # Test addresses resource
+  ######################################################################
+
+  describe "test account.addresses resource" do
+
+    specify "correct type" do
+
+      assert_kind_of Resources::Addresses, addresses
+    end
+
+    specify "expected actions" do
+      [:create].each do |method|
+        assert_respond_to addresses, method
+      end
+    end
+
+  end
+
 end
 
