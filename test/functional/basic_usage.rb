@@ -136,6 +136,17 @@ describe "Using the BitVault API" do
     @payee_address ||= payee.addr
   end
 
+  def unsigned_payment
+    @unsigned_payment ||= payments.create(
+      :outputs => [
+        {
+          :amount => 600_000,
+          :payee => {:address => payee_address}
+        }
+      ]
+    )
+  end
+
   ######################################################################
   # Test API discovery
   ######################################################################
@@ -521,6 +532,26 @@ describe "Using the BitVault API" do
     specify "expected actions" do
       [:create].each do |method|
         assert_respond_to payments, method
+      end
+    end
+
+  end
+
+  ######################################################################
+  # Test unsigned_payment creation
+  ######################################################################
+
+  describe "test unsigned_payment creation" do
+
+    specify "correct type" do
+
+      assert_kind_of Resources::UnsignedPayment, unsigned_payment
+    end
+
+    specify "expected actions" do
+
+      [:sign].each do |method|
+        assert_respond_to unsigned_payment, method
       end
     end
 
