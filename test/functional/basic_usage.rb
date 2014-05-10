@@ -54,7 +54,7 @@ describe "Using the BitVault API" do
 
   def application_names
     # This won't actually work while we're returning only mock data
-    ["bitcoin_emporium", "bitcoins-r-us"]
+    ["bitcoin-emporium", "bitcoin-extravaganza", "bitcoins-r-us"]
   end
 
   def application_list
@@ -163,6 +163,8 @@ describe "Using the BitVault API" do
     specify "expected actions" do
       [:get, :update, :reset].each do |method|
         assert_respond_to user, method
+
+        # TODO: add tests of each method
       end
     end
 
@@ -171,6 +173,7 @@ describe "Using the BitVault API" do
         assert_respond_to user, method
       end
     end
+
   end
 
   ######################################################################
@@ -192,7 +195,7 @@ describe "Using the BitVault API" do
   end
 
   ######################################################################
-  # Test applications.create
+  # Test applications methods
   ######################################################################
 
   describe "applications.create, applications.list" do
@@ -201,7 +204,6 @@ describe "Using the BitVault API" do
 
       application_list.each do |app|
         assert_kind_of Resources::Application, app
-        puts app.name
       end
 
       # Here so that we know that the applications have been created
@@ -217,6 +219,10 @@ describe "Using the BitVault API" do
       end
     end
 
+  ######################################################################
+  # Test application methods
+  ######################################################################
+
     specify "expected actions" do
       [:get, :update, :reset, :delete].each do |method|
         application_list.each do |app|
@@ -231,6 +237,30 @@ describe "Using the BitVault API" do
           assert_respond_to app, method
         end
       end
+    end
+
+    specify "test application.update" do
+
+      application_list.each do |app|
+        app.update(:name => app.name + "-updated")
+      end
+
+      # TODO: post-mock data, check that the names are changed
+    end
+
+    specify "test application.reset" do
+
+      reset = application.reset
+      assert_respond_to reset, :api_token
+    end
+
+    specify "test application.delete" do
+
+      application_list.each do |app|
+        app.delete
+      end
+
+      # TODO: post mock-data, test that they were deleted
     end
 
   end
