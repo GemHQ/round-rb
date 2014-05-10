@@ -108,6 +108,18 @@ describe "Using the BitVault API" do
     @accounts ||= wallet.accounts
   end
 
+  def account
+    @account ||= accounts.create :name => "office supplies"
+  end
+
+  def addresses
+    @addresses ||= account.addresses
+  end
+
+  def incoming_address
+    @incoming_address ||= addresses.create
+  end
+
   ######################################################################
   # Test API discovery
   ######################################################################
@@ -202,8 +214,10 @@ describe "Using the BitVault API" do
       [:get, :update, :reset].each do |method|
         assert_respond_to user, method
 
-        # TODO: add tests of each method
       end
+
+      # TODO: add tests of each method
+      assert_kind_of Resources::User, user.get
     end
 
     specify "expected attributes" do
@@ -271,6 +285,11 @@ describe "Using the BitVault API" do
           assert_respond_to app, method
         end
       end
+
+      # TODO: test each method
+      application_list.each do |app|
+        assert_kind_of Resources::Application, app.get
+      end
     end
 
     specify "expected attributes" do
@@ -314,7 +333,7 @@ describe "Using the BitVault API" do
   end
 
   ######################################################################
-  # Test wallet creation
+  # Test wallets resource
   ######################################################################
 
   describe "test application.wallets" do
@@ -333,7 +352,7 @@ describe "Using the BitVault API" do
   end
 
   ######################################################################
-  # Test wallet creation
+  # Test MultiWallet creation
   ######################################################################
 
   describe "test MultiWallet creation" do
@@ -343,9 +362,22 @@ describe "Using the BitVault API" do
     end
   end
 
+  ######################################################################
+  # Test wallet creation
+  ######################################################################
+
   describe "test wallet creation" do
     specify "correct type" do
       assert_kind_of Resources::Wallet, wallet
+    end
+
+    specify "expected actions" do
+      [:get].each do |method|
+        assert_respond_to wallet, method
+      end
+
+      # TODO: test each method
+      assert_kind_of Resources::Wallet, wallet.get
     end
 
     specify "test wallets.list" do
