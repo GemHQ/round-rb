@@ -408,5 +408,37 @@ describe "Using the BitVault API" do
 
   end
 
+  ######################################################################
+  # Test account creation
+  ######################################################################
+
+  describe "test account creation" do
+
+    specify "correct type" do
+      assert_kind_of Resources::Account, account
+    end
+
+    specify "expected actions" do
+      [:get, :update].each do |method|
+        assert_respond_to account, method
+      end
+
+      # TODO: test each method
+      assert_kind_of Resources::Account, account.get
+
+      assert_kind_of Resources::Account, account.update(:name => "rubber bands")
+    end
+
+    specify "accounts.list" do
+
+      assert_equal accounts.list.length, 1
+
+      accounts.list.each do |acct|
+        assert_kind_of Resources::Account, account
+      end
+    end
+
+  end
+
 end
 
