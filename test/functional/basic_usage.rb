@@ -128,6 +128,14 @@ describe "Using the BitVault API" do
                end
   end
 
+  def payments
+    @payments ||= account.payments
+  end
+
+  def payee_address
+    @payee_address ||= payee.addr
+  end
+
   ######################################################################
   # Test API discovery
   ######################################################################
@@ -494,6 +502,25 @@ describe "Using the BitVault API" do
 
       [:addr].each do |method|
         assert_respond_to payee, method
+      end
+    end
+
+  end
+
+  ######################################################################
+  # Test payments resource
+  ######################################################################
+
+  describe "test payments resource" do
+
+    specify "correct type" do
+
+      assert_kind_of Resources::Payments, payments
+    end
+
+    specify "expected actions" do
+      [:create].each do |method|
+        assert_respond_to payments, method
       end
     end
 
