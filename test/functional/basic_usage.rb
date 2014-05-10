@@ -4,6 +4,9 @@ require_relative "setup"
 BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
 
 Resources = BitVault::Client::Resources
+PassphraseBox = BitVault::Crypto::PassphraseBox
+MultiWallet = BitVault::Bitcoin::MultiWallet
+
 
 describe "Using the BitVault API" do
 
@@ -68,6 +71,28 @@ describe "Using the BitVault API" do
 
   def application
     application_list[0]
+  end
+
+  def new_wallet
+    @new_wallet ||= MultiWallet.generate [:primary, :backup]
+  end
+
+  def passphrase
+    "wrong pony generator brad"
+  end
+
+  def wallet
+    @wallet ||= begin
+      primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
+      encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
+      application.wallets.create(
+        :name => "my favorite wallet",
+        :network => "bitcoin_testnet",
+        :backup_address => new_wallet.trees[:backup].to_serialized_address,
+        :primary_address => new_wallet.trees[:primary].to_serialized_address,
+        :primary_seed => encrypted_seed
+      )
+    end
   end
 
   ######################################################################
@@ -198,7 +223,7 @@ describe "Using the BitVault API" do
   # Test applications methods
   ######################################################################
 
-  describe "applications.create, applications.list" do
+  describe "test applications.create, applications.list" do
 
     specify "correct type" do
 
@@ -219,9 +244,13 @@ describe "Using the BitVault API" do
       end
     end
 
+  end
+
   ######################################################################
   # Test application methods
   ######################################################################
+
+  describe "test application methods" do
 
     specify "expected actions" do
       [:get, :update, :reset, :delete].each do |method|
@@ -245,7 +274,7 @@ describe "Using the BitVault API" do
         app.update(:name => app.name + "-updated")
       end
 
-      # TODO: post-mock data, check that the names are changed
+      # TODO: after mock-data, check that the names are changed
     end
 
     specify "test application.reset" do
@@ -260,14 +289,27 @@ describe "Using the BitVault API" do
         app.delete
       end
 
-      # TODO: post mock-data, test that they were deleted
+      # TODO: after mock-data, test that they were deleted
     end
 
   end
 
   ######################################################################
-  # Test
+  # Test wallet creation
   ######################################################################
+
+  describe "test MultiWallet creation" do
+
+    specify "MultiWallet.generate" do
+      assert_kind_of MultiWallet, new_wallet
+    end
+  end
+
+  describe "test wallet creation" do
+    specify "foo" do
+      puts wallet.class
+    end
+  end
 
     #describe "user.wallets.create" do
 
