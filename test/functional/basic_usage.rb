@@ -147,6 +147,10 @@ describe "Using the BitVault API" do
     )
   end
 
+  def transaction
+    @transaction ||= BitVault::Bitcoin::Transaction.data(unsigned_payment)
+  end
+
   ######################################################################
   # Test API discovery
   ######################################################################
@@ -552,6 +556,26 @@ describe "Using the BitVault API" do
 
       [:sign].each do |method|
         assert_respond_to unsigned_payment, method
+      end
+    end
+
+  end
+
+  ######################################################################
+  # Test transaction creation
+  ######################################################################
+
+  describe "test transaction creation" do
+
+    specify "correct type" do
+
+      assert_kind_of BitVault::Bitcoin::Transaction, transaction
+    end
+
+    specify "expected resources" do
+
+      [:outputs].each do |method|
+        assert_respond_to transaction, method
       end
     end
 
