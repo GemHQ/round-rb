@@ -52,11 +52,22 @@ describe "Using the BitVault API" do
     @applications ||= user.applications
   end
 
+  def application_names
+    # This won't actually work while we're returning only mock data
+    ["bitcoin_emporium", "bitcoins-r-us"]
+  end
+
+  def application_list
+    @application_list ||= application_names.map do |name|
+      applications.create(
+        :name => name,
+        :callback_url => "https://api.#{name}.io/events"
+      )
+    end
+  end
+
   def application
-    @application ||= applications.create(
-      :name => "bitcoin_emporium",
-      :callback_url => "https://api.bitcoin-emporium.io/events"
-    )
+    application_list[0]
   end
 
   ######################################################################
@@ -184,21 +195,41 @@ describe "Using the BitVault API" do
   # Test applications.create
   ######################################################################
 
-  describe "applications.create" do
+  describe "applications.create, applications.list" do
 
     specify "correct type" do
-      assert_kind_of Resources::Application, application
+
+      application_list.each do |app|
+        assert_kind_of Resources::Application, app
+        puts app.name
+      end
+
+      # Here so that we know that the applications have been created
+
+      # the below is for the future, it won't work while the server
+      # is returning mock data.
+
+      #assert_equal applications.list.length, application_list.length
+      assert_equal applications.list.length, 1
+
+      applications.list.each do |app|
+        assert_kind_of Resources::Application, app
+      end
     end
 
     specify "expected actions" do
       [:get, :update, :reset, :delete].each do |method|
-        assert_respond_to application, method
+        application_list.each do |app|
+          assert_respond_to app, method
+        end
       end
     end
 
     specify "expected attributes" do
       [:name, :api_token, :owner, :wallets, :callback_url].each do |method|
-        assert_respond_to application, method
+        application_list.each do |app|
+          assert_respond_to app, method
+        end
       end
     end
 
