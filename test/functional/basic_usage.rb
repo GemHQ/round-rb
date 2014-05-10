@@ -389,5 +389,24 @@ describe "Using the BitVault API" do
     end
   end
 
+  ######################################################################
+  # Test accounts resource
+  ######################################################################
+
+  describe "test wallet.accounts resource" do
+
+    specify "correct type" do
+
+      assert_kind_of Resources::Accounts, accounts
+    end
+
+    specify "expected actions" do
+      [:create, :list].each do |method|
+        assert_respond_to accounts, method
+      end
+    end
+
+  end
+
 end
 
