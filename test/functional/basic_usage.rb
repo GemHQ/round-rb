@@ -1,11 +1,13 @@
 require_relative "setup"
-
-# Why must this be here at global scope?
-BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
+include BitVault::Encodings
 
 Resources = BitVault::Client::Resources
 PassphraseBox = BitVault::Crypto::PassphraseBox
 MultiWallet = BitVault::Bitcoin::MultiWallet
+
+
+# Why must this be here at global scope?
+BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
 
 
 describe "Using the BitVault API" do
@@ -163,6 +165,23 @@ describe "Using the BitVault API" do
     @transaction ||= BitVault::Bitcoin::Transaction.data(unsigned_payment)
   end
 
+  def signed_payment
+    @signed_payment ||= unsigned_payment.sign(
+      :transaction_hash => transaction.base58_hash,
+      :inputs => client_wallet.signatures(transaction)
+    )
+  end
+
+  def unsigned_transfer
+    @unsigned_transfer ||= wallet.transfers.create(
+      :value => 16_000,
+      :memo => "running low",
+      :source => "URL of source account goes here",
+      :destination => "URL of destination account goes here"
+    )
+  end
+
+=begin
   ######################################################################
   # Test API discovery
   ######################################################################
@@ -589,6 +608,37 @@ describe "Using the BitVault API" do
       [:outputs].each do |method|
         assert_respond_to transaction, method
       end
+    end
+
+    specify "valid change address" do
+      assert client_wallet.valid_output?(transaction.outputs.last)
+    end
+
+  end
+=end
+
+  ######################################################################
+  # Test transaction signing
+  ######################################################################
+
+  describe "test transaction signing" do
+
+    specify "correct type" do
+
+      assert_kind_of Hashie::Mash, signed_payment
+    end
+
+  end
+
+  ######################################################################
+  # Test transfer creation
+  ######################################################################
+
+  describe "test transfer creation" do
+
+    specify "create unsigned transfer" do
+
+      assert_kind_of Resources::UnsignedTransfer, unsigned_transfer
     end
 
     specify "valid source address" do
