@@ -185,6 +185,18 @@ describe "Using the BitVault API" do
     )
   end
 
+  def transfer_transaction
+    @transfer_transaction ||=
+      BitVault::Bitcoin::Transaction.data(unsigned_transfer)
+  end
+
+  def signed_transfer
+    @signed_transfer ||= unsigned_transfer.sign(
+        :transaction_hash => transfer_transaction.base58_hash,
+        :inputs => client_wallet.signatures(transfer_transaction)
+    )
+  end
+
   ######################################################################
   # Test API discovery
   ######################################################################
@@ -670,12 +682,40 @@ describe "Using the BitVault API" do
       end
     end
 
+  end
+
+  ######################################################################
+  # Test transfer transaction reconstruction
+  ######################################################################
+
+  describe "test transfer transaction reconstruction" do
+
+    specify "reconstruct transfer transaction" do
+
+      assert_kind_of BitVault::Bitcoin::Transaction, transfer_transaction
+    end
+
     specify "valid source address" do
-      assert client_wallet.valid_output?(transaction.inputs.first.output)
+      assert client_wallet.valid_output?(
+        transfer_transaction.inputs.first.output
+      )
     end
 
     specify "valid destination address" do
-      assert client_wallet.valid_output?(transaction.outputs.last)
+      assert client_wallet.valid_output?(transfer_transaction.outputs.last)
+    end
+
+  end
+
+  ######################################################################
+  # Test transfer signing
+  ######################################################################
+
+  describe "test transfer signing" do
+
+    specify "sign transfer" do
+
+      assert_kind_of Hashie::Mash, signed_transfer
     end
 
   end
