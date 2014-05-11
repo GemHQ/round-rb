@@ -104,6 +104,18 @@ describe "Using the BitVault API" do
     end
   end
 
+  def client_wallet
+    @client_wallet ||=
+      begin
+        primary_seed = PassphraseBox.decrypt(passphrase, wallet.primary_seed)
+        MultiWallet.new(
+          :private => {:primary => primary_seed},
+          :public =>  {:cosigner => wallet.cosigner_address,
+                       :backup =>   wallet.backup_address}
+        )
+      end
+  end
+
   def accounts
     @accounts ||= wallet.accounts
   end
@@ -577,6 +589,14 @@ describe "Using the BitVault API" do
       [:outputs].each do |method|
         assert_respond_to transaction, method
       end
+    end
+
+    specify "valid source address" do
+      assert client_wallet.valid_output?(transaction.inputs.first.output)
+    end
+
+    specify "valid destination address" do
+      assert client_wallet.valid_output?(transaction.outputs.last)
     end
 
   end
