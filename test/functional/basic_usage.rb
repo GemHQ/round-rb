@@ -197,6 +197,14 @@ describe "Using the BitVault API" do
     )
   end
 
+  def transactions_resource
+    @transactions_resource ||= account.transactions
+  end
+
+  def transactions_list
+    @transactions_list ||= transactions_resource.list
+  end
+
   ######################################################################
   # Test API discovery
   ######################################################################
@@ -670,7 +678,7 @@ describe "Using the BitVault API" do
 
   describe "test transfer creation" do
 
-    specify "create unsigned transfer" do
+    specify "correct type" do
 
       assert_kind_of Resources::UnsignedTransfer, unsigned_transfer
     end
@@ -690,7 +698,7 @@ describe "Using the BitVault API" do
 
   describe "test transfer transaction reconstruction" do
 
-    specify "reconstruct transfer transaction" do
+    specify "correct type" do
 
       assert_kind_of BitVault::Bitcoin::Transaction, transfer_transaction
     end
@@ -713,9 +721,58 @@ describe "Using the BitVault API" do
 
   describe "test transfer signing" do
 
-    specify "sign transfer" do
+    specify "correct type" do
 
       assert_kind_of Hashie::Mash, signed_transfer
+    end
+
+  end
+
+  ######################################################################
+  # Test transactions resource
+  ######################################################################
+
+  describe "test transactions resource" do
+
+    specify "correct type" do
+
+      assert_kind_of Resources::Transactions, transactions_resource
+    end
+
+    specify "expected actions" do
+
+      [:list].each do |method|
+        assert_respond_to transactions_resource, method
+      end
+
+      assert_kind_of Patchboard::API::ArrayResource, transactions_list
+    end
+
+  end
+
+  ######################################################################
+  # Test retrieved transactions
+  ######################################################################
+
+  describe "test retrieved transactions" do
+
+    specify "correct type" do
+
+      transactions_list.each do |transaction|
+        assert_kind_of Resources::Transaction, transaction
+      end
+    end
+
+    specify "expected actions" do
+
+      transactions_list.each do |transaction|
+        [:get].each do |method|
+          assert_respond_to transaction, method
+        end
+
+        assert_kind_of Resources::Transaction, transaction.get
+      end
+
     end
 
   end
