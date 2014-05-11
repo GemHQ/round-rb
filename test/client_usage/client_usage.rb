@@ -46,24 +46,6 @@ application = user.applications.list[0]
 # FIXME: Do we need to do this? It currently makes no difference
 #application = application.get
 
-updated = application.update(:name => "bitcoin_extravaganza")
-
-
-## Reset or delete the application
-#
-# At time of writing, the server is using mocked data, so these actions
-# do not affect the rest of the script.
-
-reset = application.reset
-
-log "Application reset", {
-  :previous_token => application.api_token,
-  :new_token => reset.api_token
-}
-
-result = application.delete
-log "Application delete response status", result.response.status
-
 
 ## Generate a MultiWallet with random seeds
 #
