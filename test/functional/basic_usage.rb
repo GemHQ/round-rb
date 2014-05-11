@@ -172,8 +172,12 @@ describe "Using the BitVault API" do
     )
   end
 
+  def transfers
+    @transfers ||= wallet.transfers
+  end
+
   def unsigned_transfer
-    @unsigned_transfer ||= wallet.transfers.create(
+    @unsigned_transfer ||= transfers.create(
       :value => 16_000,
       :memo => "running low",
       :source => "URL of source account goes here",
@@ -181,7 +185,6 @@ describe "Using the BitVault API" do
     )
   end
 
-=begin
   ######################################################################
   # Test API discovery
   ######################################################################
@@ -615,7 +618,6 @@ describe "Using the BitVault API" do
     end
 
   end
-=end
 
   ######################################################################
   # Test transaction signing
@@ -631,6 +633,26 @@ describe "Using the BitVault API" do
   end
 
   ######################################################################
+  # Test transfers resource
+  ######################################################################
+
+  describe "test transfers resource" do
+
+    specify "correct type" do
+
+      assert_kind_of Resources::Transfers, transfers
+    end
+
+    specify "expected actions" do
+
+      [:create].each do |method|
+        assert_respond_to transfers, method
+      end
+    end
+
+  end
+
+  ######################################################################
   # Test transfer creation
   ######################################################################
 
@@ -639,6 +661,13 @@ describe "Using the BitVault API" do
     specify "create unsigned transfer" do
 
       assert_kind_of Resources::UnsignedTransfer, unsigned_transfer
+    end
+
+    specify "expected actions" do
+
+      [:sign].each do |method|
+        assert_respond_to unsigned_transfer, method
+      end
     end
 
     specify "valid source address" do
