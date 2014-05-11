@@ -28,37 +28,23 @@ client = BV.spawn
 # credential to use based on the authorization scheme.
 
 # Data from the client's database
-user_url = "http://localhost:8999/users/Kw8aTuNfh6ZXKpq1CpmRMf"
 client.context.password = "incredibly_secure"
+user_url = "http://localhost:8999/users/Kw8aTuNfh6ZXKpq1CpmRMf"
+api_token = "9ZmwP5nDu3p59xMqELqVrnedXkYG4vKqQrssHxAs8chi"
 
 # Retrieve the user resource
 
 user = client.resources.user(user_url).get
 
-
-## Create an application.
-#
-# Wallets belong to applications, not directly
-# to users. The optional callback_url attribute specifies a URL where BitVault
-# can POST event information such as confirmed transactions.
-
-application = user.applications.create(
-  :name => "bitcoin_emporium",
-  :callback_url => "https://api.bitcoin-emporium.io/events"
-)
-
-log "Application", application
-
-# Applications use API tokens for authentication, rather than
-# requiring the user password.  Tokens can be reset easily,
-# password resets pose a major inconvenience to the user.
-
 # Supply the client with the authentication credential
-client.context.api_token = application.api_token
 
-# List and retrieve applications
-log "Application list", user.applications.list
-log "Retrieved application", application.get
+client.context.api_token = api_token
+
+# Retrieve application
+
+application = user.applications.list[0]
+# FIXME: Do we need to do this? It currently makes no difference
+#application = application.get
 
 updated = application.update(:name => "bitcoin_extravaganza")
 
