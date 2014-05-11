@@ -23,45 +23,17 @@ BV = BitVault::Client.discover(service_url) { BitVault::Client::Context.new }
 
 client = BV.spawn
 
-
-# Create a user
-#
-# The objects in `client.resources` are resource instances created at
-# discovery-time.  Each has action methods defined based on the JSON
-# API definition.  Action methods perform the actual HTTP requests
-# and wrap the results in further resource instances when appropriate.
-
-
-users = client.resources.users
-
-user = users.create(
-  :email => "matthew@bitvault.io",
-  :first_name => "Matthew",
-  :last_name => "King",
-  :password => "incredibly_secure"
-)
-log "User", user
-
-# The create action returned a User Resource which has:
-#
-# * action methods (get, update, reset)
-# * attributes (email, first_name, etc.)
-# * associated resources (applications)
-
-
-## Simulate a later session
-
-client = BV.spawn
-
 # Supply the client with the user password, required to manage the user
 # and its applications.  The context class used here determines which
 # credential to use based on the authorization scheme.
 
+# Data from the client's database
+user_url = "http://localhost:8999/users/Kw8aTuNfh6ZXKpq1CpmRMf"
 client.context.password = "incredibly_secure"
 
 # Retrieve the user resource
 
-user = client.resources.user(user.url).get
+user = client.resources.user(user_url).get
 
 
 ## Update some attributes for the user
