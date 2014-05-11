@@ -36,12 +36,6 @@ client.context.password = "incredibly_secure"
 user = client.resources.user(user_url).get
 
 
-## Update some attributes for the user
-
-user = user.update(:first_name => "Matt")
-log "User updated", user
-
-
 ## Create an application.
 #
 # Wallets belong to applications, not directly
