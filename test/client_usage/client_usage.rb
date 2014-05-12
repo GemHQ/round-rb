@@ -43,6 +43,7 @@ client.context.api_token = api_token
 # Retrieve application
 
 application = user.applications.list[0]
+
 # FIXME: Do we need to do this? It currently makes no difference
 #application = application.get
 
