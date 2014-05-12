@@ -23,93 +23,38 @@ BV = BitVault::Client.discover(service_url) { BitVault::Client::Context.new }
 
 client = BV.spawn
 
-
-# Create a user
-#
-# The objects in `client.resources` are resource instances created at
-# discovery-time.  Each has action methods defined based on the JSON
-# API definition.  Action methods perform the actual HTTP requests
-# and wrap the results in further resource instances when appropriate.
-
-
-users = client.resources.users
-
-user = users.create(
-  :email => "matthew@bitvault.io",
-  :first_name => "Matthew",
-  :last_name => "King",
-  :password => "incredibly_secure"
-)
-log "User", user
-
-# The create action returned a User Resource which has:
-#
-# * action methods (get, update, reset)
-# * attributes (email, first_name, etc.)
-# * associated resources (applications)
-
-
-## Simulate a later session
-
-client = BV.spawn
-
 # Supply the client with the user password, required to manage the user
 # and its applications.  The context class used here determines which
 # credential to use based on the authorization scheme.
 
+# Data from the client's database
 client.context.password = "incredibly_secure"
+user_url = "http://localhost:8999/users/Kw8aTuNfh6ZXKpq1CpmRMf"
+api_token = "9ZmwP5nDu3p59xMqELqVrnedXkYG4vKqQrssHxAs8chi"
+passphrase = "wrong pony generator brad"
+encrypted_seed = {
+  "salt" => "DAzgTjNCAfuCcQoMUKsfsx",
+  "iterations" => 100000,
+  "nonce" => "Hc9Q8BP9HA9X8KivpT7BdQbA7pkgUdpkY",
+  "ciphertext" => "X4QXL9SMfgokJkJQQuRoiZMKAZkFM3ZHwWGNB76VYtbkCN86FJ3yKecSbxwHiq3xg64R3PrRZUrZQfKmbkgbAwacCvKk2oNovFpPDq9keLFZiPA32nAiBHaiqrZmh7LQJ5Jufq3pU5QWNYfpbjdqB3Ag142ag63BVFtyknv2uxgZk"
+}
 
 # Retrieve the user resource
 
-user = client.resources.user(user.url).get
-
-
-## Update some attributes for the user
-
-user = user.update(:first_name => "Matt")
-log "User updated", user
-
-
-## Create an application.
-#
-# Wallets belong to applications, not directly
-# to users. The optional callback_url attribute specifies a URL where BitVault
-# can POST event information such as confirmed transactions.
-
-application = user.applications.create(
-  :name => "bitcoin_emporium",
-  :callback_url => "https://api.bitcoin-emporium.io/events"
-)
-
-log "Application", application
-
-# Applications use API tokens for authentication, rather than
-# requiring the user password.  Tokens can be reset easily,
-# password resets pose a major inconvenience to the user.
+user = client.resources.user(user_url).get
 
 # Supply the client with the authentication credential
-client.context.api_token = application.api_token
 
-# List and retrieve applications
-log "Application list", user.applications.list
-log "Retrieved application", application.get
+client.context.api_token = api_token
 
-updated = application.update(:name => "bitcoin_extravaganza")
+# Retrieve application
 
+application = user.applications.list[0]
 
-## Reset or delete the application
-#
-# At time of writing, the server is using mocked data, so these actions
-# do not affect the rest of the script.
+# FIXME: Do we need to do this? It currently makes no difference
+#application = application.get
 
-reset = application.reset
-
-log "Application reset", {
-  :previous_token => application.api_token,
-  :new_token => reset.api_token
-}
-
-
+#=begin
 ## Generate a MultiWallet with random seeds
 #
 # A MultiWallet encapsulates any number of hierarchical deterministic
@@ -133,8 +78,7 @@ primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
 
 ## Encrypt the primary seed using a passphrase-derived key
 
-passphrase = "wrong pony generator brad"
-encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
+#encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
 
 wallet = application.wallets.create(
   :name => "my favorite wallet",
@@ -145,7 +89,7 @@ wallet = application.wallets.create(
 )
 
 log "Wallet", wallet
-
+#=end
 
 ## Use the server's response data to construct a MultiWallet
 #
@@ -153,7 +97,7 @@ log "Wallet", wallet
 # The MultiWallet will be used later in this script to verify and sign a
 # transaction.
 
-primary_seed = PassphraseBox.decrypt(passphrase, wallet.primary_seed)
+primary_seed = PassphraseBox.decrypt(passphrase, encrypted_seed)
 client_wallet = MultiWallet.new(
   :private => {
     :primary => primary_seed
