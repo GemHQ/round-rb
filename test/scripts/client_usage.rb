@@ -109,9 +109,6 @@ log "Application reset", {
   :new_token => reset.api_token
 }
 
-result = application.delete
-log "Application delete response status", result.response.status
-
 
 ## Generate a MultiWallet with random seeds
 #
