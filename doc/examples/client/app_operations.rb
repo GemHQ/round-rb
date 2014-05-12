@@ -45,6 +45,7 @@ client.context.api_token = api_token
 log "Application list", user.applications.list
 
 # Client would select from multiple applications based on data in his database
+# FIXME: state which is best (I suspect the application key)
 
 application = user.applications.list[0]
 # FIXME: Do we need to do this? It currently makes no difference

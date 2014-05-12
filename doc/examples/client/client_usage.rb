@@ -31,6 +31,13 @@ client = BV.spawn
 client.context.password = "incredibly_secure"
 user_url = "http://localhost:8999/users/Kw8aTuNfh6ZXKpq1CpmRMf"
 api_token = "9ZmwP5nDu3p59xMqELqVrnedXkYG4vKqQrssHxAs8chi"
+passphrase = "wrong pony generator brad"
+encrypted_seed = {
+  "salt" => "DAzgTjNCAfuCcQoMUKsfsx",
+  "iterations" => 100000,
+  "nonce" => "Hc9Q8BP9HA9X8KivpT7BdQbA7pkgUdpkY",
+  "ciphertext" => "X4QXL9SMfgokJkJQQuRoiZMKAZkFM3ZHwWGNB76VYtbkCN86FJ3yKecSbxwHiq3xg64R3PrRZUrZQfKmbkgbAwacCvKk2oNovFpPDq9keLFZiPA32nAiBHaiqrZmh7LQJ5Jufq3pU5QWNYfpbjdqB3Ag142ag63BVFtyknv2uxgZk"
+}
 
 # Retrieve the user resource
 
@@ -47,7 +54,7 @@ application = user.applications.list[0]
 # FIXME: Do we need to do this? It currently makes no difference
 #application = application.get
 
-
+#=begin
 ## Generate a MultiWallet with random seeds
 #
 # A MultiWallet encapsulates any number of hierarchical deterministic
@@ -71,8 +78,7 @@ primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
 
 ## Encrypt the primary seed using a passphrase-derived key
 
-passphrase = "wrong pony generator brad"
-encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
+#encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
 
 wallet = application.wallets.create(
   :name => "my favorite wallet",
@@ -83,7 +89,7 @@ wallet = application.wallets.create(
 )
 
 log "Wallet", wallet
-
+#=end
 
 ## Use the server's response data to construct a MultiWallet
 #
@@ -91,7 +97,7 @@ log "Wallet", wallet
 # The MultiWallet will be used later in this script to verify and sign a
 # transaction.
 
-primary_seed = PassphraseBox.decrypt(passphrase, wallet.primary_seed)
+primary_seed = PassphraseBox.decrypt(passphrase, encrypted_seed)
 client_wallet = MultiWallet.new(
   :private => {
     :primary => primary_seed
