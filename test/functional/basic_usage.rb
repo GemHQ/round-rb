@@ -335,11 +335,10 @@ describe "Using the BitVault API" do
 
     specify "test user.update" do
 
-      # FIXME: currently user.update hangs
-      #updated_user = user.update(:first_name => "Matt")
+      updated_user = user.update(:first_name => "Matt")
 
-      #assert_equal updated_user.first_name, "Matt"
-      #assert_equal updated_user.updated_at, 1_400_016_181.596653569
+      assert_equal updated_user.first_name, "Matt"
+      assert_equal updated_user.updated_at, 1_400_016_181.596653569
     end
 
   end
@@ -465,6 +464,14 @@ describe "Using the BitVault API" do
       end
     end
 
+    specify "test wallets.list" do
+
+      assert_equal wallets.list.length, 1
+      wallets.list.each do |wallet|
+        assert_kind_of Resources::Wallet, wallet
+      end
+    end
+
   end
 
   ######################################################################
@@ -496,13 +503,16 @@ describe "Using the BitVault API" do
       assert_kind_of Resources::Wallet, wallet.get
     end
 
-    specify "test wallets.list" do
-
-      assert_equal wallets.list.length, 1
-      wallets.list.each do |wallet|
-        assert_kind_of Resources::Wallet, wallet
+    specify "expected attributes" do
+      [:created_at, :updated_at].each do |method|
+        assert_respond_to wallet, method
       end
+
+      # TODO: test all attributes
+      assert_equal wallet.created_at, 1_370_012_317.886902763
+      assert_equal wallet.updated_at, 1_400_012_287.857975450
     end
+
   end
 
   ######################################################################
@@ -519,6 +529,15 @@ describe "Using the BitVault API" do
     specify "expected actions" do
       [:create, :list].each do |method|
         assert_respond_to accounts, method
+      end
+    end
+
+    specify "accounts.list" do
+
+      assert_equal accounts.list.length, 1
+
+      accounts.list.each do |acct|
+        assert_kind_of Resources::Account, account
       end
     end
 
@@ -545,13 +564,22 @@ describe "Using the BitVault API" do
       assert_kind_of Resources::Account, account.update(:name => "rubber bands")
     end
 
-    specify "accounts.list" do
-
-      assert_equal accounts.list.length, 1
-
-      accounts.list.each do |acct|
-        assert_kind_of Resources::Account, account
+    specify "expected attributes" do
+      [:created_at, :updated_at].each do |method|
+        assert_respond_to account, method
       end
+
+      # TODO: test all attributes
+      assert_equal account.created_at, 1_370_012_317.886902763
+      assert_equal account.updated_at, 1_400_012_287.857975450
+    end
+
+    specify "test account.update" do
+
+      updated_account = account.update(:name => "rubber bands")
+
+      assert_equal updated_account.name, "rubber bands"
+      assert_equal updated_account.updated_at, 1_400_016_181.596653569
     end
 
   end
