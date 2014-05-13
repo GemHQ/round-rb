@@ -83,5 +83,4 @@ wallet = application.wallets.create(
 
 log "Wallet", wallet
 
-# The client will save this for subsequent use
-log "Encrypted seed", encrypted_seed
+log "Wallet list", application.wallets.list
