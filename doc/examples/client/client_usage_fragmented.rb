@@ -33,10 +33,10 @@ user_url = "http://localhost:8999/users/Kw8aTuNfh6ZXKpq1CpmRMf"
 api_token = "9ZmwP5nDu3p59xMqELqVrnedXkYG4vKqQrssHxAs8chi"
 passphrase = "wrong pony generator brad"
 encrypted_seed = {
-  "salt" => "DAzgTjNCAfuCcQoMUKsfsx",
+  "salt" => "FPX1ZBkCLTzxMTuVzy856m",
   "iterations" => 100000,
-  "nonce" => "Hc9Q8BP9HA9X8KivpT7BdQbA7pkgUdpkY",
-  "ciphertext" => "X4QXL9SMfgokJkJQQuRoiZMKAZkFM3ZHwWGNB76VYtbkCN86FJ3yKecSbxwHiq3xg64R3PrRZUrZQfKmbkgbAwacCvKk2oNovFpPDq9keLFZiPA32nAiBHaiqrZmh7LQJ5Jufq3pU5QWNYfpbjdqB3Ag142ag63BVFtyknv2uxgZk"
+  "nonce" => "PRa5MVMjLzX3qKBJGr7PP7wGEqUQQ7suQ",
+  "ciphertext" => "5VhRdNdneQU2qykUJGbr3aDP5jt2MRHD795jHNniCzraTRbNyukuh1ZcyjwyvaKPxwca6kRYfsuEqPRAjHtV9g6hByehYyzmG1GYyRxWhu51w2YYtHzGeV1Ev5G6bZprM6SC5i8caob7DGnoAsFxYeygvxAjAFQ77ABZRqXDKihwjr"
 }
 
 # Retrieve the user resource
@@ -54,42 +54,10 @@ application = user.applications.list[0]
 # FIXME: Do we need to do this? It currently makes no difference
 #application = application.get
 
-#=begin
-## Generate a MultiWallet with random seeds
-#
-# A MultiWallet encapsulates any number of hierarchical deterministic
-# wallet trees (BIP 32).  Some of the trees may be public-key only.
-#
-# From a high-level point of view, a BitVault wallet consists of three
-# trees: the primary, the cosigner, and the backup.  The primary and
-# backup trees are owned by the user, the cosigner tree by BitVault.
-# "Owned" here means "knows the root private key".  The root public
-# keys for all three trees are, of course, public.  The root private
-# key for the backup tree should be stored offline.
-#
-# BitVault uses all three public trees to generate multisig payment addresses
-# for a wallet.  To spend bitcoins paid to such an address requires
-# two signatures.  Under normal circumstances, these signatures will be
-# derived from the primary and cosigner trees.
+# Retrieve wallet
 
-new_wallet = MultiWallet.generate [:primary, :backup]
-primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
-
-
-## Encrypt the primary seed using a passphrase-derived key
-
-#encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
-
-wallet = application.wallets.create(
-  :name => "my favorite wallet",
-  :network => "bitcoin_testnet",
-  :backup_address => new_wallet.trees[:backup].to_serialized_address,
-  :primary_address => new_wallet.trees[:primary].to_serialized_address,
-  :primary_seed => encrypted_seed
-)
-
-log "Wallet", wallet
-#=end
+log "Wallet list", application.wallets.list
+wallet = application.wallets.list[0]
 
 ## Use the server's response data to construct a MultiWallet
 #
@@ -97,7 +65,7 @@ log "Wallet", wallet
 # The MultiWallet will be used later in this script to verify and sign a
 # transaction.
 
-primary_seed = PassphraseBox.decrypt(passphrase, encrypted_seed)
+primary_seed = PassphraseBox.decrypt(passphrase, wallet.primary_seed)
 client_wallet = MultiWallet.new(
   :private => {
     :primary => primary_seed
@@ -108,11 +76,10 @@ client_wallet = MultiWallet.new(
   }
 )
 
-log "Wallet list", application.wallets.list
-
 
 ## Retrieve and use the newly created wallet for further actions.
 
+# FIXME: why do we do this? It currently doesn't make a difference
 wallet = wallet.get
 
 
