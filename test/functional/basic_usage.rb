@@ -9,79 +9,65 @@ MultiWallet = BitVault::Bitcoin::MultiWallet
 # Why must this be here at global scope?
 BV = BitVault::Client.discover("http://localhost:8999/") { BitVault::Client::Context.new }
 
+module SpecFixtures
+  def fixture(name, value=nil, &block)
+    @@mini_test_spec_fixtures ||= {}
+
+    self.define_singleton_method(name) do
+      if value
+        @@mini_test_spec_fixtures[name] ||= value
+      else
+        @@mini_test_spec_fixtures[name] ||= yield
+      end
+    end
+
+    self.module_eval do
+      define_method(name) do
+        self.class.send(name)
+      end
+    end
+  end
+end
 
 describe "Using the BitVault API" do
+  extend SpecFixtures
 
-  ######################################################################
   # Cached access to various test objects
-  ######################################################################
 
-=begin
-  def BV
-    @BV ||= BitVault::Client.discover("http://localhost:8999/") {
-      BitVault::Client::Context.new
-    }
-  end
-=end
-
-  def client
-    @client ||= begin
-      client = BV.spawn
-      client.context.password = "incredibly secure"
-      client
-    end
+  fixture :client, begin
+    client = BV.spawn
+    client.context.password = "incredibly secure"
+    client
   end
 
-  def context
-    @context ||= client.context
-  end
+  fixture :context, client.context
+  fixture :resources, client.resources
+  fixture :users, resources.users
 
-  def resources
-    @resources ||= client.resources
-  end
+  #fixture :user, users.create(
+    #:email => "matthew@bitvault.io",
+    #:first_name => "Matthew",
+    #:last_name => "King",
+    #:password => "incredibly_secure"
+  #)
 
-  def users
-    @users ||= resources.users
-  end
+  #fixture :applications, user.applications
 
-  def user
-    @user ||= users.create(
-      :email => "matthew@bitvault.io",
-      :first_name => "Matthew",
-      :last_name => "King",
-      :password => "incredibly_secure"
-    )
-  end
+  # This won't actually work while we're returning only mock data
+  #fixture :application_names, ["bitcoin-emporium", "bitcoin-extravaganza", "bitcoins-r-us"]
 
-  def applications
-    @applications ||= user.applications
-  end
+  #fixture :application_list do
+    #application_names.map do |name|
+      #applications.create(
+        #:name => name,
+        #:callback_url => "https://api.#{name}.io/events"
+      #)
+    #end
+  #end
 
-  def application_names
-    # This won't actually work while we're returning only mock data
-    ["bitcoin-emporium", "bitcoin-extravaganza", "bitcoins-r-us"]
-  end
+  #fixture :application, application_list[0]
 
-  def application_list
-    @application_list ||= application_names.map do |name|
-      applications.create(
-        :name => name,
-        :callback_url => "https://api.#{name}.io/events"
-      )
-    end
-  end
-
-  def application
-    application_list[0]
-  end
-
-  def new_wallet
-    @new_wallet ||= MultiWallet.generate [:primary, :backup]
-  end
-
-  def passphrase
-    "wrong pony generator brad"
-  end
+  fixture :passphrase, "wrong pony generator brad"
 
   def wallets
     @wallets ||= begin
@@ -93,14 +79,15 @@ describe "Using the BitVault API" do
 
   def wallet
     @wallet ||= begin
-      primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
+      multi_wallet = MultiWallet.generate [:primary, :backup]
+      primary_seed = multi_wallet.trees[:primary].to_serialized_address(:private)
       encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
       # Must have the authentication token to create a wallet
       wallets.create(
         :name => "my favorite wallet",
         :network => "bitcoin_testnet",
-        :backup_address => new_wallet.trees[:backup].to_serialized_address,
-        :primary_address => new_wallet.trees[:primary].to_serialized_address,
+        :backup_address => multi_wallet.trees[:backup].to_serialized_address,
+        :primary_address => multi_wallet.trees[:primary].to_serialized_address,
         :primary_seed => encrypted_seed
       )
     end
@@ -205,91 +192,87 @@ describe "Using the BitVault API" do
     @transactions_list ||= transactions_resource.list
   end
 
-  ######################################################################
-  # Test API discovery
-  ######################################################################
+  ## Test API discovery
 
-  describe "BitVault API discovery" do
+  #describe "BitVault API discovery" do
 
-    # N.B.: The tests reflect the API even when we know, e.g. that the function
-    # exists because we called it in the code above.
+    ## N.B.: The tests reflect the API even when we know, e.g. that the function
+    ## exists because we called it in the code above.
 
-    specify "expected class actions" do
-      assert_respond_to BitVault::Client, :discover
-    end
+    #specify "expected class actions" do
+      #assert_respond_to BitVault::Client, :discover
+    #end
 
-    specify "correct class" do
-      assert_kind_of BitVault::Client, BV
-    end
+    #specify "correct class" do
+      #assert_kind_of BitVault::Client, BV
+    #end
 
-    specify "expected actions" do
-      assert_respond_to BV, :spawn
-    end
-  end
+    #specify "expected actions" do
+      #assert_respond_to BV, :spawn
+    #end
+  #end
 
-  ######################################################################
-  # Test client creation
-  ######################################################################
+  ## Test client creation
 
-  describe "client" do
+  #describe "client" do
 
-    specify "correct class" do
-      assert_kind_of Patchboard::Client, client
-    end
+    #specify "correct class" do
+      #assert_kind_of Patchboard::Client, client
+    #end
 
-    specify "expected actions" do
-      [:resources, :context].each do |method|
-        assert_respond_to client, method
-      end
-    end
-  end
+    #specify "expected actions" do
+      #[:resources, :context].each do |method|
+        #assert_respond_to client, method
+      #end
+    #end
+  #end
 
-  ######################################################################
-  # Test client context
-  ######################################################################
+  ## Test client context
 
-  describe "client.context" do
+  #describe "client.context" do
 
-    specify "expected actions" do
-      [:authorizer].each do |method|
-        assert_respond_to context, method
-      end
+    #specify "expected actions" do
+      #[:authorizer].each do |method|
+        #assert_respond_to context, method
+      #end
 
-      # These are not required according to client_usage.rb, but exist in the
-      # code
-      [:password, :api_token, :inspect].each do |method|
-        assert_respond_to context, method
-      end
-    end
-  end
+      ## These are not required according to client_usage.rb, but exist in the
+      ## code
+      #[:password, :api_token, :inspect].each do |method|
+        #assert_respond_to context, method
+      #end
+    #end
+  #end
 
-  ######################################################################
-  # Test client resources
-  ######################################################################
+  ## Test client resources
 
-  describe "client.resources" do
+  #describe "client.resources" do
 
-    specify "expected actions" do
-      assert_respond_to resources, :users
-    end
-  end
+    #specify "expected actions" do
+      #assert_respond_to resources, :users
+    #end
+  #end
 
-  ######################################################################
-  # Test users resource
-  ######################################################################
+  ## Test users resource
 
-  describe "client.resources.users" do
+  #describe "client.resources.users" do
 
-    specify "expected actions" do
-      assert_respond_to client.resources.users, :create
-    end
-  end
+    #specify "expected actions" do
+      #assert_respond_to client.resources.users, :create
+    #end
+  #end
 
-  ######################################################################
   # Test users.create
-  ######################################################################
 
   describe "users.create" do
+
+    fixture :user, users.create(
+      :email => "matthew@bitvault.io",
+      :first_name => "Matthew",
+      :last_name => "King",
+      :password => "incredibly_secure"
+    )
+
 
     specify "correct type" do
       assert_kind_of Resources::User, user
@@ -313,9 +296,9 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
+  next
+
   # Test applications resource
-  ######################################################################
 
   describe "applications" do
 
@@ -331,9 +314,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test applications methods
-  ######################################################################
 
   describe "test applications.create, applications.list" do
 
@@ -358,9 +339,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test application methods
-  ######################################################################
 
   describe "test application methods" do
 
@@ -417,9 +396,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test wallets resource
-  ######################################################################
 
   describe "test application.wallets" do
 
@@ -436,20 +413,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
-  # Test MultiWallet creation
-  ######################################################################
-
-  describe "test MultiWallet creation" do
-
-    specify "MultiWallet.generate" do
-      assert_kind_of MultiWallet, new_wallet
-    end
-  end
-
-  ######################################################################
   # Test wallet creation
-  ######################################################################
 
   describe "test wallet creation" do
     specify "correct type" do
@@ -474,9 +438,7 @@ describe "Using the BitVault API" do
     end
   end
 
-  ######################################################################
   # Test accounts resource
-  ######################################################################
 
   describe "test wallet.accounts resource" do
 
@@ -493,9 +455,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test account creation
-  ######################################################################
 
   describe "test account creation" do
 
@@ -525,9 +485,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test addresses resource
-  ######################################################################
 
   describe "test account.addresses resource" do
 
@@ -544,9 +502,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test address creation
-  ######################################################################
 
   describe "test address creation" do
 
@@ -556,9 +512,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test payee creation
-  ######################################################################
 
   describe "test payee creation" do
 
@@ -576,9 +530,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test payments resource
-  ######################################################################
 
   describe "test payments resource" do
 
@@ -595,9 +547,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test unsigned_payment creation
-  ######################################################################
 
   describe "test unsigned_payment creation" do
 
@@ -615,9 +565,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test transaction creation
-  ######################################################################
 
   describe "test transaction creation" do
 
@@ -639,9 +587,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test transaction signing
-  ######################################################################
 
   describe "test transaction signing" do
 
@@ -652,9 +598,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test transfers resource
-  ######################################################################
 
   describe "test transfers resource" do
 
@@ -672,9 +616,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test transfer creation
-  ######################################################################
 
   describe "test transfer creation" do
 
@@ -692,9 +634,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test transfer transaction reconstruction
-  ######################################################################
 
   describe "test transfer transaction reconstruction" do
 
@@ -715,9 +655,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test transfer signing
-  ######################################################################
 
   describe "test transfer signing" do
 
@@ -728,9 +666,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test transactions resource
-  ######################################################################
 
   describe "test transactions resource" do
 
@@ -750,9 +686,7 @@ describe "Using the BitVault API" do
 
   end
 
-  ######################################################################
   # Test retrieved transactions
-  ######################################################################
 
   describe "test retrieved transactions" do
 
