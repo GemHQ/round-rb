@@ -80,3 +80,13 @@ log "Account list", wallet.accounts.list
 account = wallet.accounts.list[0]
 
 log "Account updated", account.update(:name => "rubber bands")
+
+
+## Generate an address where others can send payments.
+#
+# This is a BIP 16 "Pay to Script Hash" address, where the script in question
+# is a BIP 11 "multisig".
+
+incoming_address = account.addresses.create
+
+log "Payment address", incoming_address
