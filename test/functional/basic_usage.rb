@@ -317,8 +317,8 @@ describe "Using the BitVault API" do
         assert_respond_to user, method
       end
 
-      #assert_equal user.created_at, 1_370_012_317.886902763
-      #assert_equal user.updated_at, 1_400_012_287.857975450
+      assert_equal user.created_at, 1_370_012_317.886902763
+      assert_equal user.updated_at, 1_400_012_287.857975450
     end
 
   end
@@ -363,6 +363,9 @@ describe "Using the BitVault API" do
 
       applications.list.each do |app|
         assert_kind_of Resources::Application, app
+
+        assert_equal app.created_at, 1_370_012_317.886902763
+        assert_equal app.updated_at, 1_400_012_287.857975450
       end
     end
 
