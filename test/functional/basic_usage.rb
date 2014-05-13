@@ -306,9 +306,19 @@ describe "Using the BitVault API" do
     end
 
     specify "expected attributes" do
-      [:email, :first_name, :last_name, :applications].each do |method|
+      [
+        :email,
+        :first_name,
+        :last_name,
+        :applications,
+        :created_at,
+        :updated_at
+      ].each do |method|
         assert_respond_to user, method
       end
+
+      #assert_equal user.created_at, 1_370_012_317.886902763
+      #assert_equal user.updated_at, 1_400_012_287.857975450
     end
 
   end
@@ -778,4 +788,3 @@ describe "Using the BitVault API" do
   end
 
 end
-
