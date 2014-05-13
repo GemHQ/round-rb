@@ -19,6 +19,10 @@ describe "Blockr.io interface" do
 
     result.each do |output|
       assert_kind_of BitVault::Bitcoin::Output, output
+
+      # Check that unspent outputs report their confirmations,
+      # should be a large positive number
+      assert output.confirmations > 10_000
     end
 
     output = result[0]
