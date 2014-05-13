@@ -31,6 +31,7 @@ client = BV.spawn
 client.context.password = "incredibly_secure"
 user_url = "http://localhost:8999/users/Kw8aTuNfh6ZXKpq1CpmRMf"
 api_token = "9ZmwP5nDu3p59xMqELqVrnedXkYG4vKqQrssHxAs8chi"
+passphrase = "wrong pony generator brad"
 
 # Retrieve the user resource
 
@@ -40,34 +41,49 @@ user = client.resources.user(user_url).get
 
 client.context.api_token = api_token
 
-# List and retrieve applications
-
-log "Application list", user.applications.list
-
-# Client would select from multiple applications based on data in his database
-# FIXME: state which is best (I suspect the application key)
+# Retrieve application
 
 application = user.applications.list[0]
+
 # FIXME: Do we need to do this? It currently makes no difference
 #application = application.get
 
-log "Retrieved application", application
+# Retrieve wallet
 
+# FIXME: I  just guessed this, double-check that it's correct--DLL
+wallet = application.wallets.list[0]
 
-updated = application.update(:name => "bitcoin_extravaganza")
-
-
-## Reset or delete the application
+## Use the server's response data to construct a MultiWallet
 #
-# At time of writing, the server is using mocked data, so these actions
-# do not affect the rest of the script.
+# This models what an application would do in any subsequent interactions.
+# The MultiWallet will be used later in this script to verify and sign a
+# transaction.
 
-reset = application.reset
+primary_seed = PassphraseBox.decrypt(passphrase, wallet.primary_seed)
+client_wallet = MultiWallet.new(
+  :private => {
+    :primary => primary_seed
+  },
+  :public => {
+    :cosigner => wallet.cosigner_address,
+    :backup => wallet.backup_address
+  }
+)
 
-log "Application reset", {
-  :previous_token => application.api_token,
-  :new_token => reset.api_token
-}
+# Retrieve the account
+account = wallet.accounts.list[0]
 
-result = application.delete
-log "Application delete response status", result.response.status
+
+## List the transactions for an account
+
+list = account.transactions.list
+
+log "Transactions list", list
+
+## Retrieve an individual transaction
+
+transaction = list[0].get
+
+log "Transaction get", transaction
+
+

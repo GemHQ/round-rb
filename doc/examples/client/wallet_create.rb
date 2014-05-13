@@ -40,34 +40,47 @@ user = client.resources.user(user_url).get
 
 client.context.api_token = api_token
 
-# List and retrieve applications
-
-log "Application list", user.applications.list
-
-# Client would select from multiple applications based on data in his database
-# FIXME: state which is best (I suspect the application key)
+# Retrieve application
 
 application = user.applications.list[0]
 # FIXME: Do we need to do this? It currently makes no difference
 #application = application.get
 
-log "Retrieved application", application
 
-
-updated = application.update(:name => "bitcoin_extravaganza")
-
-
-## Reset or delete the application
+## Generate a MultiWallet with random seeds
 #
-# At time of writing, the server is using mocked data, so these actions
-# do not affect the rest of the script.
+# A MultiWallet encapsulates any number of hierarchical deterministic
+# wallet trees (BIP 32).  Some of the trees may be public-key only.
+#
+# From a high-level point of view, a BitVault wallet consists of three
+# trees: the primary, the cosigner, and the backup.  The primary and
+# backup trees are owned by the user, the cosigner tree by BitVault.
+# "Owned" here means "knows the root private key".  The root public
+# keys for all three trees are, of course, public.  The root private
+# key for the backup tree should be stored offline.
+#
+# BitVault uses all three public trees to generate multisig payment addresses
+# for a wallet.  To spend bitcoins paid to such an address requires
+# two signatures.  Under normal circumstances, these signatures will be
+# derived from the primary and cosigner trees.
 
-reset = application.reset
+new_wallet = MultiWallet.generate [:primary, :backup]
+primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
 
-log "Application reset", {
-  :previous_token => application.api_token,
-  :new_token => reset.api_token
-}
 
-result = application.delete
-log "Application delete response status", result.response.status
+## Encrypt the primary seed using a passphrase-derived key
+
+passphrase = "wrong pony generator brad"
+encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
+
+wallet = application.wallets.create(
+  :name => "my favorite wallet",
+  :network => "bitcoin_testnet",
+  :backup_address => new_wallet.trees[:backup].to_serialized_address,
+  :primary_address => new_wallet.trees[:primary].to_serialized_address,
+  :primary_seed => encrypted_seed
+)
+
+log "Wallet", wallet
+
+log "Wallet list", application.wallets.list
