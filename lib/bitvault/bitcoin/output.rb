@@ -6,6 +6,7 @@ module BitVault::Bitcoin
 
     attr_accessor :metadata
     attr_reader :native, :transaction, :index, :value, :script, :address
+    attr_reader :confirmations
 
     # Takes a Hash with required keys:
     #
@@ -31,6 +32,7 @@ module BitVault::Bitcoin
       # FIXME: be aware of string bitcoin values versus
       # integer satoshi values
       @index, @value, @address = options.values_at :index, :value, :address
+      @confirmations = options.values_at :confirmations
       @metadata = options[:metadata] || {}
 
       if options[:script]
@@ -68,7 +70,8 @@ module BitVault::Bitcoin
         :value => self.value,
         :script => self.script,
         :address => self.address,
-        :metadata => self.metadata
+        :metadata => self.metadata,
+        :confirmations => self.confirmations
       }
     end
 
