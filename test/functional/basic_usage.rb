@@ -613,6 +613,16 @@ describe "Using the BitVault API" do
       assert_kind_of Hashie::Mash, incoming_address
     end
 
+    specify "expected keys" do
+      ["created_at"].each do |key|
+        assert incoming_address.has_key? key
+      end
+
+
+      # TODO: test all attributes
+      assert_equal incoming_address["created_at"], 1_370_012_317.886902763
+    end
+
   end
 
   ######################################################################
