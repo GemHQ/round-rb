@@ -32,12 +32,6 @@ client.context.password = "incredibly_secure"
 user_url = "http://localhost:8999/users/Kw8aTuNfh6ZXKpq1CpmRMf"
 api_token = "9ZmwP5nDu3p59xMqELqVrnedXkYG4vKqQrssHxAs8chi"
 passphrase = "wrong pony generator brad"
-encrypted_seed = {
-  "salt" => "FPX1ZBkCLTzxMTuVzy856m",
-  "iterations" => 100000,
-  "nonce" => "PRa5MVMjLzX3qKBJGr7PP7wGEqUQQ7suQ",
-  "ciphertext" => "5VhRdNdneQU2qykUJGbr3aDP5jt2MRHD795jHNniCzraTRbNyukuh1ZcyjwyvaKPxwca6kRYfsuEqPRAjHtV9g6hByehYyzmG1GYyRxWhu51w2YYtHzGeV1Ev5G6bZprM6SC5i8caob7DGnoAsFxYeygvxAjAFQ77ABZRqXDKihwjr"
-}
 
 # Retrieve the user resource
 
@@ -56,6 +50,7 @@ application = user.applications.list[0]
 
 # Retrieve wallet
 
+# FIXME: I  just guessed this, double-check that it's correct--DLL
 log "Wallet list", application.wallets.list
 wallet = application.wallets.list[0]
 
@@ -75,30 +70,6 @@ client_wallet = MultiWallet.new(
     :backup => wallet.backup_address
   }
 )
-
-
-## Retrieve and use the newly created wallet for further actions.
-
-# FIXME: why do we do this? It currently doesn't make a difference
-wallet = wallet.get
-
-
-## Create an account within a wallet
-#
-# Wallets can have multiple accounts, each represented by a path in the
-# MultiWallet's deterministic trees.
-
-account = wallet.accounts.create :name => "office supplies"
-
-log "Account", account
-log "Account list", wallet.accounts.list
-
-## Prove you can retrieve and use the newly created account
-account = account.get
-
-
-log "Account updated", account.update(:name => "rubber bands")
-
 
 ## Generate an address where others can send payments.
 #
