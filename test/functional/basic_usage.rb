@@ -295,6 +295,14 @@ describe "Using the BitVault API" do
       assert_kind_of Resources::User, user
     end
 
+  end
+
+  ######################################################################
+  # Test user methods
+  ######################################################################
+
+  describe "test user methods" do
+
     specify "expected actions" do
       [:get, :update, :reset].each do |method|
         assert_respond_to user, method
@@ -306,19 +314,32 @@ describe "Using the BitVault API" do
     end
 
     specify "expected attributes" do
-      [
-        :email,
-        :first_name,
-        :last_name,
-        :applications,
-        :created_at,
-        :updated_at
-      ].each do |method|
-        assert_respond_to user, method
+
+      [user, user.get].each do |u|
+        [
+          :email,
+          :first_name,
+          :last_name,
+          :applications,
+          :created_at,
+          :updated_at
+        ].each do |method|
+          assert_respond_to u, method
+        end
+
+        assert_equal u.created_at, 1_370_012_317.886902763
+        assert_equal u.updated_at, 1_400_012_287.857975450
       end
 
-      assert_equal user.created_at, 1_370_012_317.886902763
-      assert_equal user.updated_at, 1_400_012_287.857975450
+    end
+
+    specify "test user.update" do
+
+      # FIXME: currently user.update hangs
+      #updated_user = user.update(:first_name => "Matt")
+
+      #assert_equal updated_user.first_name, "Matt"
+      #assert_equal updated_user.updated_at, 1_400_016_181.596653569
     end
 
   end
@@ -401,7 +422,14 @@ describe "Using the BitVault API" do
     specify "test application.update" do
 
       application_list.each do |app|
-        app.update(:name => app.name + "-updated")
+        # These won't work with mock data
+        #updated_app = app.update(:name => app.name + "-updated")
+        #assert_equal updated_app.name, app.name + "-updated"
+
+        updated_app = app.update(:name => "bitcoin_extravaganza")
+        assert_equal updated_app.name, "bitcoin_extravaganza"
+
+        assert_equal updated_app.updated_at, 1_400_016_181.596653569
       end
 
       # TODO: after mock-data, check that the names are changed
