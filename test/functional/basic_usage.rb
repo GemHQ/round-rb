@@ -719,6 +719,16 @@ describe "Using the BitVault API" do
       assert_kind_of Hashie::Mash, signed_payment
     end
 
+    specify "expected keys" do
+      ["created_at"].each do |key|
+        assert signed_payment.has_key? key
+      end
+
+
+      # TODO: test all attributes
+      assert_equal signed_payment["created_at"], 1_370_012_317.886902763
+    end
+
   end
 
   ######################################################################
@@ -793,6 +803,16 @@ describe "Using the BitVault API" do
     specify "correct type" do
 
       assert_kind_of Hashie::Mash, signed_transfer
+    end
+
+    specify "expected keys" do
+      ["created_at"].each do |key|
+        assert signed_transfer.has_key? key
+      end
+
+
+      # TODO: test all attributes
+      assert_equal signed_transfer["created_at"], 1_370_012_317.886902763
     end
 
   end
