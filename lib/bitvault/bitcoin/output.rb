@@ -32,7 +32,7 @@ module BitVault::Bitcoin
       # FIXME: be aware of string bitcoin values versus
       # integer satoshi values
       @index, @value, @address = options.values_at :index, :value, :address
-      @confirmations = options.values_at :confirmations
+      @confirmations = options[:confirmations]
       @metadata = options[:metadata] || {}
 
       if options[:script]
