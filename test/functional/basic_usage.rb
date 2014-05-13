@@ -399,7 +399,7 @@ describe "Using the BitVault API" do
   describe "test application methods" do
 
     specify "expected actions" do
-      [:get, :update, :reset, :delete].each do |method|
+      [:get, :update, :reset].each do |method|
         application_list.each do |app|
           assert_respond_to app, method
         end
@@ -444,16 +444,6 @@ describe "Using the BitVault API" do
           assert_respond_to reset, :api_token
           refute_equal reset.api_token, app.api_token
       end
-    end
-
-    specify "test application.delete" do
-
-      # No actual reset with mock data
-      application_list.each do |app|
-        app.delete
-      end
-
-      # TODO: after mock-data, test that they were deleted
     end
 
   end
