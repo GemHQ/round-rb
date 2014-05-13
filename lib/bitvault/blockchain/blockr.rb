@@ -40,15 +40,16 @@ module BitVault
           record[:unspent].each do |output|
             address = record[:address]
 
-            transaction_hex, index, value, script_hex =
-              output.values_at :tx, :n, :amount, :script
+            transaction_hex, index, value, script_hex, confirmations =
+              output.values_at :tx, :n, :amount, :script, :confirmations
 
             outputs << BitVault::Bitcoin::Output.new(
               :transaction_hex => transaction_hex,
               :index => index,
               :value => bitcoins_to_satoshis(value),
               :script => {:hex => script_hex},
-              :address => address
+              :address => address,
+              :confirmations => confirmations
             )
           end
         end
