@@ -70,9 +70,6 @@ client_wallet = MultiWallet.new(
   }
 )
 
-# Retrieve the account
-account = wallet.accounts.list[0]
-
 
 ## Transfer money between two accounts in the same wallet
 
@@ -120,18 +117,3 @@ log "Signed transfer", signed_transfer
 # The only rationale for doing so would be to detect an error in the
 # server's signatures.  Such an error would make the transaction invalid,
 # but would not put any bitcoin at risk.
-
-
-## List the transactions for an account
-
-list = account.transactions.list
-
-log "Transactions list", list
-
-## Retrieve an individual transaction
-
-transaction = list[0].get
-
-log "Transaction get", transaction
-
-
