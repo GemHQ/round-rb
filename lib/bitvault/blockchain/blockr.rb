@@ -78,6 +78,29 @@ module BitVault
         end
       end
 
+      def address_transactions(addresses)
+        results = request(:address, :txs, addresses)
+
+
+        out = []
+        ids = []
+        results.each do |record|
+          record[:txs].each do |tx|
+            address = record[:address]
+            ids << tx[:tx]
+            out <<  {:address => address, :hash => tx[:tx], :amount => tx[:amount]}
+          end
+        end
+        transactions = self.transactions(ids)
+        out.each_with_index do |record, i|
+          record[:transaction] = transactions[i]
+        end
+
+        out
+
+
+      end
+
 
       def address_info(addresses, confirmations=6)
         # Useful for testing transactions()
