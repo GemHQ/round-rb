@@ -5,7 +5,7 @@ $:.unshift "#{project_root}/lib"
 
 ## 
 #$LOAD_PATH.unshift "#{project_root}/../bitcoin-ruby/lib"
-#$LOAD_PATH.unshift "#{project_root}/../patchboard-rb/lib"
+$LOAD_PATH.unshift "#{project_root}/../patchboard-rb/lib"
 
 
 require "bitvault"

@@ -34,8 +34,10 @@ client = BV.spawn
 
 users = client.resources.users
 
+email = "matthew-#{Time.now.to_i}@bitvault.io"
+
 user = users.create(
-  :email => "matthew@bitvault.io",
+  :email => email,
   :first_name => "Matthew",
   :last_name => "King",
   :password => "incredibly_secure"
@@ -61,8 +63,13 @@ client.context.password = "incredibly_secure"
 
 # Retrieve the user resource
 
-user = client.resources.user(user.url).get
+#user = client.resources.user(user.url).get
 
+user = client.resources.login(:email => email).get
+
+pp user
+
+exit
 
 ## Update some attributes for the user
 

@@ -113,8 +113,8 @@ module BitVault::Bitcoin
       bad_inputs = []
       valid = true
       @inputs.each_with_index do |input, index|
-        # TODO: confirm whether we need to mess with the block_timestamp arg
         unless self.native.verify_input_signature(index, input.output.transaction.native)
+          # TODO: confirm whether we need to mess with the block_timestamp arg
           valid = false
           bad_inputs << index
         end
@@ -168,6 +168,10 @@ module BitVault::Bitcoin
 
     def base58_hash
       base58(self.binary_hash)
+    end
+
+    def hex_hash
+      hex(self.binary_hash)
     end
 
     def version

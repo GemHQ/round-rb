@@ -2,6 +2,7 @@ require "money-tree"
 require "bitcoin"
 
 module BitVault::Bitcoin
+  include BitVault::Encodings
 
   module Builder
     extend Bitcoin::Builder
