@@ -1,5 +1,6 @@
 require "patchboard"
 require_relative "crypto"
+require "base64"
 
 module BitVault
 
@@ -19,7 +20,15 @@ module BitVault
     # other purposes.  It will be used in Patchboard#spawn, which
     # returns a "sub-client".
     class Context
-      attr_accessor :password, :api_token
+      attr_accessor :email, :password, :api_token
+
+      def set_basic(email, password)
+        @basic = Base64.encode64("#{email}:#{password}").gsub("\n", "")
+      end
+
+      def set_token(api_token)
+        @api_token
+      end
 
       # Provided with the authentication scheme for an Authorization
       # header, the resource instance on which an action is being called,
@@ -32,8 +41,10 @@ module BitVault
       def authorizer(scheme, resource, action)
         case scheme
         when "Basic"
-          @password
+          raise "Must call set_basic(email, password) first" unless @basic
+          @basic
         when "BitVault-Token"
+          raise "Must call set_token(api_token) first" unless @api_token
           @api_token
         end
       end
