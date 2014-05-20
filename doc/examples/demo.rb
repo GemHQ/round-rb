@@ -88,7 +88,7 @@ client = BV.spawn
 # and its applications.  The context class used here determines which
 # credential to use based on the authorization scheme.
 
-client.context.password = "incredibly_secure"
+client.context.set_basic(email, "incredibly_secure")
 
 # Retrieve the user resource
 
@@ -115,7 +115,7 @@ log "Created an application for the user", mask(application, :name, :api_token, 
 # password resets pose a major inconvenience to the user.
 
 # Supply the client with the authentication credential
-client.context.api_token = application.api_token
+client.context.set_token(application.api_token)
 
 # List applications
 list = user.applications.list
