@@ -84,7 +84,7 @@ account.update(name: 'rubber bands')
 #
 # Sending payments
 
-payment = account.pay(payees: { 'address1' => 10_000, 'address2' => 20_000 })
+payment = account.pay(payees: [{ address: 'address', amount: 20_000 }])
 
 # Creating addresses for receiving payments
 # This is a BIP 16 "Pay to Script Hash" address, where the script in question
