@@ -6,11 +6,19 @@ module BitVault
 
   class Client < Patchboard
 
+    BASE_URL = 'http://bitvault.pandastrike.com'
+
     # Create a namespace for the resource classes that will be automatically
     # created by Patchboard.
 
-    def self.discover(url)
-      super url, :namespace => self::Resources
+    def self.discover(options = {})
+      super(BASE_URL, :namespace => self::Resources) { BitVault::Client::Context.new }
+    end
+
+    def authed_client(options = {})      
+      client = self.spawn
+      client.context.set_basic(options[:email], options[:password])
+      client
     end
 
     module Resources; end

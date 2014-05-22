@@ -1,0 +1,1089 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://bitvault.pandastrike.com/
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - patchboard-rb v0.1.0
+      Accept:
+      - application/json
+      Host:
+      - bitvault.pandastrike.com
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Vary:
+      - Accept-Encoding
+      Content-Length:
+      - '31197'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 22 May 2014 01:30:35 GMT
+      Connection:
+      - keep-alive
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "resources": {
+            "service": {
+              "description": "A resource describing the resources and schemas for this API.",
+              "actions": {
+                "documentation": {
+                  "method": "GET",
+                  "response": {
+                    "status": 200
+                  }
+                },
+                "description": {
+                  "method": "GET",
+                  "response": {
+                    "type": "application/json",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "users": {
+              "actions": {
+                "create": {
+                  "method": "POST",
+                  "request": {
+                    "type": "application/vnd.bitvault.user+json;version=1.0"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.user+json;version=1.0",
+                    "status": 201
+                  }
+                }
+              }
+            },
+            "user": {
+              "actions": {
+                "get": {
+                  "method": "GET",
+                  "request": {
+                    "authorization": "Basic"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.user+json;version=1.0",
+                    "status": 200
+                  }
+                },
+                "update": {
+                  "method": "PATCH",
+                  "request": {
+                    "type": "application/vnd.bitvault.user+json;version=1.0",
+                    "authorization": "Basic"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.user+json;version=1.0",
+                    "status": 200
+                  }
+                },
+                "reset": {
+                  "method": "POST",
+                  "request": {
+                    "authorization": "Basic"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.user+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "applications": {
+              "actions": {
+                "create": {
+                  "method": "POST",
+                  "request": {
+                    "type": "application/vnd.bitvault.application+json;version=1.0",
+                    "authorization": "Basic"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.application+json;version=1.0",
+                    "status": 201
+                  }
+                },
+                "list": {
+                  "method": "GET",
+                  "request": {
+                    "authorization": "Basic"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.application_list+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "application": {
+              "actions": {
+                "get": {
+                  "method": "GET",
+                  "request": {
+                    "authorization": "Basic"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.application+json;version=1.0",
+                    "status": 200
+                  }
+                },
+                "update": {
+                  "method": "PATCH",
+                  "request": {
+                    "type": "application/vnd.bitvault.application+json;version=1.0",
+                    "authorization": "Basic"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.application+json;version=1.0",
+                    "status": 200
+                  }
+                },
+                "reset": {
+                  "method": "POST",
+                  "request": {
+                    "authorization": "Basic"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.application+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "wallets": {
+              "description": "The collection of wallets belonging to an application.  BitVault wallets\ncombine three deterministic trees to provide the co-signing security\nfeature.  The primary and backup trees are owned by the user while the\ncosigner tree is owned by BitVault.\n\n\"Owned\" here means \"knows the root private key\".  The root public\nkeys for all three trees are, of course, public.  The root private\nkey for the backup tree should be stored offline.\n",
+              "actions": {
+                "create": {
+                  "description": "Create a new wallet for the authenticated application",
+                  "method": "POST",
+                  "request": {
+                    "type": "application/vnd.bitvault.wallet+json;version=1.0",
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.wallet+json;version=1.0",
+                    "status": 201
+                  }
+                },
+                "list": {
+                  "description": "List wallets belonging to the authenticated application",
+                  "method": "GET",
+                  "request": {
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.wallet_list+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "wallet": {
+              "actions": {
+                "get": {
+                  "description": "Retrieve a wallet.  The response contains public seeds for all\nthree trees, as well as an encrypted form of the private seed for\nthe primary tree.  Provided with the correct passphrase, clients\ncan decrypt the primary seed for use in signing transactions.  The\nclient can use the public seeds to verify the correctness of the\nBitcoin addresses generated by the server.",
+                  "method": "GET",
+                  "request": {
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.wallet+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "accounts": {
+              "description": "",
+              "actions": {
+                "create": {
+                  "description": "Create a new account within a wallet",
+                  "method": "POST",
+                  "request": {
+                    "type": "application/vnd.bitvault.account_create+json;version=1.0",
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.account+json;version=1.0",
+                    "status": 201
+                  }
+                },
+                "list": {
+                  "description": "List the accounts belonging to a wallet",
+                  "method": "GET",
+                  "request": {
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.account_list+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "account": {
+              "actions": {
+                "get": {
+                  "method": "GET",
+                  "request": {
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.account+json;version=1.0",
+                    "status": 200
+                  }
+                },
+                "update": {
+                  "method": "PUT",
+                  "request": {
+                    "type": "application/vnd.bitvault.account_create+json;version=1.0",
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.account+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "addresses": {
+              "actions": {
+                "create": {
+                  "method": "POST",
+                  "request": {
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.address+json;version=1.0",
+                    "status": 201
+                  }
+                },
+                "list": {
+                  "method": "GET",
+                  "request": {
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.address_list+json;version=1.0",
+                    "status": 201
+                  }
+                }
+              }
+            },
+            "payments": {
+              "actions": {
+                "create": {
+                  "description": "Prepare a Bitcoin transaction for signing.",
+                  "method": "POST",
+                  "request": {
+                    "type": "application/vnd.bitvault.payment+json;version=1.0",
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.unsigned_payment+json;version=1.0",
+                    "status": 201
+                  }
+                }
+              }
+            },
+            "unsigned_payment": {
+              "actions": {
+                "sign": {
+                  "description": "Send the signed transaction to the service for delivery to the network.",
+                  "method": "POST",
+                  "request": {
+                    "type": "application/vnd.bitvault.transaction_signatures+json;version=1.0",
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.signed_payment+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "transfers": {
+              "actions": {
+                "create": {
+                  "method": "POST",
+                  "request": {
+                    "type": "application/vnd.bitvault.transfer_create+json;version=1.0",
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.unsigned_transfer+json;version=1.0",
+                    "status": 201
+                  }
+                }
+              }
+            },
+            "unsigned_transfer": {
+              "actions": {
+                "sign": {
+                  "description": "Send the signed transfer to the service for delivery to the network.",
+                  "method": "POST",
+                  "request": {
+                    "type": "application/vnd.bitvault.transaction_signatures+json;version=1.0",
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.signed_transfer+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "transactions": {
+              "description": "A combined list of all transactions and receipts.",
+              "actions": {
+                "list": {
+                  "method": "GET",
+                  "request": {
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.transaction_list+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            },
+            "transaction": {
+              "actions": {
+                "get": {
+                  "method": "GET",
+                  "request": {
+                    "authorization": "BitVault-Token"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.transaction+json;version=1.0",
+                    "status": 200
+                  }
+                }
+              }
+            }
+          },
+          "schemas": [
+            {
+              "id": "urn:patchboard",
+              "definitions": {
+                "resource": {
+                  "id": "#resource",
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "readonly": true
+                    }
+                  }
+                },
+                "service": {
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "id": "#service"
+                },
+                "description": {
+                  "id": "#description",
+                  "type": "object",
+                  "properties": {
+                    "schema": {
+                      "type": "object"
+                    },
+                    "resources": {
+                      "type": "object"
+                    },
+                    "directory": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "id": "urn:bitvault.io",
+              "definitions": {
+                "base58": {
+                  "type": "string",
+                  "pattern": "^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$",
+                  "id": "#base58"
+                },
+                "wallet_path": {
+                  "description": "The string representation of a path in a wallet tree.",
+                  "type": "string",
+                  "pattern": "^[mM](/d)+$",
+                  "id": "#wallet_path"
+                },
+                "user": {
+                  "mediaType": "application/vnd.bitvault.user+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "first_name": {
+                      "type": "string"
+                    },
+                    "last_name": {
+                      "type": "string"
+                    },
+                    "applications": {
+                      "$ref": "urn:bitvault.io#applications"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    },
+                    "updated_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    }
+                  },
+                  "id": "#user"
+                },
+                "applications": {
+                  "mediaType": "application/vnd.bitvault.applications+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "id": "#applications"
+                },
+                "application_list": {
+                  "mediaType": "application/vnd.bitvault.application_list+json;version=1.0",
+                  "type": "array",
+                  "items": {
+                    "$ref": "urn:bitvault.io#application"
+                  },
+                  "id": "#application_list"
+                },
+                "application": {
+                  "mediaType": "application/vnd.bitvault.application+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "required": true,
+                      "type": "string",
+                      "minLength": 4
+                    },
+                    "api_token": {
+                      "description": "Token used to authenticate API requests.",
+                      "type": "string"
+                    },
+                    "owner": {
+                      "$ref": "urn:bitvault.io#user"
+                    },
+                    "wallets": {
+                      "$ref": "urn:bitvault.io#wallets"
+                    },
+                    "callback_url": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    },
+                    "updated_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    }
+                  },
+                  "id": "#application"
+                },
+                "wallets": {
+                  "mediaType": "application/vnd.bitvault.wallets+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "id": "#wallets"
+                },
+                "wallet_list": {
+                  "mediaType": "application/vnd.bitvault.wallet_list+json;version=1.0",
+                  "type": "array",
+                  "items": {
+                    "$ref": "urn:bitvault.io#wallet"
+                  },
+                  "id": "#wallet_list"
+                },
+                "wallet": {
+                  "description": "A wallet contains an arbitrary number of accounts used for\nperforming Bitcoin transactions.",
+                  "mediaType": "application/vnd.bitvault.wallet+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "required": true,
+                      "type": "string"
+                    },
+                    "network": {
+                      "required": true,
+                      "type": "string",
+                      "enum": [
+                        "bitcoin",
+                        "bitcoin_testnet"
+                      ]
+                    },
+                    "cosigner_public_seed": {
+                      "description": "The public address for the cosigning tree of a multi-wallet.\nBitVault generates this tree and shares only the public address."
+                    },
+                    "backup_public_seed": {
+                      "required": true,
+                      "description": "The public address for the backup tree of a multi-wallet.\nThe client generates this tree and provides the service with\nthe public address only.",
+                      "type": "string"
+                    },
+                    "primary_public_seed": {
+                      "required": true,
+                      "description": "The public address for the primary tree of a multi-wallet.\nThe client generates this tree and provides the service with\nthe public address and an encrypted form of the private\naddress (see the `primary_seed` property below).",
+                      "type": "string"
+                    },
+                    "primary_private_seed": {
+                      "description": "Encrypted form of the seed used to generate the wallet's primary tree.",
+                      "type": "object",
+                      "properties": {
+                        "salt": {
+                          "type": "string"
+                        },
+                        "nonce": {
+                          "type": "string"
+                        },
+                        "ciphertext": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "default_account": {
+                      "$ref": "urn:bitvault.io#account"
+                    },
+                    "accounts": {
+                      "$ref": "urn:bitvault.io#accounts"
+                    },
+                    "transfers": {
+                      "$ref": "urn:bitvault.io#transfers"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    },
+                    "updated_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    }
+                  },
+                  "id": "#wallet"
+                },
+                "accounts": {
+                  "mediaType": "application/vnd.bitvault.accounts+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "id": "#accounts"
+                },
+                "account_list": {
+                  "description": "A list of named accounts, each being used as an individual\nBitcoin address.",
+                  "mediaType": "application/vnd.bitvault.account_list+json;version=1.0",
+                  "type": "array",
+                  "items": {
+                    "$ref": "urn:bitvault.io#account"
+                  },
+                  "id": "#account_list"
+                },
+                "account_create": {
+                  "mediaType": "application/vnd.bitvault.account_create+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "id": "#account_create"
+                },
+                "account": {
+                  "mediaType": "application/vnd.bitvault.account+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "balance": {
+                      "type": "integer"
+                    },
+                    "pending_balance": {
+                      "type": "integer"
+                    },
+                    "addresses": {
+                      "$ref": "urn:bitvault.io#addresses"
+                    },
+                    "payments": {
+                      "$ref": "urn:bitvault.io#payments"
+                    },
+                    "transactions": {
+                      "$ref": "urn:bitvault.io#transactions"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    },
+                    "updated_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    }
+                  },
+                  "id": "#account"
+                },
+                "addresses": {
+                  "mediaType": "application/vnd.bitvault.addresses+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "id": "#addresses"
+                },
+                "address_list": {
+                  "mediaType": "application/vnd.bitvault.address_list+json;version=1.0",
+                  "type": "array",
+                  "items": {
+                    "$ref": "urn:bitvault.io#address"
+                  },
+                  "id": "#address_list"
+                },
+                "address": {
+                  "mediaType": "application/vnd.bitvault.address+json;version=1.0",
+                  "type": "object",
+                  "properties": {
+                    "path": {
+                      "type": "string"
+                    },
+                    "string": {
+                      "extends": {
+                        "$ref": "#base58"
+                      }
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    }
+                  },
+                  "id": "#address"
+                },
+                "payments": {
+                  "mediaType": "application/vnd.bitvault.payments+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "id": "#payments"
+                },
+                "payment": {
+                  "mediaType": "application/vnd.bitvault.payment+json;version=1.0",
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "outputs": {
+                      "description": "A list of the output addresses",
+                      "type": "array",
+                      "items": {
+                        "$ref": "#payment_output"
+                      }
+                    }
+                  },
+                  "id": "#payment"
+                },
+                "payment_output": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "amount": {
+                      "type": "integer"
+                    },
+                    "payee": {
+                      "properties": {
+                        "address": {
+                          "extends": {
+                            "$ref": "#base58"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "id": "#payment_output"
+                },
+                "transfers": {
+                  "mediaType": "application/vnd.bitvault.transfers+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "id": "#transfers"
+                },
+                "transfer_create": {
+                  "mediaType": "application/vnd.bitvault.transfer_create+json;version=1.0",
+                  "additionalProperties": false,
+                  "properties": {
+                    "memo": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "integer"
+                    },
+                    "source": {
+                      "type": "string"
+                    },
+                    "destination": {
+                      "type": "string"
+                    }
+                  },
+                  "id": "#transfer_create"
+                },
+                "unsigned_transfer": {
+                  "mediaType": "application/vnd.bitvault.unsigned_transfer+json;version=1.0",
+                  "extends": {
+                    "$ref": "#unsigned_payment"
+                  },
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "transaction_id": {
+                      "type": "string"
+                    }
+                  },
+                  "id": "#unsigned_transfer"
+                },
+                "signed_transfer": {
+                  "mediaType": "application/vnd.bitvault.signed_transfer+json;version=1.0",
+                  "extends": {
+                    "$ref": "#signed_payment"
+                  },
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "transaction_id": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    }
+                  },
+                  "id": "#signed_transfer"
+                },
+                "transactions": {
+                  "mediaType": "application/vnd.bitvault.transactions+json;version=1.0",
+                  "extends": {
+                    "$ref": "urn:patchboard#resource"
+                  },
+                  "id": "#transactions"
+                },
+                "transaction_list": {
+                  "mediaType": "application/vnd.bitvault.transaction_list+json;version=1.0",
+                  "type": "array",
+                  "items": {
+                    "$ref": "urn:bitvault.io#transaction"
+                  },
+                  "id": "#transaction_list"
+                },
+                "transaction": {
+                  "mediaType": "application/vnd.bitvault.transaction+json;version=1.0",
+                  "additionalProperties": false,
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "incoming",
+                        "outgoing",
+                        "transfer_in",
+                        "transfer_out"
+                      ]
+                    },
+                    "data": {
+                      "$ref": "#bitcoin_transaction"
+                    }
+                  },
+                  "id": "#transaction"
+                },
+                "bitcoin_transaction": {
+                  "mediaType": "application/vnd.bitvault.bitcoin_transaction+json;version=1.0",
+                  "properties": {
+                    "version": {
+                      "type": "integer"
+                    },
+                    "lock_time": {
+                      "type": "integer"
+                    },
+                    "hash": {
+                      "extends": {
+                        "$ref": "#base58"
+                      }
+                    },
+                    "inputs": {
+                      "type": "array"
+                    },
+                    "outputs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#output"
+                      }
+                    }
+                  },
+                  "id": "#bitcoin_transaction"
+                },
+                "unsigned_payment": {
+                  "mediaType": "application/vnd.bitvault.unsigned_payment+json;version=1.0",
+                  "extends": {
+                    "$ref": "#bitcoin_transaction"
+                  },
+                  "properties": {
+                    "inputs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#input"
+                      }
+                    }
+                  },
+                  "id": "#unsigned_payment"
+                },
+                "signed_payment": {
+                  "mediaType": "application/vnd.bitvault.signed_payment+json;version=1.0",
+                  "extends": {
+                    "$ref": "#bitcoin_transaction"
+                  },
+                  "properties": {
+                    "inputs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#input"
+                      }
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "utc-millisec"
+                    }
+                  },
+                  "id": "#signed_payment"
+                },
+                "input": {
+                  "type": "object",
+                  "properties": {
+                    "output": {
+                      "$ref": "#output"
+                    },
+                    "sig_hash": {
+                      "description": "Base58 encoding of hash160 of a document composed of this input's\npayload and all the output payloads.  Provided to the client for\nerror checking, as most users will wish to compute their own\ndocuments for signing.",
+                      "extends": {
+                        "$ref": "#base58"
+                      }
+                    },
+                    "signatures": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "extends": {
+                          "$ref": "#base58"
+                        }
+                      }
+                    },
+                    "script_sig": {
+                      "type": "string"
+                    }
+                  },
+                  "id": "#input"
+                },
+                "transaction_signatures": {
+                  "mediaType": "application/vnd.bitvault.transaction_signatures+json;version=1.0",
+                  "type": "object",
+                  "properties": {
+                    "transaction_hash": {
+                      "required": true,
+                      "extends": {
+                        "$ref": "#base58"
+                      }
+                    },
+                    "inputs": {
+                      "required": true,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "signatures": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "extends": {
+                                "$ref": "#base58"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "id": "#transaction_signatures"
+                },
+                "output": {
+                  "type": "object",
+                  "properties": {
+                    "transaction_hash": {
+                      "description": "The hash value used to identify the output's transaction",
+                      "extends": {
+                        "$ref": "#base58"
+                      }
+                    },
+                    "index": {
+                      "description": "The index of this output in its transaction.",
+                      "type": "integer"
+                    },
+                    "value": {
+                      "description": "The value of the output in Satoshis",
+                      "type": "integer"
+                    },
+                    "metadata": {
+                      "description": "A place to store free-form metadata, such as a deterministic\nwallet path",
+                      "type": "object"
+                    },
+                    "script": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "address",
+                            "p2sh"
+                          ]
+                        },
+                        "string": {
+                          "description": "The unencoded redemption script for this output",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "id": "#output"
+                }
+              }
+            }
+          ],
+          "mappings": {
+            "service": {
+              "resource": "service",
+              "url": "http://bitvault.pandastrike.com/"
+            },
+            "users": {
+              "resource": "users",
+              "url": "http://bitvault.pandastrike.com/users"
+            },
+            "login": {
+              "resource": "user",
+              "url": "http://bitvault.pandastrike.com/users",
+              "query": {
+                "email": {
+                  "required": true,
+                  "type": "string",
+                  "format": "email"
+                }
+              }
+            },
+            "user": {
+              "resource": "user",
+              "template": "http://bitvault.pandastrike.com/users/:key"
+            },
+            "applications": {
+              "resource": "applications",
+              "template": "http://bitvault.pandastrike.com/users/:key/apps"
+            },
+            "application": {
+              "resource": "application",
+              "template": "http://bitvault.pandastrike.com/apps/:key"
+            },
+            "wallets": {
+              "resource": "wallets",
+              "template": "http://bitvault.pandastrike.com/apps/:key/wallets"
+            },
+            "wallet": {
+              "resource": "wallet",
+              "template": "http://bitvault.pandastrike.com/wallets/:key"
+            },
+            "accounts": {
+              "resource": "accounts",
+              "template": "http://bitvault.pandastrike.com/wallets/:key/accounts"
+            },
+            "account": {
+              "resource": "account",
+              "template": "http://bitvault.pandastrike.com/accounts/:key"
+            },
+            "addresses": {
+              "resource": "addresses",
+              "template": "http://bitvault.pandastrike.com/accounts/:key/addresses"
+            },
+            "payments": {
+              "resource": "payments",
+              "template": "http://bitvault.pandastrike.com/accounts/:key/payments"
+            },
+            "unsigned_payment": {
+              "resource": "unsigned_payment",
+              "template": "http://bitvault.pandastrike.com/transactions/:key"
+            },
+            "transfers": {
+              "resource": "transfers",
+              "template": "http://bitvault.pandastrike.com/wallets/:key/transfers"
+            },
+            "unsigned_transfer": {
+              "resource": "unsigned_transfer",
+              "template": "http://bitvault.pandastrike.com/transfers/:key"
+            },
+            "transactions": {
+              "resource": "transactions",
+              "template": "http://bitvault.pandastrike.com/account/:key/transactions",
+              "query": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "incoming",
+                    "outgoing",
+                    "transfer_in",
+                    "transfer_out",
+                    "change"
+                  ]
+                },
+                "limit": {
+                  "type": "integer",
+                  "maximum": 100
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "transaction": {
+              "resource": "transaction",
+              "template": "http://bitvault.pandastrike.com/transactions/:key"
+            }
+          }
+        }
+    http_version: 
+  recorded_at: Thu, 22 May 2014 01:30:35 GMT
+recorded_with: VCR 2.9.0
