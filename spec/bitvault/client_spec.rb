@@ -1,21 +1,12 @@
 require 'spec_helper'
 
-describe BitVault::Client, :vcr do
+describe BitVault::Patchboard::Client do
+  let(:client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
 
-  let(:client) { BitVault::Client.discover }
-
-  describe '.discover' do
-    it 'discovers the API' do
-      expect(client.resources).to_not be_nil
+  describe '#user' do
+    it 'should return a user model for the logged in user' do
+      expect(client.user).to_not be_nil
+      expect(client.user).to be_a_kind_of(User)
     end
-  end
-
-  describe '#authed_client' do
-    it 'returns an authed client with basic auth' do
-      authed_client = client.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret')
-      expect(authed_client.context).to_not be_nil
-      expect { authed_client.context.authorizer('Basic', nil, nil) }.to_not raise_error
-    end
-  end
-
+  end 
 end

@@ -4,24 +4,37 @@ require "base64"
 
 module BitVault
 
-  class Client < Patchboard
+  class Patchboard < Patchboard
 
-    BASE_URL = 'http://bitvault.pandastrike.com'
+    BASE_URL = 'http://localhost:8999/'
 
-    # Create a namespace for the resource classes that will be automatically
-    # created by Patchboard.
-
-    def self.discover(options = {})
-      super(BASE_URL, :namespace => self::Resources) { BitVault::Client::Context.new }
-    end
-
-    def authed_client(options = {})      
-      client = self.spawn
-      client.context.set_basic(options[:email], options[:password])
+    def self.authed_client(options = {})
+      @@patchboard ||= self.discover(BASE_URL, :namespace => self::Resources) { BitVault::Patchboard::Context.new }
+      client = @@patchboard.spawn
+      if options[:email] && options[:password]
+        client.context.set_basic(options[:email], options[:password])
+      elsif options[:api_token]
+        client.context.set_token(options[:api_token])
+      end
       client
     end
 
     module Resources; end
+
+    class Client < Patchboard::Client
+      def user
+        unless @user
+          user_resource = self.resources.login(email: self.context.email).get
+          @user = User.new(resources: self.resources.user)
+        end
+        
+        @user
+      end
+
+      def wallets
+
+      end
+    end
 
     # A class providing the `authorizer` method to allow for distinct
     # authentication contexts.  This may later be useful for many
@@ -31,11 +44,12 @@ module BitVault
       attr_accessor :email, :password, :api_token
 
       def set_basic(email, password)
+        @email = email
         @basic = Base64.encode64("#{email}:#{password}").gsub("\n", "")
       end
 
       def set_token(api_token)
-        @api_token
+        @api_token = api_token
       end
 
       # Provided with the authentication scheme for an Authorization
