@@ -9,8 +9,9 @@ module BitVault
     BASE_URL = 'http://bitvault.pandastrike.com/'
 
     def self.authed_client(options = {})
-      @@patchboard ||= self.discover(BASE_URL, :namespace => self::Resources) { BitVault::Patchboard::Context.new }
-      client = @@patchboard.spawn
+      @patchboard ||= self.discover(BASE_URL, :namespace => self::Resources) { BitVault::Patchboard::Context.new }
+      raise 'No credentials supplied' unless options[:email] or options[:api_token]
+      client = @patchboard.spawn
       if options[:email] && options[:password]
         client.context.set_basic(options[:email], options[:password])
       elsif options[:api_token]
@@ -29,10 +30,6 @@ module BitVault
         end
         
         @user
-      end
-
-      def wallets
-
       end
     end
 

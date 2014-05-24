@@ -16,7 +16,7 @@ describe BitVault::User, :vcr do
   end
 
   describe '#update' do
-    it 'should delegate to the resource' do
+    it 'delegates to the resource' do
       user.resource.should_receive(:update).with({first_name: 'Julian'})
       user.update(first_name: 'Julian')
     end
