@@ -6,7 +6,7 @@ module BitVault
 
   class Patchboard < Patchboard
 
-    BASE_URL = 'http://localhost:8999/'
+    BASE_URL = 'http://bitvault.pandastrike.com/'
 
     def self.authed_client(options = {})
       @@patchboard ||= self.discover(BASE_URL, :namespace => self::Resources) { BitVault::Patchboard::Context.new }
@@ -25,7 +25,7 @@ module BitVault
       def user
         unless @user
           user_resource = self.resources.login(email: self.context.email).get
-          @user = User.new(resources: self.resources.user)
+          @user = User.new(resource: user_resource)
         end
         
         @user
