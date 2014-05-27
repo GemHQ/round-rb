@@ -10,7 +10,7 @@ class BitVault::ApplicationCollection < BitVault::Base
 
   def populate_array
     @collection = []
-    @resource.list.each do |app|
+    @resource.each do |app|
       @collection << BitVault::Application.new(resource: app)
     end
   end

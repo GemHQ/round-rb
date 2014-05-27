@@ -7,8 +7,8 @@ class BitVault::User < BitVault::Base
     super(options)
   end
 
-  def applications
-  	@applications = BitVault::ApplicationCollection.new(resource: @resource.applications)
+  def applications(options = {})
+  	@applications = BitVault::ApplicationCollection.new(resource: @resource.applications) if !@applications || options[:refresh]
   	@applications
   end
 

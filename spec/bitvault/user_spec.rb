@@ -21,8 +21,24 @@ describe BitVault::User, :vcr do
   end
 
   describe '#applications' do
+    before(:each) { 
+      user.resource.stub(:applications).and_return({})
+    }
+    
     it 'returns an ApplicationCollection' do
       expect(user.applications).to be_a_kind_of(BitVault::ApplicationCollection)
+    end
+
+    it 'only fetches once' do
+      user.resource.should_receive(:applications).once
+      user.applications
+      user.applications
+    end
+
+    it 'fetches twice when refresh is passed' do
+      user.resource.should_receive(:applications).twice
+      user.applications
+      user.applications(refresh: true)
     end
   end
 end
