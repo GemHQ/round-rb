@@ -24,5 +24,5 @@ describe BitVault::User, :vcr do
     it 'returns an ApplicationCollection' do
       expect(user.applications).to be_a_kind_of(BitVault::ApplicationCollection)
     end
-  end 
+  end
 end

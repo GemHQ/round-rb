@@ -1,8 +1,7 @@
 class BitVault::ApplicationCollection
   extend Forwardable
 
-  def_delegators :@collection, :each, :count
-  def_delegators :@resource, :create
+  def_delegators :@collection, :each, :count, :map
 
   attr_reader :resource
 
@@ -16,5 +15,10 @@ class BitVault::ApplicationCollection
     @resource.list.each do |app|
       @collection << BitVault::Application.new(resource: app)
     end
+  end
+
+  def create(options = {})
+    app = @resource.create(options)
+    @collection << BitVault::Application.new(resource: app)
   end
 end

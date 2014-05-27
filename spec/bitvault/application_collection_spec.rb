@@ -26,7 +26,8 @@ describe BitVault::ApplicationCollection, :vcr do
 
   describe '#create' do
     it 'delegates to the resource' do
-      user.applications.should_receive(:create)
+      user.applications.resource.should_receive(:create)
+      user.applications.resource.stub(:create).and_return({})
       user.applications.create(name: 'bitcoin_app', callback_url:'http://someapp.com/callback')
     end
   end
