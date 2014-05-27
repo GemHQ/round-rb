@@ -20,4 +20,10 @@ describe BitVault::Application, :vcr do
       application.update(name: 'other_app')
     end
   end
+
+  describe '#wallets' do
+    it 'returns a WalletCollection' do
+      expect(application.wallets).to be_a_kind_of(BitVault::WalletCollection)
+    end
+  end
 end

@@ -13,10 +13,25 @@ describe BitVault::User, :vcr do
     end
   end
 
-  describe '#update' do
-    it 'delegates to the resource' do
+  describe 'delegate methods' do
+    it 'delegates update to the resource' do
       user.resource.should_receive(:update).with({first_name: 'Julian'})
       user.update(first_name: 'Julian')
+    end
+
+    it 'delegates email to the resource' do
+      user.resource.should_receive(:email)
+      user.email
+    end
+
+    it 'delegates first_name to the resource' do
+      user.resource.should_receive(:first_name)
+      user.first_name
+    end
+
+    it 'delegates last_name to the resource' do
+      user.resource.should_receive(:last_name)
+      user.last_name
     end
   end
 
