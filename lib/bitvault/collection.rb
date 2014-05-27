@@ -12,7 +12,7 @@ class BitVault::Collection < BitVault::Base
   end
 
   def collection_type
-    raise 'Implement collection_type in child class of BitVault::Collection'
+    raise 'Must implement collection_type in child class of BitVault::Collection'
   end
 
   private

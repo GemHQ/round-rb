@@ -8,7 +8,8 @@ class BitVault::Application < BitVault::Base
   end
 
   def wallets
-    
+    @resource.context.set_token(@resource.api_token)
+    @wallets ||= BitVault::WalletCollection.new(resource: @resource.wallets)
+    @wallets
   end
-
 end

@@ -1,5 +1,7 @@
 class BitVault::WalletCollection < BitVault::Collection
-  def initialize(options = {})
-    
+
+  def collection_type
+    BitVault::Wallet
   end
+
 end
