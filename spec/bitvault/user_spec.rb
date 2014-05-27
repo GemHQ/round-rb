@@ -2,15 +2,13 @@ require 'spec_helper'
 
 describe BitVault::User, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:resource) {
-    authed_client.user
-  }
-  let(:user) { BitVault::User.new(resource: resource) }
+  let(:user) { authed_client.user }
 
   describe '#initialize' do
     context 'with a valid User resource' do
       it 'should set the resource' do
         expect(user.resource).to_not be_nil
+        expect(user.resource).to be_a_kind_of(Patchboard::Resource)
       end
     end
   end
