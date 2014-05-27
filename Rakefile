@@ -3,7 +3,7 @@ $LOAD_PATH.unshift "#{project_root}/../starter/lib"
 
 require "starter/tasks/gems"
 require "starter/tasks/git"
-require "starter/markdown/extender"
+#require "starter/markdown/extender"
 require "rspec/core/rake_task"
 
 RSpec::Core::RakeTask.new

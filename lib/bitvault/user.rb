@@ -9,4 +9,9 @@ class BitVault::User
     @resource = options[:resource]
   end
 
+  def applications
+  	@applications = BitVault::ApplicationCollection.new(resource: @resource.applications)
+  	@applications
+  end
+
 end

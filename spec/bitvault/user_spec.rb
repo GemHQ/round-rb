@@ -21,4 +21,10 @@ describe BitVault::User, :vcr do
       user.update(first_name: 'Julian')
     end
   end
+
+  describe '#applications' do
+    it 'returns an ApplicationCollection' do
+      expect(user.applications).to be_a_kind_of(BitVault::ApplicationCollection)
+    end
+  end 
 end
