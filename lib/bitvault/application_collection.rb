@@ -1,12 +1,10 @@
-class BitVault::ApplicationCollection
+class BitVault::ApplicationCollection < BitVault::Base
   extend Forwardable
 
   def_delegators :@collection, :each, :count, :map
 
-  attr_reader :resource
-
   def initialize(options = {})
-    @resource = options[:resource]
+    super(options)
     self.populate_array
   end
 

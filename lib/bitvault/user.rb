@@ -1,12 +1,10 @@
-class BitVault::User
+class BitVault::User < BitVault::Base
   extend Forwardable
 
   def_delegators :@resource, :update
 
-  attr_reader :resource
-
   def initialize(options = {})
-    @resource = options[:resource]
+    super(options)
   end
 
   def applications
