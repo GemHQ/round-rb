@@ -22,7 +22,7 @@ describe BitVault::User, :vcr do
 
   describe '#applications' do
     before(:each) { 
-      user.resource.stub(:applications).and_return({})
+      user.resource.applications.stub(:list).and_return([])
     }
     
     it 'returns an ApplicationCollection' do
@@ -30,13 +30,13 @@ describe BitVault::User, :vcr do
     end
 
     it 'only fetches once' do
-      user.resource.should_receive(:applications).once
+      user.resource.applications.should_receive(:list).once
       user.applications
       user.applications
     end
 
     it 'fetches twice when refresh is passed' do
-      user.resource.should_receive(:applications).twice
+      user.resource.applications.should_receive(:list).twice
       user.applications
       user.applications(refresh: true)
     end

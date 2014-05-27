@@ -1,7 +1,4 @@
 class BitVault::ApplicationCollection < BitVault::Base
-  extend Forwardable
-
-  def_delegators :@collection, :each, :count, :map
 
   def initialize(options = {})
     super(options)
@@ -10,7 +7,7 @@ class BitVault::ApplicationCollection < BitVault::Base
   end
 
   def populate_array
-    @resource.each do |app|
+    @resource.list.each do |app|
       @collection << BitVault::Application.new(resource: app)
     end
   end
@@ -20,5 +17,11 @@ class BitVault::ApplicationCollection < BitVault::Base
     app = BitVault::Application.new(resource: app_resource)
     @collection << app
     app
+  end
+
+  private
+
+  def method_missing(method, *args, &block)
+    @collection.send(method, *args, &block)
   end
 end
