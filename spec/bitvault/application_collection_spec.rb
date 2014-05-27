@@ -25,10 +25,23 @@ describe BitVault::ApplicationCollection, :vcr do
   end
 
   describe '#create' do
-    it 'delegates to the resource' do
+    before(:each) {
       user.applications.resource.stub(:create).and_return({})
+    }
+
+    let(:application) { user.applications.create(name: 'bitcoin_app', callback_url:'http://someapp.com/callback') }
+
+    it 'delegates to the resource' do
       user.applications.resource.should_receive(:create)
-      user.applications.create(name: 'bitcoin_app', callback_url:'http://someapp.com/callback')
+      application
+    end
+
+    it 'returns an Application object' do
+      expect(application).to be_a_kind_of(BitVault::Application)
+    end
+
+    it 'increases the application count' do
+      expect { application }.to change(user.applications, :count).by(1)
     end
   end
 end
