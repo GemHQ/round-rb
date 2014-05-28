@@ -9,6 +9,10 @@ describe BitVault::WalletCollection, :vcr do
     context 'with a valid passphrase and name' do
       let(:wallet) { wallets.create(passphrase: 'very insecure', name: 'my funds') }
 
+      before(:each) {
+        wallets.resource.stub(:create).and_return({})
+      }
+
       it 'returns a Wallet model' do
         expect(wallet).to be_a_kind_of(BitVault::Wallet)
       end
