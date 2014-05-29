@@ -22,9 +22,9 @@ class BitVault::WalletCollection < BitVault::Collection
     @resource.create(
       name: name,
       network: network,
-      backup_address: new_wallet.trees[:backup].to_serialized_address,
-      primary_address: new_wallet.trees[:primary].to_serialized_address,
-      primary_seed: encrypted_seed
+      backup_public_seed: new_wallet.trees[:backup].to_serialized_address,
+      primary_public_seed: new_wallet.trees[:primary].to_serialized_address,
+      primary_private_seed: encrypted_seed
     )
   end
 

@@ -54,9 +54,9 @@ describe BitVault::WalletCollection, :vcr do
       wallets.resource.should_receive(:create).with hash_including(
         name: name,
         network: network,
-        backup_address: backup_address,
-        primary_address: primary_address,
-        primary_seed: encrypted_seed)
+        backup_public_seed: backup_address,
+        primary_public_seed: primary_address,
+        primary_private_seed: encrypted_seed)
       resource
     end
   end

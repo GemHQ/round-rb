@@ -6,8 +6,8 @@ class BitVault::Collection < BitVault::Base
   end
 
   def populate_array
-    @resource.list.each do |app|
-      @collection << self.collection_type.new(resource: app)
+    @resource.list.each do |resource|
+      @collection << self.collection_type.new(resource: resource)
     end
   end
 
@@ -18,6 +18,6 @@ class BitVault::Collection < BitVault::Base
   private
 
   def method_missing(method, *args, &block)
-    @collection.send(method, *args, &block)
+    @collection.send(method, *args, &block) if @collection.methods.include? method
   end
 end

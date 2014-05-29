@@ -22,8 +22,18 @@ describe BitVault::Application, :vcr do
   end
 
   describe '#wallets' do
+    before(:each) { 
+      application.resource.wallets.stub(:list).and_return([])
+    }
+
     it 'returns a WalletCollection' do
       expect(application.wallets).to be_a_kind_of(BitVault::WalletCollection)
+    end
+
+    it 'only fetches once' do
+      application.resource.wallets.should_receive(:list).once
+      application.wallets
+      application.wallets
     end
   end
 end
