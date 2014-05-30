@@ -5,7 +5,7 @@ class BitVault::WalletCollection < BitVault::Collection
   end
 
   def create(options = {})
-    raise ArgumentError unless options[:passphrase] and options[:name]
+    raise ArgumentError, "Name and passphrase are required" unless options[:passphrase] and options[:name]
     network = options[:network] || "bitcoin_testnet"
     wallet = BitVault::Wallet.new(resource: self.create_wallet_resource(options[:passphrase], options[:name], network))
     @collection << wallet

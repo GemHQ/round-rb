@@ -3,13 +3,17 @@ require 'spec_helper'
 describe BitVault::Wallet, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
   let(:wallet) { authed_client.user.applications[0].wallets[0] }
+  let(:passphrase) { 'very insecure' }
+  let(:primary_seed) { BitVault::Bitcoin::PassphraseBox.decrypt(passphrase, wallet.primary_seed) }
 
   describe '#unlock' do
-    it 'decrypts the wallet' do
-
+    it 'populates the multiwallet' do
+      wallet.unlock(passphrase)
+      expect(wallet.multiwallet).to_not be_nil
+      expect(wallet.multiwallet).to be_a_kind_of(BitVault::Bitcoin::MultiWallet)
     end
 
-    it 'populates the multiwallet' do
+    it 'decrypts the wallet' do
 
     end
   end

@@ -1,8 +1,8 @@
 class BitVault::Collection < BitVault::Base
   def initialize(options = {})
     super(options)
-    options.delete(:resource)
     @collection = []
+    options.delete(:resource)
     self.populate_array(options)
   end
 

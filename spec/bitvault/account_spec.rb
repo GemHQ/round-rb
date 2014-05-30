@@ -10,4 +10,14 @@ describe BitVault::Account, :vcr do
       expect(account.wallet).to eql(wallet)
     end
   end
+
+  describe '#pay' do
+    it 'raises an error with no payees' do
+      expect{ account.pay }.to raise_error(ArgumentError)
+    end
+
+    it 'raises an error when incorrect object passed' do
+      expect{ account.pay(payees: Object.new) }.to raise_error(ArgumentError)
+    end
+  end
 end
