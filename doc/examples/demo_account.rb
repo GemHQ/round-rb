@@ -2,15 +2,6 @@ require "yaml"
 require_relative "setup"
 
 
-def self.mask(hash, *keys)
-  out = {}
-  keys.each do |key|
-    out[key] = hash[key]
-  end
-  out[:etc] = "..."
-  out
-end
-
 
 if File.exists? "demo_wallet.yaml"
   data = YAML.load_file "demo_wallet.yaml"
@@ -29,10 +20,10 @@ if File.exists? "demo_wallet.yaml"
   exit
 end
 
-include BitVault::Encodings
-include BitVault::Crypto
+include CoinOp::Encodings
+include CoinOp::Crypto
 
-MultiWallet = BitVault::Bitcoin::MultiWallet
+MultiWallet = CoinOp::Bit::MultiWallet
 
 
 ## API discovery

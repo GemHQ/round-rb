@@ -2,9 +2,10 @@
 require "yaml"
 require_relative "setup"
 
-include BitVault::Encodings
-include BitVault::Crypto
-MultiWallet = BitVault::Bitcoin::MultiWallet
+include CoinOp::Encodings
+include CoinOp::Crypto
+
+MultiWallet = CoinOp::Bit::MultiWallet
 
 unless File.exists? "demo_wallet.yaml"
   puts
@@ -69,6 +70,7 @@ unsigned_payment = account.payments.create(
 
 log "Unsigned payment", unsigned_payment
 
+
 ## Reconstruct the transaction for signing.
 #
 # The unsigned payment record contains all the information needed for the
@@ -94,7 +96,7 @@ log "Unsigned payment", unsigned_payment
 # the only result of this would be to grant an exorbitant transaction fee to
 # whichever miner solves the next block.
 
-transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
+transaction = CoinOp::Bit::Transaction.data(unsigned_payment)
 
 
 ## Sign the transaction inputs
@@ -131,11 +133,11 @@ end
 # then sends the fully signed transaction record back to the client.
 
 signed_payment = unsigned_payment.sign(
-  :transaction_hash => transaction.base58_hash,
+  :transaction_hash => transaction.hex_hash,
   :inputs => client_wallet.signatures(transaction)
 )
 
-log "Signed payment", signed_payment
+log "Signed payment", mask(signed_payment, :status, :hash)
 
 
 # The client will then be able to check the confirmation status of the signed
@@ -143,6 +145,7 @@ log "Signed payment", signed_payment
 # service will post transaction statuses to the application's callback_url,
 # if supplied.
 
+log "Check transaction confirmations at http://tbtc.blockr.io/tx/info/#{signed_payment[:hash]}"
 
 
 

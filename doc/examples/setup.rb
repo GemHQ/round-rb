@@ -4,9 +4,8 @@ project_root = File.expand_path("#{File.dirname(__FILE__)}/../../")
 $:.unshift "#{project_root}/lib"
 
 require "bitvault"
-require "#{project_root}/test/helpers/mockchain"
-require "#{project_root}/test/helpers/bitcoin"
-require "#{project_root}/test/helpers/testnet_assets"
+gem "coin-op", "~> 0.1.0"
+require "coin-op"
 
 require "term/ansicolor"
 String.send :include, Term::ANSIColor
@@ -26,3 +25,13 @@ def log(message, data=nil)
   end
   puts
 end
+
+def mask(hash, *keys)
+  out = {}
+  keys.each do |key|
+    out[key] = hash[key]
+  end
+  out[:etc] = "..."
+  out
+end
+
