@@ -27,7 +27,7 @@ module BitVault
       end
 
       def set_token(api_token)
-        @api_token
+        @api_token = api_token
       end
 
       # Provided with the authentication scheme for an Authorization

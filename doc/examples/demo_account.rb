@@ -1,23 +1,6 @@
+require "yaml"
 require_relative "setup"
 
-require "term/ansicolor"
-String.send :include, Term::ANSIColor
-
-# colored output to make it easier to see structure
-def log(message, data=nil)
-  if data.is_a? String
-    puts "#{message.yellow} => #{data.dump.cyan}"
-  elsif data.nil?
-    puts "#{message.yellow}"
-  else
-    begin
-      puts "#{message.yellow} => #{JSON.pretty_generate(data).cyan}"
-    rescue
-      puts "#{message.yellow} => #{data.inspect.cyan}"
-    end
-  end
-  puts
-end
 
 def self.mask(hash, *keys)
   out = {}
@@ -28,6 +11,23 @@ def self.mask(hash, *keys)
   out
 end
 
+
+if File.exists? "demo_wallet.yaml"
+  data = YAML.load_file "demo_wallet.yaml"
+  address = data[:node][:address]
+  puts
+  puts <<-MESSAGE
+  Settings from a previous run of this script are in ./demo_wallet.yaml
+  If you have not already funded that wallet, you can remove the file.
+  Otherwise, fund this address:
+  #{address}
+  then run demo_payment.rb
+  You can check the state of transactions for the address at:
+  http://tbtc.blockr.io/address/info/#{address}
+  MESSAGE
+  puts
+  exit
+end
 
 include BitVault::Encodings
 include BitVault::Crypto
@@ -134,7 +134,7 @@ log "Reset an application's api token", {
   :new_token => reset.api_token
 }
 
-client.context.api_token = reset.api_token
+client.context.set_token(reset.api_token)
 
 
 ## Generate a MultiWallet with random seeds
@@ -181,27 +181,6 @@ log "Create a co-signing wallet for an application", mask(
 
 
 
-## Use the server's response data to construct a MultiWallet
-#
-# This models what an application would do in any subsequent interactions.
-# The MultiWallet will be used later in this script to verify and sign a
-# transaction.
-
-primary_seed = PassphraseBox.decrypt(passphrase, wallet.primary_private_seed)
-client_wallet = MultiWallet.new(
-  :private => {
-    :primary => primary_seed
-  },
-  :public => {
-    :cosigner => wallet.cosigner_public_seed,
-    :backup => wallet.backup_public_seed
-  }
-)
-
-
-
-
-
 ## Create an account within a wallet
 #
 # Wallets can have multiple accounts, each represented by a path in the
@@ -225,15 +204,38 @@ log "Generate a Bitcoin address to fund the account", mask(
 )
 
 
-## Request a payment of bitcoins from this account to someone else's address.
-
-payee = Bitcoin::Key.new
-payee.generate
-payee_address = payee.addr
 
 # Until funded the account can't be used to generate payments or transfers to
 # other accounts in the wallet.
 
-log "Fund the address via a Bitcoin transaction, so that you can make payments or transfers"
+puts "Writing wallet information to ./demo_wallet.yaml for use in next test."
+
+record = {
+  :api_token => client.context.api_token,
+  :wallet => {:url => wallet.url},
+  :account => {:url => account.url},
+  :passphrase => passphrase,
+  :node => {
+    :path => incoming_address.path,
+    :address => incoming_address.string
+  }
+}
+File.open "demo_wallet.yaml", "w" do |f|
+  f.puts record.to_yaml
+end
+
+puts <<-MESSAGE
+  Fund the address from a testnet faucet, so that you can make payments or transfers.
+  Then you can run demo_payment.rb
+
+  Fund this address from a testnet faucet so that you can make payments:
+  #{address}
+
+  Suggested faucet:  http://faucet.xeno-genesis.com
+  Once the transaction is confirmed (with 6 blocks) run demo_payment.rb
+
+  You can check the state of transactions for the address at:
+  http://tbtc.blockr.io/address/info/#{address}
+MESSAGE
 
 
