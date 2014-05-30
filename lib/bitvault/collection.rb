@@ -1,13 +1,15 @@
 class BitVault::Collection < BitVault::Base
   def initialize(options = {})
     super(options)
+    options.delete(:resource)
     @collection = []
-    self.populate_array
+    self.populate_array(options)
   end
 
-  def populate_array
+  def populate_array(options)
     @resource.list.each do |resource|
-      @collection << self.collection_type.new(resource: resource)
+      options.merge!(resource: resource)
+      @collection << self.collection_type.new(options)
     end
   end
 

@@ -2,8 +2,23 @@ require 'spec_helper'
 
 describe BitVault::AccountCollection, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:accounts) { authed_client.user.applications[0].wallets[0].accounts }
-  let(:account) { accounts.create(name: 'office supplies') }
+  let(:wallet) { authed_client.user.applications[0].wallets[0] }
+  let(:accounts) { wallet.accounts }
+  let(:account) { accounts.create(name: 'office supplies', wallet: wallet) }
+
+  describe '#initialize' do
+    it 'raises an error if no wallet is provided' do
+      expect {
+        collection = BitVault::AccountCollection.new(resource: wallet.resource.accounts)  
+      }.to raise_error(ArgumentError)
+    end
+
+    it 'sets the wallet on each of the accounts' do
+      wallet.accounts.each do |account|
+        expect(account.wallet).to eql(wallet)
+      end
+    end
+  end
 
   describe '#create' do
     before(:each) {

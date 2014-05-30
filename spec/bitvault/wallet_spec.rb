@@ -2,9 +2,7 @@ require 'spec_helper'
 
 describe BitVault::Wallet, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:user) { authed_client.user }
-  let(:application) { user.applications[0] }
-  let(:wallet) { application.wallets[0] }
+  let(:wallet) { authed_client.user.applications[0].wallets[0] }
 
   describe '#unlock' do
     it 'decrypts the wallet' do
