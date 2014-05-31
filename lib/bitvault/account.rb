@@ -10,6 +10,33 @@ class BitVault::Account < BitVault::Base
   def pay(options = {})
     raise ArgumentError, 'Payees must be specified' unless options[:payees]
     raise ArgumentError, 'Payees must be an array' unless options[:payees].is_a?(Array)
+    raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
+
+    unsigned_payment = @resource.payments.create self.outputs_from_payees(options[:payees])
+    transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
+    signed_payment = self.sign_payment(unsigned_payment, transaction)
+
+    BitVault::Payment.new(resource: signed_payment)
+  end
+
+  def outputs_from_payees(payees)
+    outputs = payees.map do |payee|
+      raise 'Bad output, no amount' unless payee[:amount]
+      raise 'Bad output, no address' unless payee[:address]
+      {
+        amount: payee[:amount],
+        payee: { address: payee[:address] }
+      }
+    end
+    { outputs: outputs }
+  end
+
+  def sign_payment(unsigned_payment, transaction)
+    raise "bad change address" unless @wallet.multiwallet.valid_output?(transaction.outputs.last)
+    unsigned_payment.sign(
+      transaction_hash: transaction.base58_hash,
+      inputs: @wallet.multiwallet.signatures(transaction)
+    )
   end
 
 end 

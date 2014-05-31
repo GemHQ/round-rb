@@ -6,7 +6,8 @@ module BitVault
 
   class Patchboard < Patchboard
 
-    BASE_URL = 'http://bitvault.pandastrike.com/'
+    BASE_URL = ::API_HOST if defined? ::API_HOST
+    BASE_URL ||= 'http://bitvault.pandastrike.com/'
 
     def self.authed_client(options = {})
       @patchboard ||= self.discover(BASE_URL, :namespace => self::Resources) { BitVault::Patchboard::Context.new }

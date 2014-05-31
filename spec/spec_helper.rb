@@ -1,9 +1,10 @@
+API_HOST = 'http://localhost:8999'
+
 require_relative '../lib/bitvault'
 require 'factory_girl'
 require 'factories'
 require 'webmock/rspec'
 require 'vcr'
-require 'pry-debugger'
 
 VCR.configure do |c|
   c.cassette_library_dir = 'spec/cassettes'

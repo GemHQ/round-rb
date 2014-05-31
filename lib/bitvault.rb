@@ -16,6 +16,7 @@ require_relative "bitvault/wallet"
 require_relative "bitvault/wallet_collection"
 require_relative "bitvault/account"
 require_relative "bitvault/account_collection"
+require_relative "bitvault/payment"
 require_relative "bitvault/blockchain/mockchain"
 require_relative "bitvault/blockchain/blockr"
 

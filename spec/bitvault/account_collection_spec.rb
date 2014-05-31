@@ -4,7 +4,7 @@ describe BitVault::AccountCollection, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
   let(:wallet) { authed_client.user.applications[0].wallets[0] }
   let(:accounts) { wallet.accounts }
-  let(:account) { accounts.create(name: 'office supplies', wallet: wallet) }
+  let(:account) { accounts.create(name: 'office supplies') }
 
   describe '#initialize' do
     it 'raises an error if no wallet is provided' do

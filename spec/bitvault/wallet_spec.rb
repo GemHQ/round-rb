@@ -4,7 +4,7 @@ describe BitVault::Wallet, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
   let(:wallet) { authed_client.user.applications[0].wallets[0] }
   let(:passphrase) { 'very insecure' }
-  let(:primary_seed) { BitVault::Bitcoin::PassphraseBox.decrypt(passphrase, wallet.primary_seed) }
+  let(:primary_seed) { BitVault::Crypto::PassphraseBox.decrypt(passphrase, wallet.resource.primary_private_seed) }
 
   describe '#unlock' do
     it 'populates the multiwallet' do
@@ -14,7 +14,8 @@ describe BitVault::Wallet, :vcr do
     end
 
     it 'decrypts the wallet' do
-
+      wallet.unlock(passphrase)
+      expect(wallet.multiwallet.trees[:primary].to_serialized_address(:private)).to eql(primary_seed)
     end
   end
 
