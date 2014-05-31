@@ -9,7 +9,6 @@ class BitVault::Account < BitVault::Base
 
   def pay(options = {})
     raise ArgumentError, 'Payees must be specified' unless options[:payees]
-    raise ArgumentError, 'Payees must be an array' unless options[:payees].is_a?(Array)
     raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 
     unsigned_payment = @resource.payments.create self.outputs_from_payees(options[:payees])
@@ -20,6 +19,7 @@ class BitVault::Account < BitVault::Base
   end
 
   def outputs_from_payees(payees)
+    raise ArgumentError, 'Payees must be an array' unless payees.is_a?(Array)
     outputs = payees.map do |payee|
       raise 'Bad output, no amount' unless payee[:amount]
       raise 'Bad output, no address' unless payee[:address]

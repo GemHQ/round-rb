@@ -17,10 +17,6 @@ describe BitVault::Account, :vcr do
       it 'raises an error with no payees' do
         expect{ account.pay }.to raise_error(ArgumentError)
       end
-
-      it 'raises an error when anything but an array is passed' do
-        expect{ account.pay(payees: Object.new) }.to raise_error(ArgumentError)
-      end
     end
 
     context 'when a transaction is attempted with a locked wallet' do
@@ -46,8 +42,37 @@ describe BitVault::Account, :vcr do
   end
 
   describe '#outputs_from_payees' do
+    context 'anything but an array is passed' do
+      it 'raises an error' do
+        expect{ account.outputs_from_payees(Object.new) }.to raise_error(ArgumentError)
+      end
+    end
 
+    context 'with missing address' do
+      it 'raises an error' do
+        expect { account.outputs_from_payees([ {amount: 10_000} ]) }.to raise_error
+      end
+    end
+
+    context 'with missing amount' do
+      it 'raises an error' do
+        expect { account.outputs_from_payees([ {address: 'abcdef123456'} ]) }.to raise_error
+      end
+    end
+
+    context 'with correct input' do
+      let(:outputs) { account.outputs_from_payees([ {address: 'abcdef123456', amount: 10_000} ]) }
+      it 'returns a Hash' do
+        expect(outputs).to be_a_kind_of(Hash)
+      end
+
+      it 'has a root node of outputs' do
+        expect(outputs.has_key?(:outputs)).to be_true
+      end
+    end
   end
 
-  describe '#sign_payment'
+  describe '#sign_payment' do 
+
+  end
 end
