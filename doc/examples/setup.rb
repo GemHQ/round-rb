@@ -1,4 +1,5 @@
 require "pp"
+require "yaml"
 
 project_root = File.expand_path("#{File.dirname(__FILE__)}/../../")
 $:.unshift "#{project_root}/lib"
@@ -33,5 +34,25 @@ def mask(hash, *keys)
   end
   out[:etc] = "..."
   out
+end
+
+def bitvault_url
+  ARGV[0] || "http://bitvault.pandastrike.com/"
+end
+
+def bitvault
+  ## API discovery
+  #
+  # The BitVault server provides a JSON description of its API that allows
+  # the client to generate all necessary resource classes at runtime.
+  # We initialize the BitVault client with a block that returns an object
+  # that will be used as a "context", a place to store needful things.
+  # At present, the only requirement for a context object is that it
+  # implements a method named `authorizer`, which must return a credential
+  # for use in the HTTP Authorization headers.
+  @bitvault ||= begin
+    puts "Connecting to #{bitvault_url}"
+    BitVault::Client.discover(bitvault_url) { BitVault::Client::Context.new }
+  end
 end
 

@@ -1,7 +1,4 @@
-require "yaml"
 require_relative "setup"
-
-
 
 if File.exists? "demo_wallet.yaml"
   data = YAML.load_file "demo_wallet.yaml"
@@ -26,22 +23,10 @@ include CoinOp::Crypto
 MultiWallet = CoinOp::Bit::MultiWallet
 
 
-## API discovery
-#
-# The BitVault server provides a JSON description of its API that allows
-# the client to generate all necessary resource classes at runtime.
-# We initialize the BitVault client with a block that returns an object
-# that will be used as a "context", a place to store needful things.
-# At present, the only requirement for a context object is that it
-# implements a method named `authorizer`, which must return a credential
-# for use in the HTTP Authorization headers.
+## Create a "sub-client" with its own authentication context
 
-service_url = ARGV[0] || "http://localhost:8999/"
-BV = BitVault::Client.discover(service_url) { BitVault::Client::Context.new }
-
-## Create a "sub-client" with its own context
-
-client = BV.spawn
+client = bitvault.spawn
+client.context.set_token(api_token)
 
 
 # Create a user
@@ -73,7 +58,7 @@ log "Create a user with", mask(user, :email, :first_name, :last_name)
 
 ## Simulate a later session
 
-client = BV.spawn
+client = bitvault.spawn
 
 # Supply the client with the user password, required to manage the user
 # and its applications.  The context class used here determines which

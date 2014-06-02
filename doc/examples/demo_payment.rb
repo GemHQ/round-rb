@@ -1,5 +1,4 @@
 
-require "yaml"
 require_relative "setup"
 
 include CoinOp::Encodings
@@ -23,12 +22,9 @@ data = YAML.load_file "demo_wallet.yaml"
 api_token, passphrase =
   data.values_at :api_token, :passphrase
 
-service_url = ARGV[0] || "http://localhost:8999/"
-BV = BitVault::Client.discover(service_url) { BitVault::Client::Context.new }
-
 ## Create a "sub-client" with its own context
 
-client = BV.spawn
+client = bitvault.spawn
 client.context.set_token(api_token)
 
 wallet = client.resources.wallet(data[:wallet][:url]).get
