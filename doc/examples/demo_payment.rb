@@ -145,7 +145,7 @@ log "Signed payment", mask(signed_payment, :status, :hash)
 # service will post transaction statuses to the application's callback_url,
 # if supplied.
 
-log "Check transaction confirmations at http://tbtc.blockr.io/tx/info/#{signed_payment[:hash]}"
+log "Check transaction confirmations at:\nhttp://tbtc.blockr.io/tx/info/#{signed_payment[:hash]}"
 
 
 
