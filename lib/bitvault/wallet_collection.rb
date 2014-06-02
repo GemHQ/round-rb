@@ -13,11 +13,11 @@ class BitVault::WalletCollection < BitVault::Collection
   end
 
   def create_wallet_resource(passphrase, name, network)
-    new_wallet = BitVault::Bitcoin::MultiWallet.generate [:primary, :backup]
+    new_wallet = CoinOp::Bit::MultiWallet.generate [:primary, :backup]
     primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
 
     ## Encrypt the primary seed using a passphrase-derived key
-    encrypted_seed = BitVault::Crypto::PassphraseBox.encrypt(passphrase, primary_seed)
+    encrypted_seed = CoinOp::Crypto::PassphraseBox.encrypt(passphrase, primary_seed)
 
     @resource.create(
       name: name,

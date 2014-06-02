@@ -40,17 +40,17 @@ describe BitVault::WalletCollection, :vcr do
     let(:name) { 'my_wallet' }
     let(:network) { 'bitcoin_testnet' }
     let(:resource) { wallets.create_wallet_resource(passphrase, name, network ) }
-    let(:multi_wallet) { BitVault::Bitcoin::MultiWallet.generate [:primary, :backup] }
+    let(:multi_wallet) { CoinOp::Bit::MultiWallet.generate [:primary, :backup] }
     let(:primary_address) { multi_wallet.trees[:primary].to_serialized_address }
     let(:backup_address) { multi_wallet.trees[:backup].to_serialized_address }
     let(:primary_seed) { multi_wallet.trees[:primary].to_serialized_address(:private) }
-    let(:encrypted_seed) { BitVault::Crypto::PassphraseBox.encrypt(passphrase, primary_seed) }
+    let(:encrypted_seed) { CoinOp::Crypto::PassphraseBox.encrypt(passphrase, primary_seed) }
 
     it 'calls resource.create with the correct values' do
       multi_wallet
       encrypted_seed
-      BitVault::Bitcoin::MultiWallet.stub(:generate).and_return(multi_wallet)
-      BitVault::Crypto::PassphraseBox.stub(:encrypt).and_return(encrypted_seed)
+      CoinOp::Bit::MultiWallet.stub(:generate).and_return(multi_wallet)
+      CoinOp::Crypto::PassphraseBox.stub(:encrypt).and_return(encrypted_seed)
       wallets.resource.should_receive(:create).with hash_including(
         name: name,
         network: network,

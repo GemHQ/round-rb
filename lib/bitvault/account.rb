@@ -12,7 +12,7 @@ class BitVault::Account < BitVault::Base
     raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 
     unsigned_payment = @resource.payments.create self.outputs_from_payees(options[:payees])
-    transaction = BitVault::Bitcoin::Transaction.data(unsigned_payment)
+    transaction = CoinOp::Bit::Transaction.data(unsigned_payment)
     signed_payment = self.sign_payment(unsigned_payment, transaction)
 
     BitVault::Payment.new(resource: signed_payment)

@@ -31,7 +31,7 @@ describe BitVault::Account, :vcr do
         account.resource.payments.stub(:create).and_return({})
         account.stub(:outputs_from_payees).and_return({})
         account.stub(:sign_payment).and_return({})
-        BitVault::Bitcoin::Transaction.stub(:data).and_return({})
+        CoinOp::Bit::Transaction.stub(:data).and_return({})
       }
 
       it 'returns a Payment model' do
@@ -68,6 +68,10 @@ describe BitVault::Account, :vcr do
 
       it 'has a root node of outputs' do
         expect(outputs.has_key?(:outputs)).to be_true
+      end
+
+      it 'has the correct number of entries' do
+        expect(outputs[:outputs].count).to eql(1)
       end
     end
   end

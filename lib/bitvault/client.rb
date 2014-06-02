@@ -1,5 +1,4 @@
 require "patchboard"
-require_relative "crypto"
 require "base64"
 
 module BitVault

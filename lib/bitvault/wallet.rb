@@ -10,8 +10,8 @@ class BitVault::Wallet < BitVault::Base
   end
 
   def unlock(passphrase)
-    primary_seed = BitVault::Crypto::PassphraseBox.decrypt(passphrase, @resource.primary_private_seed)
-    @multiwallet = BitVault::Bitcoin::MultiWallet.new(
+    primary_seed = CoinOp::Crypto::PassphraseBox.decrypt(passphrase, @resource.primary_private_seed)
+    @multiwallet = CoinOp::Bit::MultiWallet.new(
       private: {
         primary: primary_seed
       },

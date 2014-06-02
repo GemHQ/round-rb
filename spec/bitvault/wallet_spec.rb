@@ -4,13 +4,13 @@ describe BitVault::Wallet, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
   let(:wallet) { authed_client.user.applications[0].wallets[0] }
   let(:passphrase) { 'very insecure' }
-  let(:primary_seed) { BitVault::Crypto::PassphraseBox.decrypt(passphrase, wallet.resource.primary_private_seed) }
+  let(:primary_seed) { CoinOp::Crypto::PassphraseBox.decrypt(passphrase, wallet.resource.primary_private_seed) }
 
   describe '#unlock' do
     it 'populates the multiwallet' do
       wallet.unlock(passphrase)
       expect(wallet.multiwallet).to_not be_nil
-      expect(wallet.multiwallet).to be_a_kind_of(BitVault::Bitcoin::MultiWallet)
+      expect(wallet.multiwallet).to be_a_kind_of(CoinOp::Bit::MultiWallet)
     end
 
     it 'decrypts the wallet' do

@@ -3,6 +3,7 @@ PATH
   specs:
     bitvault (0.0.1)
       bitcoin-ruby (= 0.0.5)
+      coin-op (= 0.1.0)
       money-tree (= 0.8.6)
       patchboard (= 0.4.2)
       rbnacl (~> 2.0)
@@ -20,6 +21,9 @@ GEM
     ansi (1.4.3)
     bitcoin-ruby (0.0.5)
     builder (3.2.2)
+    coin-op (0.1.0)
+      bitcoin-ruby (= 0.0.5)
+      money-tree (~> 0.8)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)

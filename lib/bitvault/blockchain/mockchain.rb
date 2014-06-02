@@ -20,7 +20,7 @@ Bitcoin::NETWORKS[:mockchain] = {
 Bitcoin.network = :mockchain
 
 
-module BitVault::Bitcoin
+module CoinOp::Bit
 
   class MockChain
     include ::Bitcoin::Builder
