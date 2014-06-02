@@ -216,7 +216,10 @@ File.open "demo_wallet.yaml", "w" do |f|
 end
 
 puts <<-MESSAGE
-  Fund the address from a testnet faucet, so that you can make payments or transfers.
+  Fund this address from a testnet faucet, so that you can make payments or transfers:
+
+  #{incoming_address.string}
+
   Then you can run demo_payment.rb
 
   Fund this address from a testnet faucet so that you can make payments:
@@ -226,7 +229,7 @@ puts <<-MESSAGE
   Once the transaction is confirmed (with 6 blocks) run demo_payment.rb
 
   You can check the state of transactions for the address at:
-  http://tbtc.blockr.io/address/info/#{address}
+  http://tbtc.blockr.io/address/info/#{incoming_address.string}
 MESSAGE
 
 

@@ -62,7 +62,7 @@ unsigned_payment = account.payments.create(
   :outputs => [
     {
       :amount => 2_000_000,
-      # faucet donation address
+      # faucet.xeno-genesis.com donation address
       :payee => {:address => "mwwhVPiopW6HhhDtcSv3MUFLTB5ehhkgZg"}
     }
   ]
