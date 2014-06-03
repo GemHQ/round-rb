@@ -82,11 +82,49 @@ describe BitVault::Account, :vcr do
   end
 
   describe '#sign_payment' do 
+    let(:transaction) { double('transaction') }
+    let(:unsigned_payment) { double('unsigned_payment') }
+    let(:signed_payment) { double('signed_payment') }
+    let(:signatures) { double('signatures') }
+    let(:base58_hash) { 'abcdef123456' }
+    before(:each) { wallet.unlock(passphrase) }
 
     context 'with invalid change address' do
-      
+      before(:each) { account.wallet.multiwallet.stub(:valid_output?).and_return(false) }
       it 'raises an error' do
+        expect { account.sign_payment(unsigned_payment, transaction) }.to raise_error
+      end
+    end
 
+    context 'with no transaction' do
+      it 'raises and error' do
+        expect { account.sign_payment(unsigned_payment, nil) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'with no unsigned_payment' do
+      it 'raises and error' do
+        expect { account.sign_payment(nil, transaction) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'with valid inputs' do
+      before(:each) {
+        allow(unsigned_payment).to receive(:sign) { signed_payment }
+        allow(transaction).to receive(:base58_hash) { base58_hash }
+        allow(transaction).to receive(:outputs) { [] }
+        account.wallet.multiwallet.stub(:signatures).and_return(signatures)
+        account.wallet.multiwallet.stub(:valid_output?).and_return(true)
+      }
+      it 'calls sign on the unsigned transaction' do
+        unsigned_payment.should receive(:sign).with(
+          transaction_hash: base58_hash,
+          inputs: signatures)
+        account.sign_payment(unsigned_payment, transaction)
+      end
+
+      it 'returns the signed payment' do
+        expect(account.sign_payment(unsigned_payment, transaction)).to eql(signed_payment)
       end
     end
 
