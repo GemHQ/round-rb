@@ -21,13 +21,13 @@ http_interactions:
       Vary:
       - Accept-Encoding
       Content-Length:
-      - '31252'
+      - '31270'
       Content-Type:
       - application/json
       Date:
-      - Tue, 03 Jun 2014 00:15:39 GMT
-      Connection:
-      - keep-alive
+      - Tue, 03 Jun 2014 23:46:56 GMT
+      Proxy-Connection:
+      - Keep-alive
     body:
       encoding: UTF-8
       string: |-
@@ -127,16 +127,6 @@ http_interactions:
             },
             "application": {
               "actions": {
-                "get": {
-                  "method": "GET",
-                  "request": {
-                    "authorization": "Basic"
-                  },
-                  "response": {
-                    "type": "application/vnd.bitvault.application+json;version=1.0",
-                    "status": 200
-                  }
-                },
                 "update": {
                   "method": "PATCH",
                   "request": {
@@ -152,6 +142,16 @@ http_interactions:
                   "method": "POST",
                   "request": {
                     "authorization": "Basic"
+                  },
+                  "response": {
+                    "type": "application/vnd.bitvault.application+json;version=1.0",
+                    "status": 200
+                  }
+                },
+                "get": {
+                  "method": "GET",
+                  "request": {
+                    "authorization": "BitVault-Token"
                   },
                   "response": {
                     "type": "application/vnd.bitvault.application+json;version=1.0",
@@ -562,6 +562,9 @@ http_interactions:
                         "salt": {
                           "type": "string"
                         },
+                        "iterations": {
+                          "type": "integer"
+                        },
                         "nonce": {
                           "type": "string"
                         },
@@ -927,10 +930,7 @@ http_interactions:
                   "type": "object",
                   "properties": {
                     "transaction_hash": {
-                      "required": true,
-                      "extends": {
-                        "$ref": "#base58"
-                      }
+                      "required": true
                     },
                     "inputs": {
                       "required": true,
@@ -1094,7 +1094,7 @@ http_interactions:
           }
         }
     http_version: 
-  recorded_at: Tue, 03 Jun 2014 00:15:39 GMT
+  recorded_at: Tue, 03 Jun 2014 23:46:56 GMT
 - request:
     method: get
     uri: http://localhost:8999/users?email=julian@bitvault.io
@@ -1122,14 +1122,14 @@ http_interactions:
       Content-Type:
       - application/vnd.bitvault.user+json;version=1.0
       Date:
-      - Tue, 03 Jun 2014 00:15:39 GMT
-      Connection:
-      - keep-alive
+      - Tue, 03 Jun 2014 23:46:57 GMT
+      Proxy-Connection:
+      - Keep-alive
     body:
       encoding: UTF-8
       string: '{"key":"3VuzedCjCxFStkVc8derGw","email":"julian@bitvault.io","first_name":null,"last_name":null,"applications":{"key":"3VuzedCjCxFStkVc8derGw","url":"http://localhost:8999/users/3VuzedCjCxFStkVc8derGw/apps"},"url":"http://localhost:8999/users/3VuzedCjCxFStkVc8derGw"}'
     http_version: 
-  recorded_at: Tue, 03 Jun 2014 00:15:39 GMT
+  recorded_at: Tue, 03 Jun 2014 23:46:57 GMT
 - request:
     method: get
     uri: http://localhost:8999/users/3VuzedCjCxFStkVc8derGw/apps
@@ -1157,14 +1157,14 @@ http_interactions:
       Content-Type:
       - application/vnd.bitvault.application_list+json;version=1.0
       Date:
-      - Tue, 03 Jun 2014 00:15:40 GMT
-      Connection:
-      - keep-alive
+      - Tue, 03 Jun 2014 23:46:57 GMT
+      Proxy-Connection:
+      - Keep-alive
     body:
       encoding: UTF-8
       string: '[{"key":"9foNkOXAx5o-jZKx672EAQ","name":"bitcoin_app","api_token":"j5kiETM6ZD0PAkybkHqagqT_S2zwRWUfe9Sn-o2Bwkg","callback_url":"http://someapp.com/callback","wallets":{"key":"9foNkOXAx5o-jZKx672EAQ","url":"http://localhost:8999/apps/9foNkOXAx5o-jZKx672EAQ/wallets"},"owner":{"key":"3VuzedCjCxFStkVc8derGw","url":"http://localhost:8999/users/3VuzedCjCxFStkVc8derGw"},"url":"http://localhost:8999/apps/9foNkOXAx5o-jZKx672EAQ"}]'
     http_version: 
-  recorded_at: Tue, 03 Jun 2014 00:15:40 GMT
+  recorded_at: Tue, 03 Jun 2014 23:46:57 GMT
 - request:
     method: get
     uri: http://localhost:8999/apps/9foNkOXAx5o-jZKx672EAQ/wallets
@@ -1192,14 +1192,14 @@ http_interactions:
       Content-Type:
       - application/vnd.bitvault.wallet_list+json;version=1.0
       Date:
-      - Tue, 03 Jun 2014 00:15:40 GMT
-      Connection:
-      - keep-alive
+      - Tue, 03 Jun 2014 23:46:57 GMT
+      Proxy-Connection:
+      - Keep-alive
     body:
       encoding: UTF-8
       string: '[{"key":"KXXdNIsTUpGgpm_R9Tk0Vw","name":"my funds","network":"bitcoin_testnet","backup_public_seed":"tpubD6NzVbkrYhZ4XUCECYPjJr6a54RYdT8aPSTc7KyY8kR8hhsxc1pm7kj1Y5xSoF2uSR8XJrYJq12jYS5443vwSjAgimhkp8HoWzxtrWop7ZR","primary_public_seed":"tpubD6NzVbkrYhZ4YDgMTs61GDmkEU9Wkfg9bn4X6L3wRjGYGK6fZ8HvkTrea2WZx3if9pRBpm4y89RPgf9MSEAm6N7LKEGR1zfkiF1iPThoLah","cosigner_public_seed":"tpubD6NzVbkrYhZ4YVFkXP8ZdhimsMspmeDhE3yHesovZPcms2wZp3xCFfBZBxBMEu5PfLQ75jobjJvrCMKogVW8XYLEMv4wy7BoRfoMEzMoyXB","default_account":{"key":"VCEdSryh_WIduLfDzJpgug","url":"http://localhost:8999/accounts/VCEdSryh_WIduLfDzJpgug"},"primary_private_seed":{"salt":"3SUu8g3a9gBVC6KNhjQ8y3","iterations":100000,"nonce":"Le9fjnhEZMW9qUiEZcoV2w17iBnTiFMRY","ciphertext":"qjkcGQJ4gxzSD2jt212vYpWCBU5TArmmGTG9QyfZY1jb3yeuZayz7HxC3DMPBYYN5c2UsNorXtGn65DwTZZX4PA5oNwNi2oJqSKSGvuRp6rNgs1RNM5vj9NfM7AudVGiKTRvMra1pPjdoKYWtXN5Xek814dfuKk6sSKevpaDGEZvz"},"accounts":{"key":"KXXdNIsTUpGgpm_R9Tk0Vw","url":"http://localhost:8999/wallets/KXXdNIsTUpGgpm_R9Tk0Vw/accounts"},"transfers":{"key":"KXXdNIsTUpGgpm_R9Tk0Vw","url":"http://localhost:8999/wallets/KXXdNIsTUpGgpm_R9Tk0Vw/transfers"},"url":"http://localhost:8999/wallets/KXXdNIsTUpGgpm_R9Tk0Vw"}]'
     http_version: 
-  recorded_at: Tue, 03 Jun 2014 00:15:40 GMT
+  recorded_at: Tue, 03 Jun 2014 23:46:57 GMT
 - request:
     method: get
     uri: http://localhost:8999/wallets/KXXdNIsTUpGgpm_R9Tk0Vw/accounts
@@ -1227,12 +1227,12 @@ http_interactions:
       Content-Type:
       - application/vnd.bitvault.account_list+json;version=1.0
       Date:
-      - Tue, 03 Jun 2014 00:15:40 GMT
-      Connection:
-      - keep-alive
+      - Tue, 03 Jun 2014 23:46:57 GMT
+      Proxy-Connection:
+      - Keep-alive
     body:
       encoding: UTF-8
       string: '[{"key":"VCEdSryh_WIduLfDzJpgug","name":"default","i":0,"next_k":null,"path":"m/0","balance":0,"pending_balance":0,"addresses":{"key":"VCEdSryh_WIduLfDzJpgug","url":"http://localhost:8999/accounts/VCEdSryh_WIduLfDzJpgug/addresses"},"payments":{"key":"VCEdSryh_WIduLfDzJpgug","url":"http://localhost:8999/accounts/VCEdSryh_WIduLfDzJpgug/payments"},"transactions":{"key":"VCEdSryh_WIduLfDzJpgug","url":"http://localhost:8999/account/VCEdSryh_WIduLfDzJpgug/transactions"},"url":"http://localhost:8999/accounts/VCEdSryh_WIduLfDzJpgug"},{"key":"HZ1COOsEXv31XfcKDDz6ag","name":"office_supplies","i":1,"next_k":null,"path":"m/1","balance":0,"pending_balance":0,"addresses":{"key":"HZ1COOsEXv31XfcKDDz6ag","url":"http://localhost:8999/accounts/HZ1COOsEXv31XfcKDDz6ag/addresses"},"payments":{"key":"HZ1COOsEXv31XfcKDDz6ag","url":"http://localhost:8999/accounts/HZ1COOsEXv31XfcKDDz6ag/payments"},"transactions":{"key":"HZ1COOsEXv31XfcKDDz6ag","url":"http://localhost:8999/account/HZ1COOsEXv31XfcKDDz6ag/transactions"},"url":"http://localhost:8999/accounts/HZ1COOsEXv31XfcKDDz6ag"}]'
     http_version: 
-  recorded_at: Tue, 03 Jun 2014 00:15:40 GMT
+  recorded_at: Tue, 03 Jun 2014 23:46:57 GMT
 recorded_with: VCR 2.9.2
