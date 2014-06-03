@@ -1,4 +1,6 @@
 class BitVault::Collection < BitVault::Base
+  def_delegators :@collection, :each, :count, :[]
+
   def initialize(options = {})
     super(options)
     @collection = []
@@ -15,11 +17,5 @@ class BitVault::Collection < BitVault::Base
 
   def collection_type
     raise 'Must implement collection_type in child class of BitVault::Collection'
-  end
-
-  private
-
-  def method_missing(method, *args, &block)
-    @collection.send(method, *args, &block) if @collection.methods.include? method
   end
 end
