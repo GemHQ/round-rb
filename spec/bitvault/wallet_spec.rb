@@ -35,10 +35,86 @@ describe BitVault::Wallet, :vcr do
     end
   end
 
+  describe '#transfer' do
+    let(:account_1) { double('account') }
+    let(:account_2) { double('account') }
+    let(:amount) { 10_000 }
+
+    context 'no source account provided' do
+      it 'raises an error' do
+        expect { wallet.transfer(destination: account_2, amount: 10_000) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'no destination account provided' do
+      it 'raises an error' do
+        expect { wallet.transfer(source: account_1, amount: 10_000) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'no amount provided' do
+      it 'raises an error' do
+        expect { wallet.transfer(destination: account_2, source: account_1) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'locked wallet' do
+      it 'raises an error' do
+        expect { wallet.transfer(source: account_1, destination: account_2, amount: amount) }.to raise_error
+      end
+    end
+
+    context 'valid arguments' do
+      let(:transfer) { wallet.transfer(source: account_1, destination: account_2, amount: amount) }
+      let(:unsigned_transfer) { double('unsigned_transfer') }
+      let(:transaction) { double('transaction') }
+      let(:signed_transfer) { double('signed_transfer') }
+      let(:signatures) { double('signatures') }
+      before(:each) {
+        wallet.unlock(passphrase)
+        wallet.resource.transfers.stub(:create).and_return(unsigned_transfer)
+        wallet.multiwallet.stub(:signatures).and_return(signatures)
+        CoinOp::Bit::Transaction.stub(:data).and_return(transaction)
+        allow(unsigned_transfer).to receive(:sign) { signed_transfer }
+        allow(transaction).to receive(:base58_hash) { 'abcdef123456' }
+        allow(account_1).to receive(:url) { 'http://some.url/account1' }
+        allow(account_2).to receive(:url) { 'http://some.url/account2' }
+      }
+
+      it 'calls create on transfers resource with the correct values' do
+        wallet.resource.transfers.should_receive(:create).with(
+          value: amount,
+          source: account_1.url,
+          destination: account_2.url)
+        transfer
+      end
+
+      it 'creates a native bitcoin transaction' do
+        CoinOp::Bit::Transaction.should_receive(:data).with(unsigned_transfer)
+        transfer
+      end
+
+      it 'signs the transfer' do
+        unsigned_transfer.should_receive(:sign).with(
+          transaction_hash: 'abcdef123456',
+          inputs: signatures)
+        transfer
+      end
+
+      it 'returns a Transaction model' do
+        expect(transfer).to be_a_kind_of(BitVault::Transaction)
+      end
+    end
+  end
+
   describe 'delegate methods' do
-    it 'delegates name to resource' do
-      wallet.resource.should_receive(:name)
-      wallet.name
+    [:name, :network, :cosigner_public_seed, 
+      :backup_public_seed, :primary_public_seed,
+      :primary_private_seed].each do |method|
+      it "delegates #{method} to resource" do
+        wallet.resource.should_receive(method)
+        wallet.send(method)
+      end
     end
   end
 end

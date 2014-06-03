@@ -94,8 +94,6 @@ unless client_wallet.valid_output?(transaction.outputs.last)
   raise "bad destination address"
 end
 
-signatures = client_wallet.signatures(transaction)
-
 signed_transfer = unsigned_transfer.sign(
   :transaction_hash => transaction.base58_hash,
   :inputs => client_wallet.signatures(transaction)

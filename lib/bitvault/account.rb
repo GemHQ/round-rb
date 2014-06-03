@@ -15,7 +15,7 @@ class BitVault::Account < BitVault::Base
     transaction = CoinOp::Bit::Transaction.data(unsigned_payment)
     signed_payment = self.sign_payment(unsigned_payment, transaction)
 
-    BitVault::Payment.new(resource: signed_payment)
+    BitVault::Transaction.new(resource: signed_payment)
   end
 
   def outputs_from_payees(payees)

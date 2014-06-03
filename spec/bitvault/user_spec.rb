@@ -19,19 +19,11 @@ describe BitVault::User, :vcr do
       user.update(first_name: 'Julian')
     end
 
-    it 'delegates email to the resource' do
-      user.resource.should_receive(:email)
-      user.email
-    end
-
-    it 'delegates first_name to the resource' do
-      user.resource.should_receive(:first_name)
-      user.first_name
-    end
-
-    it 'delegates last_name to the resource' do
-      user.resource.should_receive(:last_name)
-      user.last_name
+    [:email, :first_name, :last_name].each do |method|
+      it 'delegates email to the resource' do
+        user.resource.should_receive(method)
+        user.send(method)
+      end
     end
   end
 

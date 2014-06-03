@@ -36,7 +36,7 @@ describe BitVault::Account, :vcr do
 
       it 'returns a Payment model' do
         expect(account.pay(payees: [ {address: 'abcdef123456', amount: 10_000} ]))
-          .to be_a_kind_of(BitVault::Payment)
+          .to be_a_kind_of(BitVault::Transaction)
       end
     end
   end

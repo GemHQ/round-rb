@@ -1,6 +1,4 @@
 class BitVault::User < BitVault::Base
-  extend Forwardable
-
   def_delegators :@resource, :update, :email, :first_name, :last_name
 
   def applications(options = {})
