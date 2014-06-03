@@ -1,4 +1,5 @@
 require "pp"
+require "uri"
 require "yaml"
 
 project_root = File.expand_path("#{File.dirname(__FILE__)}/../../")
@@ -38,6 +39,11 @@ end
 
 def bitvault_url
   ARGV[0] || "http://bitvault.pandastrike.com/"
+end
+
+def saved_file
+  host = URI.parse(bitvault_url).hostname
+  "demo-#{host}.yaml"
 end
 
 def bitvault

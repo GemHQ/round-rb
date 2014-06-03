@@ -6,11 +6,16 @@ include CoinOp::Crypto
 
 MultiWallet = CoinOp::Bit::MultiWallet
 
-unless File.exists? "demo_wallet.yaml"
+require "uri"
+host = URI.parse(bitvault_url).hostname
+
+saved_file = "demo-#{host}.yaml"
+
+unless File.exists? saved_file
   puts
   puts <<-MESSAGE
   This script requires output from demo_account.rb, which will be
-  found in ./demo_wallet.yaml.
+  found in #{saved_file}.
   Run demo_account.rb first, then fund the address provided using
   a testnet faucet.  Once the transaction has 6 confirmations,
   you should be able to run this script.
@@ -18,7 +23,7 @@ unless File.exists? "demo_wallet.yaml"
   exit
 end
 
-data = YAML.load_file "demo_wallet.yaml"
+data = YAML.load_file saved_file
 api_token, passphrase =
   data.values_at :api_token, :passphrase
 

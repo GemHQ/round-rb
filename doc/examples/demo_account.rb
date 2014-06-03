@@ -1,11 +1,11 @@
 require_relative "setup"
 
-if File.exists? "demo_wallet.yaml"
-  data = YAML.load_file "demo_wallet.yaml"
+if File.exists? saved_file
+  data = YAML.load_file saved_file
   address = data[:node][:address]
   puts
   puts <<-MESSAGE
-  Settings from a previous run of this script are in ./demo_wallet.yaml
+  Settings from a previous run of this script are in #{saved_file}.
   If you have not already funded that wallet, you can remove the file.
   Otherwise, fund this address:
   #{address}
@@ -184,7 +184,7 @@ log "Generate a Bitcoin address to fund the account", mask(
 # Until funded the account can't be used to generate payments or transfers to
 # other accounts in the wallet.
 
-puts "Writing wallet information to ./demo_wallet.yaml for use in next test."
+puts "Writing wallet information to #{saved_file} for use in next test."
 
 record = {
   :api_token => client.context.api_token,
@@ -196,7 +196,7 @@ record = {
     :address => incoming_address.string
   }
 }
-File.open "demo_wallet.yaml", "w" do |f|
+File.open saved_file, "w" do |f|
   f.puts record.to_yaml
 end
 

@@ -1,4 +1,4 @@
 log
 *.gem
 *~
-demo_wallet.*
+demo-*.yaml
