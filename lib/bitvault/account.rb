@@ -32,6 +32,8 @@ class BitVault::Account < BitVault::Base
   end
 
   def sign_payment(unsigned_payment, transaction)
+    raise ArgumentError, 'unsigned_payment is required' unless unsigned_payment
+    raise ArgumentError, 'transaction is required' unless transaction
     raise "bad change address" unless @wallet.multiwallet.valid_output?(transaction.outputs.last)
     unsigned_payment.sign(
       transaction_hash: transaction.base58_hash,

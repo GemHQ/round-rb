@@ -73,10 +73,22 @@ describe BitVault::Account, :vcr do
       it 'has the correct number of entries' do
         expect(outputs[:outputs].count).to eql(1)
       end
+
+      it 'has the correct values and structure' do
+        expect(outputs[:outputs].first[:amount]).to eql(10_000)
+        expect(outputs[:outputs].first[:payee][:address]).to eql('abcdef123456')
+      end
     end
   end
 
   describe '#sign_payment' do 
+
+    context 'with invalid change address' do
+      
+      it 'raises an error' do
+
+      end
+    end
 
   end
 end
