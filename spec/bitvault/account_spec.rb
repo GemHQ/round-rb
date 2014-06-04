@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BitVault::Account, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:wallet) { authed_client.user.applications[0].wallets[0] }
+  let(:wallet) { authed_client.user.applications[0].wallets['my funds'] }
   let(:passphrase) { 'very insecure' }
   let(:account) { BitVault::Account.new(resource: wallet.accounts[0].resource, wallet: wallet) }
 

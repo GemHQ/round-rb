@@ -3,7 +3,7 @@ class BitVault::ApplicationCollection < BitVault::Collection
   def create(options = {})
     app_resource = @resource.create(options)
     app = BitVault::Application.new(resource: app_resource)
-    @collection << app
+    self.add(app)
     app
   end
 

@@ -7,7 +7,7 @@ class BitVault::AddressCollection < BitVault::Collection
   def create
     resource = @resource.create
     address = BitVault::Address.new(resource: resource)
-    @collection << address
+    self.add(address)
     address
   end
 end

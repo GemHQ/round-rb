@@ -5,7 +5,7 @@ describe BitVault::AccountCollection, :vcr do
     BitVault::Patchboard.authed_client(app_url: 'http://localhost:8999/apps/jeZgADLToHXD5PDziaMk2g', 
       api_token: '9X7axU2VU36ssm4MoVN8rNjQBFVL2iLoM1VRFvlLyBM') 
   }
-  let(:wallet) { authed_client.application.wallets[0] }
+  let(:wallet) { authed_client.application.wallets['my funds'] }
   let(:accounts) { wallet.accounts }
   let(:account) { accounts.create(name: 'office supplies') }
 

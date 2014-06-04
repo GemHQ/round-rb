@@ -3,9 +3,9 @@ class BitVault::Collection < BitVault::Base
 
   def initialize(options = {})
     super(options)
-    if collection_type == Array
+    if self.collection_type == Array
       @collection = []
-    elsif collection_type == Hash
+    elsif self.collection_type == Hash
       @collection = {}
     end
     options.delete(:resource)
@@ -16,11 +16,15 @@ class BitVault::Collection < BitVault::Base
     @resource.list.each do |resource|
       options.merge!(resource: resource)
       content = self.content_type.new(options)
-      if @collection.is_a?(Array)
-        @collection << content
-      elsif @collection.is_a?(Hash)
-        @collection[content.name] = content
-      end
+      self.add(content)
+    end
+  end
+
+  def add(content)
+    if self.collection_type == Array
+      @collection << content
+    elsif self.collection_type == Hash
+      @collection[content.name] = content
     end
   end
 
