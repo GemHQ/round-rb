@@ -6,7 +6,7 @@ class BitVault::AccountCollection < BitVault::Collection
     super(options)
   end
 
-  def collection_type
+  def content_type
     BitVault::Account
   end
 

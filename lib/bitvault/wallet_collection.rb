@@ -1,6 +1,6 @@
 class BitVault::WalletCollection < BitVault::Collection
 
-  def collection_type
+  def content_type
     BitVault::Wallet
   end
 

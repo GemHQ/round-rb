@@ -11,7 +11,7 @@ describe BitVault::ApplicationCollection, :vcr do
     end
 
     it 'instantiates the collection array' do
-      BitVault::ApplicationCollection.any_instance.should_receive(:populate_array)
+      BitVault::ApplicationCollection.any_instance.should_receive(:populate_data)
       user.applications
     end
   end

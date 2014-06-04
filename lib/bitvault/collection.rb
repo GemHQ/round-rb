@@ -1,21 +1,34 @@
 class BitVault::Collection < BitVault::Base
-  def_delegators :@collection, :each, :count, :[]
+  def_delegators :@collection, :each, :count, :[], :first, :last
 
   def initialize(options = {})
     super(options)
-    @collection = []
+    if collection_type == Array
+      @collection = []
+    elsif collection_type == Hash
+      @collection = {}
+    end
     options.delete(:resource)
-    self.populate_array(options)
+    self.populate_data(options)
   end
 
-  def populate_array(options)
+  def populate_data(options)
     @resource.list.each do |resource|
       options.merge!(resource: resource)
-      @collection << self.collection_type.new(options)
+      content = self.content_type.new(options)
+      if @collection.is_a?(Array)
+        @collection << content
+      elsif @collection.is_a?(Hash)
+        @collection[content.name] = content
+      end
     end
   end
 
   def collection_type
-    raise 'Must implement collection_type in child class of BitVault::Collection'
+    Array
+  end
+
+  def content_type
+    raise 'Must implement content_type in child class of BitVault::Collection'
   end
 end
