@@ -17,15 +17,17 @@ describe BitVault::AccountCollection, :vcr do
     end
 
     it 'sets the wallet on each of the accounts' do
-      wallet.accounts.each do |account|
+      wallet.accounts.each do |name, account|
         expect(account.wallet).to eql(wallet)
       end
     end
   end
 
   describe '#create' do
+    let(:account_resource) { double('account_resource') }
     before(:each) {
-      accounts.resource.stub(:create).and_return({})
+      allow(account_resource).to receive(:name) { 'new account' }
+      accounts.resource.stub(:create).and_return(account_resource)
     }
 
     it 'returns an Account model' do

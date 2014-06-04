@@ -3,7 +3,7 @@ require 'spec_helper'
 describe BitVault::Application, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
   let(:user) { authed_client.user }
-  let(:application) { user.applications[0] }
+  let(:application) { user.applications['bitcoin_app'] }
 
   describe 'delegate methods' do
     it 'delegates name to resource' do

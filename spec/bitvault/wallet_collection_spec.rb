@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BitVault::WalletCollection, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:application) { authed_client.user.applications[0] }
+  let(:application) { authed_client.user.applications['bitcoin_app'] }
   let(:wallets) { application.wallets }
   let(:wallet_resource) { double('wallet_resource') }
   let(:name) { 'new wallet' }

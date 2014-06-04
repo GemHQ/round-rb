@@ -4,6 +4,10 @@ class BitVault::AddressCollection < BitVault::Collection
     BitVault::Address
   end
 
+  def collection_type
+    Array
+  end
+
   def create
     resource = @resource.create
     address = BitVault::Address.new(resource: resource)

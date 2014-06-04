@@ -24,15 +24,21 @@ class BitVault::Collection < BitVault::Base
     if self.collection_type == Array
       @collection << content
     elsif self.collection_type == Hash
-      @collection[content.name] = content
+      key = self.content_key || :name
+      @collection[content.send(key)] = content
     end
   end
 
   def collection_type
-    Array
+    Hash
   end
 
   def content_type
     raise 'Must implement content_type in child class of BitVault::Collection'
   end
+
+  def content_key
+
+  end
+  
 end

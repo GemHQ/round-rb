@@ -1,4 +1,6 @@
 class BitVault::Account < BitVault::Base
+  def_delegators :@resource, :name, :path, :balance, :pending_balance
+
   attr_accessor :wallet
 
   def initialize(options = {})

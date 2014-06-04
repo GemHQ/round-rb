@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BitVault::Wallet, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:wallet) { authed_client.user.applications[0].wallets['my funds'] }
+  let(:wallet) { authed_client.user.applications['bitcoin_app'].wallets['my funds'] }
   let(:passphrase) { 'very insecure' }
   let(:primary_seed) { CoinOp::Crypto::PassphraseBox.decrypt(passphrase, wallet.resource.primary_private_seed) }
 

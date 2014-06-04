@@ -18,18 +18,22 @@ describe BitVault::ApplicationCollection, :vcr do
 
   describe '#populate_array' do
     it 'populates the array with Application objects' do
-      user.applications.each do |app|
+      user.applications.each do |name, app|
         expect(app).to be_a_kind_of(BitVault::Application)
       end
     end
   end
 
   describe '#create' do
+    let(:application_resource) { double('application_resource') }
+    let(:name) { 'new_bitcoin_app' }
+    let(:callback_url) { 'http://someapp.com/callback' }
     before(:each) {
-      user.applications.resource.stub(:create).and_return({})
+      allow(application_resource).to receive(:name) { name }
+      user.applications.resource.stub(:create).and_return(application_resource)
     }
 
-    let(:application) { user.applications.create(name: 'bitcoin_app', callback_url:'http://someapp.com/callback') }
+    let(:application) { user.applications.create(name: name, callback_url: callback_url) }
 
     it 'delegates to the resource' do
       user.applications.resource.should_receive(:create)

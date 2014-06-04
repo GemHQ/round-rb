@@ -2,13 +2,22 @@ require 'spec_helper'
 
 describe BitVault::Account, :vcr do
   let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:wallet) { authed_client.user.applications[0].wallets['my funds'] }
+  let(:wallet) { authed_client.user.applications['bitcoin_app'].wallets['my funds'] }
   let(:passphrase) { 'very insecure' }
-  let(:account) { BitVault::Account.new(resource: wallet.accounts[0].resource, wallet: wallet) }
+  let(:account) { BitVault::Account.new(resource: wallet.accounts['office supplies'].resource, wallet: wallet) }
 
   describe '#initialize' do
     it 'sets the wallet attribute' do
       expect(account.wallet).to eql(wallet)
+    end
+  end
+
+  describe 'delegated methods' do
+    [:name, :path, :balance, :pending_balance].each do |method|
+      it "delegates #{method} to resource" do
+        account.resource.should_receive method
+        account.send(method)
+      end
     end
   end
 
