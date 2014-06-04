@@ -11,8 +11,8 @@ describe BitVault::Patchboard::Client, :vcr do
 
   describe '#application' do
     let(:client) {
-      BitVault::Patchboard.authed_client(app_url: 'http://localhost:8999/apps/9foNkOXAx5o-jZKx672EAQ', 
-        api_token: 'j5kiETM6ZD0PAkybkHqagqT_S2zwRWUfe9Sn-o2Bwkg') 
+      BitVault::Patchboard.authed_client(app_url: 'http://localhost:8999/apps/jeZgADLToHXD5PDziaMk2g', 
+        api_token: '9X7axU2VU36ssm4MoVN8rNjQBFVL2iLoM1VRFvlLyBM') 
     }
     it 'returns an application model' do
       expect(client.application).to_not be_nil

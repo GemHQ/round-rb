@@ -41,4 +41,9 @@ class BitVault::Account < BitVault::Base
     )
   end
 
+  def addresses
+    @addresses ||= BitVault::AddressCollection.new(resource: @resource.addresses)
+    @addresses
+  end
+
 end 

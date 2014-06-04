@@ -25,9 +25,9 @@ http_interactions:
       Content-Type:
       - application/json
       Date:
-      - Tue, 03 Jun 2014 23:46:14 GMT
-      Proxy-Connection:
-      - Keep-alive
+      - Wed, 04 Jun 2014 01:59:07 GMT
+      Connection:
+      - keep-alive
     body:
       encoding: UTF-8
       string: |-
@@ -1094,7 +1094,7 @@ http_interactions:
           }
         }
     http_version: 
-  recorded_at: Tue, 03 Jun 2014 23:46:14 GMT
+  recorded_at: Wed, 04 Jun 2014 01:59:07 GMT
 - request:
     method: get
     uri: http://localhost:8999/users?email=julian@bitvault.io
@@ -1122,17 +1122,17 @@ http_interactions:
       Content-Type:
       - application/vnd.bitvault.user+json;version=1.0
       Date:
-      - Tue, 03 Jun 2014 23:46:15 GMT
-      Proxy-Connection:
-      - Keep-alive
+      - Wed, 04 Jun 2014 01:59:07 GMT
+      Connection:
+      - keep-alive
     body:
       encoding: UTF-8
-      string: '{"key":"3VuzedCjCxFStkVc8derGw","email":"julian@bitvault.io","first_name":null,"last_name":null,"applications":{"key":"3VuzedCjCxFStkVc8derGw","url":"http://localhost:8999/users/3VuzedCjCxFStkVc8derGw/apps"},"url":"http://localhost:8999/users/3VuzedCjCxFStkVc8derGw"}'
+      string: '{"key":"iMwKGIJqTGirlLXR5mkZlA","email":"julian@bitvault.io","first_name":null,"last_name":null,"applications":{"key":"iMwKGIJqTGirlLXR5mkZlA","url":"http://localhost:8999/users/iMwKGIJqTGirlLXR5mkZlA/apps"},"url":"http://localhost:8999/users/iMwKGIJqTGirlLXR5mkZlA"}'
     http_version: 
-  recorded_at: Tue, 03 Jun 2014 23:46:15 GMT
+  recorded_at: Wed, 04 Jun 2014 01:59:07 GMT
 - request:
     method: get
-    uri: http://localhost:8999/users/3VuzedCjCxFStkVc8derGw/apps
+    uri: http://localhost:8999/users/iMwKGIJqTGirlLXR5mkZlA/apps
     body:
       encoding: US-ASCII
       string: ''
@@ -1157,12 +1157,12 @@ http_interactions:
       Content-Type:
       - application/vnd.bitvault.application_list+json;version=1.0
       Date:
-      - Tue, 03 Jun 2014 23:46:15 GMT
-      Proxy-Connection:
-      - Keep-alive
+      - Wed, 04 Jun 2014 01:59:07 GMT
+      Connection:
+      - keep-alive
     body:
       encoding: UTF-8
-      string: '[{"key":"9foNkOXAx5o-jZKx672EAQ","name":"bitcoin_app","api_token":"j5kiETM6ZD0PAkybkHqagqT_S2zwRWUfe9Sn-o2Bwkg","callback_url":"http://someapp.com/callback","wallets":{"key":"9foNkOXAx5o-jZKx672EAQ","url":"http://localhost:8999/apps/9foNkOXAx5o-jZKx672EAQ/wallets"},"owner":{"key":"3VuzedCjCxFStkVc8derGw","url":"http://localhost:8999/users/3VuzedCjCxFStkVc8derGw"},"url":"http://localhost:8999/apps/9foNkOXAx5o-jZKx672EAQ"}]'
+      string: '[{"key":"jeZgADLToHXD5PDziaMk2g","name":"bitcoin_app","api_token":"9X7axU2VU36ssm4MoVN8rNjQBFVL2iLoM1VRFvlLyBM","callback_url":"http://someapp.com/callback","wallets":{"key":"jeZgADLToHXD5PDziaMk2g","url":"http://localhost:8999/apps/jeZgADLToHXD5PDziaMk2g/wallets"},"owner":{"key":"iMwKGIJqTGirlLXR5mkZlA","url":"http://localhost:8999/users/iMwKGIJqTGirlLXR5mkZlA"},"url":"http://localhost:8999/apps/jeZgADLToHXD5PDziaMk2g"}]'
     http_version: 
-  recorded_at: Tue, 03 Jun 2014 23:46:15 GMT
+  recorded_at: Wed, 04 Jun 2014 01:59:07 GMT
 recorded_with: VCR 2.9.2

@@ -129,4 +129,20 @@ describe BitVault::Account, :vcr do
     end
 
   end
+
+  describe '#addresses' do
+    before(:each) { 
+      account.resource.addresses.stub(:list).and_return([])
+    }
+
+    it 'returns an AddressCollection' do
+      expect(account.addresses).to be_a_kind_of(BitVault::AddressCollection)
+    end
+
+    it 'only fetches once' do
+      account.resource.addresses.should_receive(:list).once
+      account.addresses
+      account.addresses
+    end
+  end
 end
