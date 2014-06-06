@@ -12,7 +12,7 @@ class BitVault::AccountCollection < BitVault::Collection
 
   def create(options = {})
     resource = @resource.create(options)
-    account = BitVault::Account.new(resource: resource, wallet: self)
+    account = BitVault::Account.new(resource: resource, wallet: @wallet)
     self.add(account)
     account
   end

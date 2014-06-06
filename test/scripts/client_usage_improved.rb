@@ -1,12 +1,15 @@
-require_relative "setup"
+project_root = File.expand_path("#{File.dirname(__FILE__)}/../../")
+$:.unshift "#{project_root}/lib"
+
+API_HOST = 'http://localhost:8999'
+require "bitvault"
 
 ## API discovery
 #
 # The BitVault server provides a JSON description of its API that allows
 # the client to generate all necessary resource classes at runtime.
 
-client = BitVault::Client.discover
-
+client = BitVault::Patchboard.client
 ## User management
 #
 # The create action returns a User Resource which has:
@@ -16,13 +19,14 @@ client = BitVault::Client.discover
 # * associated resources (applications)
 
 user = client.users.create(
-  email: 'matthew@bitvault.io',
-  first_name: 'Matthew',
-  last_name: 'King',
-  password: 'incredibly_secure'
+  email: 'julian@bitvault.io',
+  first_name: 'Julian',
+  last_name: 'Vergel de Dios',
+  password: 'terrible_secret'
 )
 
-user.update(first_name: 'Matt')
+client = BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret')
+user = client.user
 
 ## Application management
 
@@ -41,23 +45,16 @@ user.applications(refresh: true)
 # can POST event information such as confirmed transactions.
 
 app = user.applications.create(
-  name: 'bitcoin_emporium',
-  callback_url: 'https://api.bitcoin-emporium.io/events'
+  name: 'bitcoin_app',
+  callback_url: 'http://someapp.com/callback'
 )
-
-app.update(name: 'bitcoin_mega_emporium')
-
-# Existing applications can also be fetched using a known token
-
-APP_TOKEN = 'abcdef123456'
-app = user.applications.authenticate(APP_TOKEN)
 
 ## Wallets
 #
 # Wallets belong to applications, not directly to users. They require
 # a passphrase to be provided on creation.
 
-wallet = app.wallets.create(passphrase: 'super_secure', name: 'smurfs')
+wallet = app.wallets.create(passphrase: 'very insecure', name: 'my funds')
 
 # An application's wallet collection is enumerable
 
@@ -65,12 +62,12 @@ wallet = app.wallets.each { |wallet| pp wallet }
 
 # And acts as a hash with names as keys
 
-wallet = app.wallets['smurfs']
+wallet = app.wallets['my funds']
 
 # The passphrase is required to unlock the wallet before you can
 # perform any transactions with it.
 
-wallet.authorize('super_secure')
+wallet.unlock('very insecure')
 
 ## Accounts
 #
@@ -78,19 +75,19 @@ wallet.authorize('super_secure')
 # MultiWallet's deterministic trees.
 
 account = wallet.accounts.create(name: 'office supplies')
-account.update(name: 'rubber bands')
 
 ## Payments
 #
 # Sending payments
 
-payment = account.pay(payees: [{ address: 'address', amount: 20_000 }])
-
 # Creating addresses for receiving payments
 # This is a BIP 16 "Pay to Script Hash" address, where the script in question
 # is a BIP 11 "multisig".
 
-address = account.addresses.create
+payment_address = account.addresses.create
+
+# TODO: Additional method "prepare" to obtain unsigned transaction for inspection
+payment = account.pay([{ address: payment_address.string, amount: 20_000 }])
 
 ## Transfers
 

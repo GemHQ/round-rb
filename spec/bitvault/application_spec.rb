@@ -14,6 +14,11 @@ describe BitVault::Application, :vcr do
       expect(application.callback_url).to eql('http://someapp.com/callback')
     end
 
+    it 'delegates api_token to resource' do
+      application.resource.should_receive(:api_token)
+      application.api_token
+    end
+
     it 'delegates update to resource' do
       application.resource.stub(:update).and_return(application.resource)
       application.resource.should_receive(:update)

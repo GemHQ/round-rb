@@ -30,113 +30,25 @@ describe BitVault::Account, :vcr do
 
     context 'when a transaction is attempted with a locked wallet' do
       it 'raises an error when the wallet is locked' do
-        expect{ account.pay(payees: []) }.to raise_error
+        expect{ account.pay([]) }.to raise_error
       end
     end
 
     context 'when a transaction is attempted with an unlocked wallet' do
-      before { 
+      let(:payment_resource) { double('payment_resource', sign: nil) }
+      let(:payment) { account.pay([ {address: 'abcdef123456', amount: 10_000} ]) }
+      before(:each) { 
         wallet.unlock(passphrase) 
-        account.resource.payments.stub(:create).and_return({})
-        account.stub(:outputs_from_payees).and_return({})
-        account.stub(:sign_payment).and_return({})
-        CoinOp::Bit::Transaction.stub(:data).and_return({})
+        account.payments.stub(:unsigned).and_return(payment_resource)
       }
 
       it 'returns a Payment model' do
-        expect(account.pay(payees: [ {address: 'abcdef123456', amount: 10_000} ]))
-          .to be_a_kind_of(BitVault::Transaction)
+        account.payments.should_receive(:unsigned)
+        payment_resource.should_receive(:sign).with(account.wallet.multiwallet)
+        expect(payment).to be_a_kind_of(BitVault::Payment)
+        expect(payment.resource).to eql(payment_resource)
       end
     end
-  end
-
-  describe '#outputs_from_payees' do
-    context 'anything but an array is passed' do
-      it 'raises an error' do
-        expect{ account.outputs_from_payees(Object.new) }.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'with missing address' do
-      it 'raises an error' do
-        expect { account.outputs_from_payees([ {amount: 10_000} ]) }.to raise_error
-      end
-    end
-
-    context 'with missing amount' do
-      it 'raises an error' do
-        expect { account.outputs_from_payees([ {address: 'abcdef123456'} ]) }.to raise_error
-      end
-    end
-
-    context 'with correct input' do
-      let(:outputs) { account.outputs_from_payees([ {address: 'abcdef123456', amount: 10_000} ]) }
-      it 'returns a Hash' do
-        expect(outputs).to be_a_kind_of(Hash)
-      end
-
-      it 'has a root node of outputs' do
-        expect(outputs.has_key?(:outputs)).to be_true
-      end
-
-      it 'has the correct number of entries' do
-        expect(outputs[:outputs].count).to eql(1)
-      end
-
-      it 'has the correct values and structure' do
-        expect(outputs[:outputs].first[:amount]).to eql(10_000)
-        expect(outputs[:outputs].first[:payee][:address]).to eql('abcdef123456')
-      end
-    end
-  end
-
-  describe '#sign_payment' do 
-    let(:transaction) { double('transaction') }
-    let(:unsigned_payment) { double('unsigned_payment') }
-    let(:signed_payment) { double('signed_payment') }
-    let(:signatures) { double('signatures') }
-    let(:base58_hash) { 'abcdef123456' }
-    before(:each) { wallet.unlock(passphrase) }
-
-    context 'with invalid change address' do
-      before(:each) { account.wallet.multiwallet.stub(:valid_output?).and_return(false) }
-      it 'raises an error' do
-        expect { account.sign_payment(unsigned_payment, transaction) }.to raise_error
-      end
-    end
-
-    context 'with no transaction' do
-      it 'raises and error' do
-        expect { account.sign_payment(unsigned_payment, nil) }.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'with no unsigned_payment' do
-      it 'raises and error' do
-        expect { account.sign_payment(nil, transaction) }.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'with valid inputs' do
-      before(:each) {
-        allow(unsigned_payment).to receive(:sign) { signed_payment }
-        allow(transaction).to receive(:base58_hash) { base58_hash }
-        allow(transaction).to receive(:outputs) { [] }
-        account.wallet.multiwallet.stub(:signatures).and_return(signatures)
-        account.wallet.multiwallet.stub(:valid_output?).and_return(true)
-      }
-      it 'calls sign on the unsigned transaction' do
-        unsigned_payment.should receive(:sign).with(
-          transaction_hash: base58_hash,
-          inputs: signatures)
-        account.sign_payment(unsigned_payment, transaction)
-      end
-
-      it 'returns the signed payment' do
-        expect(account.sign_payment(unsigned_payment, transaction)).to eql(signed_payment)
-      end
-    end
-
   end
 
   describe '#addresses' do
@@ -154,4 +66,21 @@ describe BitVault::Account, :vcr do
       account.addresses
     end
   end
+
+  describe '#transactions' do
+    before(:each) { 
+      account.resource.stub(:transactions).and_return(double('transactions_resource', list: []))
+    }
+
+    it 'returns a TransactionCollection' do
+      expect(account.transactions).to be_a_kind_of(BitVault::TransactionCollection)
+    end
+  end
+
+  describe '#payments' do
+    it 'returns a PaymentGenerator' do
+      expect(account.payments).to be_a_kind_of(BitVault::PaymentGenerator)
+    end
+  end
+
 end

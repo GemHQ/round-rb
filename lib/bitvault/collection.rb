@@ -1,5 +1,11 @@
 class BitVault::Collection < BitVault::Base
-  def_delegators :@collection, :each, :count, :[], :first, :last
+  include Enumerable
+
+  def_delegators :@collection, :[]
+
+  def each(&block)
+    @collection.each(&block)
+  end
 
   def initialize(options = {})
     super(options)
