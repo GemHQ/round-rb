@@ -1,19 +1,19 @@
 require 'spec_helper'
 
 describe BitVault::AddressCollection, :vcr do
-  let(:client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:application) { client.user.applications['bitcoin_app'] }
-  let(:account) { application.wallets['my funds'].accounts['office supplies'] }
+  let(:address_collection_resource) { double('address_collection_resource', list: []) }
+  let(:address_collection) { BitVault::AddressCollection.new(resource: address_collection_resource) }
+  let(:address_resource) { double('address_resource') }
 
   describe '#create' do
     before(:each) {
-      account.addresses.resource.stub(:create).and_return({})
+      address_collection.resource.stub(:create).and_return(address_resource)
     }
 
-    let(:address) { account.addresses.create }
+    let(:address) { address_collection.create }
 
     it 'delegates to the resource' do
-      account.addresses.resource.should_receive(:create)
+      address_collection.resource.should_receive(:create)
       address
     end
 
@@ -22,7 +22,7 @@ describe BitVault::AddressCollection, :vcr do
     end
 
     it 'increases the address count' do
-      expect { address }.to change(account.addresses, :count).by(1)
+      expect { address }.to change(address_collection, :count).by(1)
     end
   end
 end

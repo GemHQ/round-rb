@@ -1,17 +1,9 @@
 require 'spec_helper'
 
 describe BitVault::User, :vcr do
-  let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:user) { authed_client.user }
-
-  describe '#initialize' do
-    context 'with a valid User resource' do
-      it 'should set the resource' do
-        expect(user.resource).to_not be_nil
-        expect(user.resource).to be_a_kind_of(Patchboard::Resource)
-      end
-    end
-  end
+  let(:applications_resource) { double('applications_resource', list: [])}
+  let(:user_resource) { double('user_resource', applications: applications_resource) }
+  let(:user) { BitVault::User.new(resource: user_resource) }
 
   describe 'delegate methods' do
     it 'delegates update to the resource' do
@@ -28,10 +20,6 @@ describe BitVault::User, :vcr do
   end
 
   describe '#applications' do
-    before(:each) { 
-      user.resource.applications.stub(:list).and_return([])
-    }
-    
     it 'returns an ApplicationCollection' do
       expect(user.applications).to be_a_kind_of(BitVault::ApplicationCollection)
     end

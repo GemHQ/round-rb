@@ -1,14 +1,19 @@
 require 'spec_helper'
 
-describe BitVault::Account, :vcr do
-  let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:wallet) { authed_client.user.applications['bitcoin_app'].wallets['my funds'] }
+describe BitVault::Account do
+  let(:multiwallet) { double('multiwallet') }
+  let(:unlocked_wallet) { double('wallet', multiwallet: multiwallet) }
+  let(:locked_wallet) { double('wallet', multiwallet: nil) }
   let(:passphrase) { 'very insecure' }
-  let(:account) { BitVault::Account.new(resource: wallet.accounts['office supplies'].resource, wallet: wallet) }
+  let(:payments_resource) { double('payments_resource') }
+  let(:addresses_resource) { double('addresses_resource') }
+  let(:account_resource) { double('account_resource', payments: payments_resource, addresses: addresses_resource) }
+  let(:account) { BitVault::Account.new(resource: account_resource, wallet: locked_wallet) }
+
 
   describe '#initialize' do
     it 'sets the wallet attribute' do
-      expect(account.wallet).to eql(wallet)
+      expect(account.wallet).to eql(locked_wallet)
     end
   end
 
@@ -37,8 +42,8 @@ describe BitVault::Account, :vcr do
     context 'when a transaction is attempted with an unlocked wallet' do
       let(:payment_resource) { double('payment_resource', sign: nil) }
       let(:payment) { account.pay([ {address: 'abcdef123456', amount: 10_000} ]) }
+      let(:account) { BitVault::Account.new(resource: account_resource, wallet: unlocked_wallet) }
       before(:each) { 
-        wallet.unlock(passphrase) 
         account.payments.stub(:unsigned).and_return(payment_resource)
       }
 

@@ -1,34 +1,30 @@
 require 'spec_helper'
 
 describe BitVault::Application, :vcr do
-  let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:user) { authed_client.user }
-  let(:application) { user.applications['bitcoin_app'] }
+  let(:wallets_resource) { double('wallets_resource', list: []) }
+  let(:context) { double('context', set_token: nil) }
+  let(:application_resource) { double('application_resource', wallets: wallets_resource, context: context) }
+  let(:application) { BitVault::Application.new(resource: application_resource) }
 
   describe 'delegate methods' do
-    it 'delegates name to resource' do
-      expect(application.name).to eql('bitcoin_app')
-    end
-
-    it 'delegates callback_url to resource' do
-      expect(application.callback_url).to eql('http://someapp.com/callback')
-    end
-
-    it 'delegates api_token to resource' do
-      application.resource.should_receive(:api_token)
-      application.api_token
+    [:name, :callback_url, :api_token].each do |method|
+      it "delegates #{method} to resource" do
+        application.resource.should_receive(method)
+        application.send(method)
+      end
     end
 
     it 'delegates update to resource' do
-      application.resource.stub(:update).and_return(application.resource)
-      application.resource.should_receive(:update)
-      application.update(name: 'other_app')
+      params = { name: 'other_app' }
+      application.resource.should_receive(:update).with(params)
+      application.update(params)
     end
   end
 
   describe '#wallets' do
-    before(:each) { 
-      application.resource.wallets.stub(:list).and_return([])
+    before(:each) {
+      allow(application_resource).to receive(:api_token)
+      allow(application_resource).to receive(:url)
     }
 
     it 'returns a WalletCollection' do

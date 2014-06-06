@@ -1,12 +1,9 @@
 require 'spec_helper'
 
 describe BitVault::PaymentGenerator do
-  let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:wallet) { authed_client.user.applications['bitcoin_app'].wallets['my funds'] }
-  let(:passphrase) { 'very insecure' }
-  let(:account) { BitVault::Account.new(resource: wallet.accounts['office supplies'].resource, wallet: wallet) }
-  let(:payment_resource) { account.payments }
-  let(:payment_generator) { BitVault::PaymentGenerator.new(resource: payment_resource) }
+  
+  let(:payments_resource) { double('payments_resource') }
+  let(:payment_generator) { BitVault::PaymentGenerator.new(resource: payments_resource) }
 
   describe '#unsigned' do
     let(:payees) { [double('payee')] }

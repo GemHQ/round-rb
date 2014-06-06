@@ -1,10 +1,8 @@
 require 'spec_helper'
 
 describe BitVault::Address, :vcr do
-  let(:client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:application) { client.user.applications['bitcoin_app'] }
-  let(:account) { application.wallets['my funds'].accounts['office supplies'] }
-  let(:address) { account.addresses[0] }
+  let(:address_resource) { double('address_resource') }
+  let(:address) { BitVault::Address.new(resource: address_resource) }
   
   describe 'delegated methods' do
     [:path, :string].each do |method|

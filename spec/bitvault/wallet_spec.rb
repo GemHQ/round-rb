@@ -1,13 +1,28 @@
 require 'spec_helper'
 
 describe BitVault::Wallet, :vcr do
-  let(:authed_client) { BitVault::Patchboard.authed_client(email: 'julian@bitvault.io', password: 'terrible_secret') }
-  let(:wallet) { authed_client.user.applications['bitcoin_app'].wallets['my funds'] }
+  let(:seed) { double('seed') }
+  let(:accounts_resource) { double('accounts_resource', list: []) }
+  let(:transfers_resource) { double('transfers_resource') }
+  let(:wallet_resource) { 
+    double('wallet_resource', 
+      accounts: accounts_resource,
+      primary_private_seed: seed,
+      cosigner_public_seed: seed,
+      backup_public_seed: seed,
+      transfers: transfers_resource) 
+  }
+  let(:wallet) { BitVault::Wallet.new(resource: wallet_resource) }
   let(:passphrase) { 'very insecure' }
-  let(:primary_seed) { CoinOp::Crypto::PassphraseBox.decrypt(passphrase, wallet.resource.primary_private_seed) }
+  let(:primary_seed) { double('primary_seed') }
+  let(:multiwallet) { double('multiwallet') }
+
+  before(:each) {
+    CoinOp::Crypto::PassphraseBox.stub(:decrypt).and_return(primary_seed)
+    CoinOp::Bit::MultiWallet.stub(:new).and_return(multiwallet)
+  }
 
   describe '#initialize' do
-    let(:multiwallet) { double('multiwallet') }
     let(:resource) { double('resource') }
     let(:new_wallet) { BitVault::Wallet.new(resource: resource, multiwallet: multiwallet) }
 
@@ -19,21 +34,11 @@ describe BitVault::Wallet, :vcr do
   describe '#unlock' do
     it 'populates the multiwallet' do
       wallet.unlock(passphrase)
-      expect(wallet.multiwallet).to_not be_nil
-      expect(wallet.multiwallet).to be_a_kind_of(CoinOp::Bit::MultiWallet)
-    end
-
-    it 'decrypts the wallet' do
-      wallet.unlock(passphrase)
-      expect(wallet.multiwallet.trees[:primary].to_serialized_address(:private)).to eql(primary_seed)
+      expect(wallet.multiwallet).to eql(multiwallet)
     end
   end
 
   describe '#accounts' do
-    before(:each) { 
-      wallet.resource.accounts.stub(:list).and_return([])
-    }
-
     it 'returns an AccountCollection' do
       expect(wallet.accounts).to be_a_kind_of(BitVault::AccountCollection)
     end

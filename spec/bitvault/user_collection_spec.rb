@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 describe BitVault::UserCollection do
-  let(:client) { BitVault::Patchboard.client }
   let(:email) { 'julian@bitvault.io' }
   let(:password) { 'terrible_secret' }
-  let(:user_collection) { client.users }
+  let(:user_collection_resource) { double('user_collection_resource') }
+  let(:user_collection) { BitVault::UserCollection.new(resource: user_collection_resource) }
 
   describe '#create' do
     context 'with a valid email and password' do
