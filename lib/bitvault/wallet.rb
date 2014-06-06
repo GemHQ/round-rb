@@ -4,6 +4,11 @@ class BitVault::Wallet < BitVault::Base
 
   attr_accessor :multiwallet
 
+  def initialize(options = {})
+    @multiwallet = options[:multiwallet]
+    super(options)
+  end
+
   def accounts
     @accounts ||= BitVault::AccountCollection.new(resource: @resource.accounts, wallet: self)
     @accounts

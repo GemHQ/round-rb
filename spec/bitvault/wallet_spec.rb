@@ -6,6 +6,16 @@ describe BitVault::Wallet, :vcr do
   let(:passphrase) { 'very insecure' }
   let(:primary_seed) { CoinOp::Crypto::PassphraseBox.decrypt(passphrase, wallet.resource.primary_private_seed) }
 
+  describe '#initialize' do
+    let(:multiwallet) { double('multiwallet') }
+    let(:resource) { double('resource') }
+    let(:new_wallet) { BitVault::Wallet.new(resource: resource, multiwallet: multiwallet) }
+
+    it 'sets the multiwallet when present' do
+      expect(new_wallet.multiwallet).to eql(multiwallet)
+    end
+  end
+
   describe '#unlock' do
     it 'populates the multiwallet' do
       wallet.unlock(passphrase)
