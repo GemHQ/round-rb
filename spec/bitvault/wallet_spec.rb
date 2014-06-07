@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BitVault::Wallet, :vcr do
+describe BitVault::Wallet do
   let(:seed) { double('seed') }
   let(:accounts_resource) { double('accounts_resource', list: []) }
   let(:transfers_resource) { double('transfers_resource') }

@@ -3,6 +3,8 @@ class BitVault::Collection < BitVault::Base
 
   def_delegators :@collection, :[]
 
+  attr_accessor :collection
+
   def each(&block)
     @collection.each(&block)
   end
@@ -19,9 +21,8 @@ class BitVault::Collection < BitVault::Base
   end
 
   def populate_data(options)
-    @resource.list.each do |resource|
-      options.merge!(resource: resource)
-      content = self.content_type.new(options)
+    resource.list.each do |resource|
+      content = self.content_type.new(options.merge(resource: resource))
       self.add(content)
     end
   end
@@ -30,8 +31,7 @@ class BitVault::Collection < BitVault::Base
     if self.collection_type == Array
       @collection << content
     elsif self.collection_type == Hash
-      key = self.content_key || :name
-      @collection[content.send(key)] = content
+      @collection[content.send(self.content_key)] = content
     end
   end
 
@@ -40,11 +40,11 @@ class BitVault::Collection < BitVault::Base
   end
 
   def content_type
-    raise 'Must implement content_type in child class of BitVault::Collection'
+    BitVault::Base
   end
 
   def content_key
-
+    :name
   end
   
 end

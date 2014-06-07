@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BitVault::User, :vcr do
+describe BitVault::User do
   let(:applications_resource) { double('applications_resource', list: [])}
   let(:user_resource) { double('user_resource', applications: applications_resource) }
   let(:user) { BitVault::User.new(resource: user_resource) }

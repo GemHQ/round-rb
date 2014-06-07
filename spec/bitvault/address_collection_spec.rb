@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BitVault::AddressCollection, :vcr do
+describe BitVault::AddressCollection do
   let(:address_collection_resource) { double('address_collection_resource', list: []) }
   let(:address_collection) { BitVault::AddressCollection.new(resource: address_collection_resource) }
   let(:address_resource) { double('address_resource') }

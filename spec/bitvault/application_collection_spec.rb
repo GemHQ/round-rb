@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BitVault::ApplicationCollection, :vcr do
+describe BitVault::ApplicationCollection do
   let(:applications_resource) { double('applications_resource', list: []) }
   let(:application_collection) { BitVault::ApplicationCollection.new(resource: applications_resource) }
 

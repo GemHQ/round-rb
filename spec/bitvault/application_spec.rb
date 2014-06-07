@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BitVault::Application, :vcr do
+describe BitVault::Application do
   let(:wallets_resource) { double('wallets_resource', list: []) }
   let(:context) { double('context', set_token: nil) }
   let(:application_resource) { double('application_resource', wallets: wallets_resource, context: context) }

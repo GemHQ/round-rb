@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BitVault::WalletCollection, :vcr do
+describe BitVault::WalletCollection do
   let(:wallet_collection_resource) { double('wallet_collection_resource', list: []) }
   let(:wallets) { BitVault::WalletCollection.new(resource: wallet_collection_resource) }
   let(:wallet_resource) { double('wallet_resource', name: name) }

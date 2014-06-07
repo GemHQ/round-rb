@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BitVault::Address, :vcr do
+describe BitVault::Address do
   let(:address_resource) { double('address_resource') }
   let(:address) { BitVault::Address.new(resource: address_resource) }
   
