@@ -13,13 +13,11 @@
 require "http"
 require "json"
 
-require_relative "../bitcoin"
-
 module BitVault
   module Blockchain
 
     class BitEasy
-      include BitVault::Encodings
+      include CoinOp::Encodings
 
       def initialize(net=:test)
         @net = (net.to_sym == :test) ? "testnet" : "blockchain"
@@ -71,7 +69,7 @@ module BitVault
               :script_pub_key,
               :to_address
           )
-          outputs << BitVault::Bitcoin::Output.new(
+          outputs << CoinOp::Bit::Output.new(
             :transaction_hex => transaction_hex,
             :index => index,
             :value => value, # Seems to already be in Satoshis

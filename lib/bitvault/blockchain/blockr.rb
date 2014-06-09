@@ -2,14 +2,12 @@ require "http"
 require "json"
 require 'enumerator'
 
-require_relative "../bitcoin"
-
 module BitVault
   module Blockchain
 
     # Blockr.io API documentation:  http://blockr.io/documentation/api
     class Blockr
-      include BitVault::Encodings
+      include CoinOp::Encodings
 
       def initialize(env=:test)
         subdomain = (env.to_sym == :test) ? "tbtc" : "btc"
@@ -43,7 +41,7 @@ module BitVault
             transaction_hex, index, value, script_hex, confirmations =
               output.values_at :tx, :n, :amount, :script, :confirmations
 
-            outputs << BitVault::Bitcoin::Output.new(
+            outputs << CoinOp::Bit::Output.new(
               :transaction_hex => transaction_hex,
               :index => index,
               :value => bitcoins_to_satoshis(value),
@@ -74,7 +72,7 @@ module BitVault
         results.map do |record|
           hex = record[:tx][:hex]
 
-          transaction = BitVault::Bitcoin::Transaction.hex(hex)
+          transaction = CoinOp::Bit::Transaction.hex(hex)
         end
       end
 
