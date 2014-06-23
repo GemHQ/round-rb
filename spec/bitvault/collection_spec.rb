@@ -8,18 +8,19 @@ describe BitVault::Collection do
   let(:collection) { BitVault::Collection.new(options) }
 
   describe '#initialize' do
+
     before(:each) {
-      BitVault::Collection.any_instance.stub(:populate_data)
+      allow_any_instance_of(BitVault::Collection).to receive(:populate_data)
     }
 
     it 'calls populate_data' do
-      BitVault::Collection.any_instance.should_receive(:populate_data).with(options)
       collection
+      expect(collection).to have_received(:populate_data).with(options)
     end
 
     context 'hash collection' do
       before(:each) {
-        BitVault::Collection.any_instance.stub(:collection_type).and_return(Hash)
+        allow_any_instance_of(BitVault::Collection).to receive(:collection_type).and_return(Hash)
       }
 
       it 'instatiates collection with a Hash' do
@@ -29,7 +30,7 @@ describe BitVault::Collection do
 
     context 'array collection' do
       before(:each) {
-        BitVault::Collection.any_instance.stub(:collection_type).and_return(Array)
+        allow_any_instance_of(BitVault::Collection).to receive(:collection_type).and_return(Array)
       }
 
       it 'instatiates collection with a Hash' do
@@ -39,11 +40,11 @@ describe BitVault::Collection do
   end
 
   describe '#populate_data' do
-    before(:each) { BitVault::Collection.any_instance.stub(:add) }
+    before(:each) { allow_any_instance_of(BitVault::Collection).to receive(:add) }
 
     it 'calls add for each subresource' do
-      BitVault::Collection.any_instance.should_receive(:add).once
       collection
+      expect(collection).to have_received(:add).once
     end
   end
 
@@ -53,7 +54,7 @@ describe BitVault::Collection do
 
     context 'hash collection' do
       before(:each) {
-        BitVault::Collection.any_instance.stub(:collection_type).and_return(Hash)
+        allow_any_instance_of(BitVault::Collection).to receive(:collection_type).and_return(Hash)
       }
 
       it 'increases the count by 1' do
@@ -68,7 +69,7 @@ describe BitVault::Collection do
 
     context 'array collection' do
       before(:each) {
-        BitVault::Collection.any_instance.stub(:collection_type).and_return(Array)
+        allow_any_instance_of(BitVault::Collection).to receive(:collection_type).and_return(Array)
       }
 
       it 'increases the count by 1' do
@@ -77,7 +78,7 @@ describe BitVault::Collection do
 
       it 'indexes the subresource by name' do
         collection.add(new_subresource)
-        expect(collection.include?(new_subresource)).to be_true
+        expect(collection).to include(new_subresource)
       end
     end
   end

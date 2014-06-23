@@ -20,7 +20,7 @@ describe BitVault::Base do
 
   describe 'delegated methods' do
     it 'delegates url to resource' do
-      resource.should_receive(:url)
+      expect(resource).to receive(:url)
       base.url
     end
   end

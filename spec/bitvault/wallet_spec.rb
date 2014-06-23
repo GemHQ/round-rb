@@ -18,8 +18,8 @@ describe BitVault::Wallet do
   let(:multiwallet) { double('multiwallet') }
 
   before(:each) {
-    CoinOp::Crypto::PassphraseBox.stub(:decrypt).and_return(primary_seed)
-    CoinOp::Bit::MultiWallet.stub(:new).and_return(multiwallet)
+    allow(CoinOp::Crypto::PassphraseBox).to receive(:decrypt).and_return(primary_seed)
+    allow(CoinOp::Bit::MultiWallet).to receive(:new).and_return(multiwallet)
   }
 
   describe '#initialize' do
@@ -44,7 +44,7 @@ describe BitVault::Wallet do
     end
 
     it 'only fetches once' do
-      wallet.resource.accounts.should_receive(:list).once
+      expect(wallet.resource.accounts).to receive(:list).once
       wallet.accounts
       wallet.accounts
     end
@@ -87,9 +87,9 @@ describe BitVault::Wallet do
       let(:signatures) { double('signatures') }
       before(:each) {
         wallet.unlock(passphrase)
-        wallet.resource.transfers.stub(:create).and_return(unsigned_transfer)
-        wallet.multiwallet.stub(:signatures).and_return(signatures)
-        CoinOp::Bit::Transaction.stub(:data).and_return(transaction)
+        allow(wallet.resource.transfers).to receive(:create).and_return(unsigned_transfer)
+        allow(wallet.multiwallet).to receive(:signatures).and_return(signatures)
+        allow(CoinOp::Bit::Transaction).to receive(:data).and_return(transaction)
         allow(unsigned_transfer).to receive(:sign) { signed_transfer }
         allow(transaction).to receive(:base58_hash) { 'abcdef123456' }
         allow(account_1).to receive(:url) { 'http://some.url/account1' }
@@ -97,7 +97,7 @@ describe BitVault::Wallet do
       }
 
       it 'calls create on transfers resource with the correct values' do
-        wallet.resource.transfers.should_receive(:create).with(
+        expect(wallet.resource.transfers).to receive(:create).with(
           value: amount,
           source: account_1.url,
           destination: account_2.url)
@@ -105,12 +105,12 @@ describe BitVault::Wallet do
       end
 
       it 'creates a native bitcoin transaction' do
-        CoinOp::Bit::Transaction.should_receive(:data).with(unsigned_transfer)
+        expect(CoinOp::Bit::Transaction).to receive(:data).with(unsigned_transfer)
         transfer
       end
 
       it 'signs the transfer' do
-        unsigned_transfer.should_receive(:sign).with(
+        expect(unsigned_transfer).to receive(:sign).with(
           transaction_hash: 'abcdef123456',
           inputs: signatures)
         transfer
@@ -127,7 +127,7 @@ describe BitVault::Wallet do
       :backup_public_seed, :primary_public_seed,
       :primary_private_seed].each do |method|
       it "delegates #{method} to resource" do
-        wallet.resource.should_receive(method)
+        expect(wallet.resource).to receive(method)
         wallet.send(method)
       end
     end

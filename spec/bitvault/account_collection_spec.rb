@@ -24,7 +24,7 @@ describe BitVault::AccountCollection do
   describe '#create' do
     let(:account_resource) { double('account_resource', name: 'new account') }
     before(:each) {
-      accounts.resource.stub(:create).and_return(account_resource)
+      allow(accounts.resource).to receive(:create).and_return(account_resource)
     }
 
     it 'returns an Account model' do
@@ -36,7 +36,7 @@ describe BitVault::AccountCollection do
     end
 
     it 'calls resource create' do
-      accounts.resource.should_receive(:create)
+      expect(accounts.resource).to receive(:create)
       account
     end
   end

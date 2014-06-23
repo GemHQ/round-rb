@@ -9,14 +9,14 @@ describe BitVault::Application do
   describe 'delegate methods' do
     [:name, :callback_url, :api_token].each do |method|
       it "delegates #{method} to resource" do
-        application.resource.should_receive(method)
+        expect(application.resource).to receive(method)
         application.send(method)
       end
     end
 
     it 'delegates update to resource' do
       params = { name: 'other_app' }
-      application.resource.should_receive(:update).with(params)
+      expect(application.resource).to receive(:update).with(params)
       application.update(params)
     end
   end
@@ -32,7 +32,7 @@ describe BitVault::Application do
     end
 
     it 'only fetches once' do
-      application.resource.wallets.should_receive(:list).once
+      expect(application.resource.wallets).to receive(:list).once
       application.wallets
       application.wallets
     end

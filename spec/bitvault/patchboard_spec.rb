@@ -47,7 +47,7 @@ describe BitVault::Patchboard, :vcr do
   describe '.client' do
     it 'discovers the API' do
       patchboard = double('patchboard', spawn: {})
-      BitVault::Patchboard.should_receive(:discover).and_return(patchboard)
+      expect(BitVault::Patchboard).to receive(:discover).and_return(patchboard)
       BitVault::Patchboard.client
     end
 

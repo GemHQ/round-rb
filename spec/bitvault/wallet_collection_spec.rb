@@ -15,9 +15,9 @@ describe BitVault::WalletCollection do
   let(:encrypted_seed) { double('encrypted_seed') }
   
   before(:each) {
-    CoinOp::Bit::MultiWallet.stub(:generate).and_return(multiwallet)
-    CoinOp::Crypto::PassphraseBox.stub(:encrypt).and_return(encrypted_seed)
-    wallets.resource.stub(:create).and_return(wallet_resource)
+    allow(CoinOp::Bit::MultiWallet).to receive(:generate).and_return(multiwallet)
+    allow(CoinOp::Crypto::PassphraseBox).to receive(:encrypt).and_return(encrypted_seed)
+    allow(wallets.resource).to receive(:create).and_return(wallet_resource)
   }
 
   describe '#create' do
@@ -33,7 +33,7 @@ describe BitVault::WalletCollection do
       end
 
       it 'sets the multiwallet on the model' do
-        CoinOp::Bit::MultiWallet.should_receive(:generate).once
+        expect(CoinOp::Bit::MultiWallet).to receive(:generate).once
         expect(wallet.multiwallet).to eql(multiwallet)
       end
 
@@ -41,7 +41,7 @@ describe BitVault::WalletCollection do
         let(:wallet) { wallets.create(passphrase: passphrase, name: name, multiwallet: multiwallet) }
 
         it 'sets the existing wallet on the model' do
-          CoinOp::Bit::MultiWallet.should_not_receive(:generate)
+          expect(CoinOp::Bit::MultiWallet).to_not receive(:generate)
           expect(wallet.multiwallet).to eql(multiwallet)
         end
       end
@@ -65,7 +65,7 @@ describe BitVault::WalletCollection do
     let(:resource) { wallets.create_wallet_resource(multiwallet, passphrase, name, network ) }
 
     it 'calls resource.create with the correct values' do
-      wallets.resource.should_receive(:create).with hash_including(
+      expect(wallets.resource).to receive(:create).with hash_including(
         name: name,
         network: network,
         backup_public_seed: backup_address,

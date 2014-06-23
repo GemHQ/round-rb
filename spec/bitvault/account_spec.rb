@@ -20,7 +20,7 @@ describe BitVault::Account do
   describe 'delegated methods' do
     [:name, :path, :balance, :pending_balance].each do |method|
       it "delegates #{method} to resource" do
-        account.resource.should_receive method
+        expect(account.resource).to receive(method)
         account.send(method)
       end
     end
@@ -44,12 +44,12 @@ describe BitVault::Account do
       let(:payment) { account.pay([ {address: 'abcdef123456', amount: 10_000} ]) }
       let(:account) { BitVault::Account.new(resource: account_resource, wallet: unlocked_wallet) }
       before(:each) { 
-        account.payments.stub(:unsigned).and_return(payment_resource)
+        allow(account.payments).to receive(:unsigned).and_return(payment_resource)
       }
 
       it 'returns a Payment model' do
-        account.payments.should_receive(:unsigned)
-        payment_resource.should_receive(:sign).with(account.wallet.multiwallet)
+        expect(account.payments).to receive(:unsigned)
+        expect(payment_resource).to receive(:sign).with(account.wallet.multiwallet)
         expect(payment).to be_a_kind_of(BitVault::Payment)
         expect(payment.resource).to eql(payment_resource)
       end
@@ -58,7 +58,7 @@ describe BitVault::Account do
 
   describe '#addresses' do
     before(:each) { 
-      account.resource.addresses.stub(:list).and_return([])
+      allow(account.resource.addresses).to receive(:list).and_return([])
     }
 
     it 'returns an AddressCollection' do
@@ -66,7 +66,7 @@ describe BitVault::Account do
     end
 
     it 'only fetches once' do
-      account.resource.addresses.should_receive(:list).once
+      expect(account.resource.addresses).to receive(:list).once
       account.addresses
       account.addresses
     end
@@ -74,7 +74,7 @@ describe BitVault::Account do
 
   describe '#transactions' do
     before(:each) { 
-      account.resource.stub(:transactions).and_return(double('transactions_resource', list: []))
+      allow(account.resource).to receive(:transactions).and_return(double('transactions_resource', list: []))
     }
 
     it 'returns a TransactionCollection' do

@@ -7,13 +7,13 @@ describe BitVault::User do
 
   describe 'delegate methods' do
     it 'delegates update to the resource' do
-      user.resource.should_receive(:update).with({first_name: 'Julian'})
+      expect(user.resource).to receive(:update).with(first_name: 'Julian')
       user.update(first_name: 'Julian')
     end
 
     [:email, :first_name, :last_name].each do |method|
       it 'delegates email to the resource' do
-        user.resource.should_receive(method)
+        expect(user.resource).to receive(method)
         user.send(method)
       end
     end
@@ -25,13 +25,13 @@ describe BitVault::User do
     end
 
     it 'only fetches once' do
-      user.resource.applications.should_receive(:list).once
+      expect(user.resource.applications).to receive(:list).once
       user.applications
       user.applications
     end
 
     it 'fetches twice when refresh is passed' do
-      user.resource.applications.should_receive(:list).twice
+      expect(user.resource.applications).to receive(:list).twice
       user.applications
       user.applications(refresh: true)
     end

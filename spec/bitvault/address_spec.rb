@@ -7,7 +7,7 @@ describe BitVault::Address do
   describe 'delegated methods' do
     [:path, :string].each do |method|
       it "delegates #{method} to the resource" do
-        address.resource.should_receive(method)
+        expect(address.resource).to receive(method)
         address.send(method)
       end
     end

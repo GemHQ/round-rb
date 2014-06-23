@@ -9,13 +9,13 @@ describe BitVault::ApplicationCollection do
     let(:name) { 'new_bitcoin_app' }
     let(:callback_url) { 'http://someapp.com/callback' }
     before(:each) {
-      application_collection.resource.stub(:create).and_return(application_resource)
+      allow(application_collection.resource).to receive(:create).and_return(application_resource)
     }
 
     let(:application) { application_collection.create(name: name, callback_url: callback_url) }
 
     it 'delegates to the resource' do
-      application_collection.resource.should_receive(:create)
+      expect(application_collection.resource).to receive(:create)
       application
     end
 

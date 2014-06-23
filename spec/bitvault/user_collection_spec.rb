@@ -3,20 +3,17 @@ require 'spec_helper'
 describe BitVault::UserCollection do
   let(:email) { 'julian@bitvault.io' }
   let(:password) { 'terrible_secret' }
-  let(:user_collection_resource) { double('user_collection_resource') }
+  let(:resource_mock) { double('user_resource') }
+  let(:user_collection_resource) { double('user_collection_resource', create: resource_mock) }
   let(:user_collection) { BitVault::UserCollection.new(resource: user_collection_resource) }
 
   describe '#create' do
     context 'with a valid email and password' do
       let(:params) { { email: 'julian@bitvault.io', password: 'terrible_secret' } }
       let(:user) { user_collection.create(params) }
-      let(:resource_mock) { double('user_resource') }
-      before(:each) {
-        user_collection.resource.stub(:create).and_return(resource_mock)
-      }
 
       it 'delegates to the resource' do
-        user_collection.resource.should_receive(:create).with(params)
+        expect(user_collection.resource).to receive(:create).with(params)
         user
       end
 

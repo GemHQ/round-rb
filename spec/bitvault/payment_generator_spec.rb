@@ -2,18 +2,17 @@ require 'spec_helper'
 
 describe BitVault::PaymentGenerator do
   
-  let(:payments_resource) { double('payments_resource') }
+  let(:unsigned_resource) { double('payment_resource') }
+  let(:payments_resource) { double('payments_resource', create: unsigned_resource) }
   let(:payment_generator) { BitVault::PaymentGenerator.new(resource: payments_resource) }
 
   describe '#unsigned' do
     let(:payees) { [double('payee')] }
     let(:outputs) { double('outputs') }
-    let(:unsigned_resource) { double('payment_resource') }
     let(:unsigned) { payment_generator.unsigned(payees) }
 
     before(:each) {
-      payment_generator.stub(:outputs_from_payees).and_return(outputs)
-      payment_generator.resource.stub(:create).and_return(unsigned_resource)
+      allow(payment_generator).to receive(:outputs_from_payees) { outputs }
     }
 
     it 'raises error without payees' do
@@ -26,7 +25,7 @@ describe BitVault::PaymentGenerator do
     end
 
     it 'delegates to the resource' do
-      payment_generator.resource.should_receive(:create).with(outputs)
+      expect(payment_generator.resource).to receive(:create).with(outputs)
       unsigned
     end
   end
@@ -57,7 +56,7 @@ describe BitVault::PaymentGenerator do
       end
 
       it 'has a root node of outputs' do
-        expect(outputs.has_key?(:outputs)).to be_true
+        expect(outputs).to include(:outputs)
       end
 
       it 'has the correct number of entries' do
