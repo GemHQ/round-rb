@@ -22,6 +22,3 @@ require_relative "bitvault/transaction"
 require_relative "bitvault/transaction_collection"
 require_relative "bitvault/payment"
 require_relative "bitvault/payment_generator"
-require_relative "bitvault/blockchain/mockchain"
-require_relative "bitvault/blockchain/blockr"
-
