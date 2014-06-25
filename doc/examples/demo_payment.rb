@@ -53,6 +53,7 @@ client_wallet = MultiWallet.new(
   }
 )
 
+
 account = client.resources.account(data[:account][:url]).get
 
 
@@ -62,7 +63,7 @@ account = client.resources.account(data[:account][:url]).get
 unsigned_payment = account.payments.create(
   :outputs => [
     {
-      :amount => 2_000_000,
+      :amount => 6_000_000,
       # faucet.xeno-genesis.com donation address
       :payee => {:address => "mwwhVPiopW6HhhDtcSv3MUFLTB5ehhkgZg"}
     }

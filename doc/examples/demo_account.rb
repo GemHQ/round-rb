@@ -26,8 +26,6 @@ MultiWallet = CoinOp::Bit::MultiWallet
 ## Create a "sub-client" with its own authentication context
 
 client = bitvault.spawn
-client.context.set_token(api_token)
-
 
 # Create a user
 #
@@ -84,7 +82,7 @@ application = user.applications.create(
   :callback_url => "https://api.bitcoin-emporium.io/events"
 )
 
-log "Created an application for the user", mask(application, :name, :api_token, :callback_url)
+log "Created an application for the user", mask(application, :name, :callback_url)
 
 # Applications use API tokens for authentication, rather than
 # requiring the user password.  Tokens can be reset easily,
