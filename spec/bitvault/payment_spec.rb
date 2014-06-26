@@ -1,14 +1,14 @@
 require 'spec_helper'
 
 describe BitVault::Payment do
+  let(:signed_payment) { double('signed_payment') }
+  let(:unsigned_payment) { double('unsigned_payment', sign: signed_payment) }
+  let(:payment) { BitVault::Payment.new(resource: unsigned_payment) }
 
   describe '#sign' do 
     let(:transaction) { double('transaction', base58_hash: base58_hash, outputs: []) }
-    let(:unsigned_payment) { double('unsigned_payment', sign: signed_payment) }
-    let(:signed_payment) { double('signed_payment') }
     let(:signatures) { double('signatures') }
     let(:base58_hash) { 'abcdef123456' }
-    let(:payment) { BitVault::Payment.new(resource: unsigned_payment) }
     let(:wallet) { double('wallet', signatures: signatures, valid_output?: true) }
 
     before(:each) {
@@ -45,5 +45,14 @@ describe BitVault::Payment do
       end
     end
 
+  end
+
+  describe 'delegate methods' do
+    [:hash, :status].each do |method|
+      it "delegates #{method} to the resource" do
+        expect(payment.resource).to receive(method)
+        payment.send(method)
+      end
+    end
   end
 end

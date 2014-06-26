@@ -56,6 +56,11 @@ module BitVault
 
         @users
       end
+
+      def wallet(options = {})
+        wallet_resource = self.resources.wallet(options[:url]).get
+        BitVault::Wallet.new(resource: wallet_resource)
+      end
     end
 
     # A class providing the `authorizer` method to allow for distinct

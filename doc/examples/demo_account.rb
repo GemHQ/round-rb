@@ -121,8 +121,6 @@ log "Create a co-signing wallet for an application", mask(
   :backup_public_seed, :primary_public_seed, :cosigner_public_seed
 )
 
-
-
 ## Create an account within a wallet
 #
 # Wallets can have multiple accounts, each represented by a path in the
@@ -153,13 +151,13 @@ log "Generate a Bitcoin address to fund the account", mask(
 puts "Writing wallet information to #{saved_file} for use in next test."
 
 record = {
-  :api_token => client.context.api_token,
-  :wallet => {:url => wallet.url},
-  :account => {:url => account.url},
-  :passphrase => passphrase,
-  :node => {
-    :path => incoming_address.path,
-    :address => incoming_address.string
+  app_url: application.url,
+  api_token: client.context.api_token,
+  wallet: {url: wallet.url, name: wallet.name, passphrase: passphrase},
+  account: {url: account.url, name: account.name},
+  node: {
+    path: incoming_address.path,
+    address: incoming_address.string
   }
 }
 File.open saved_file, "w" do |f|

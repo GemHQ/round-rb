@@ -26,4 +26,17 @@ describe BitVault::Patchboard::Client, :vcr do
       expect(client.users).to be_a_kind_of(BitVault::UserCollection)
     end
   end
+
+  describe '#wallet' do
+    let(:wallet_resource) { double('wallet_resource') }
+    let(:wallet) {double('wallet', get: wallet_resource)}
+    before(:each) {
+      allow(client.resources).to receive(:wallet) { wallet }
+    }
+
+    it 'returns a Wallet' do
+      url = 'http://bitvault.pandastrike.com/wallets/1234'
+      expect(client.wallet(url: url)).to be_a_kind_of(BitVault::Wallet)
+    end
+  end
 end
