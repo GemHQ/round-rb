@@ -9,7 +9,7 @@ class BitVault::Payment < BitVault::Base
     raise "bad change address" unless wallet.valid_output?(transaction.outputs.last)
     
     @resource = @resource.sign(
-      transaction_hash: transaction.base58_hash,
+      transaction_hash: transaction.hex_hash,
       inputs: wallet.signatures(transaction)
     )
   end

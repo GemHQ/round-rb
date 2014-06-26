@@ -6,9 +6,9 @@ describe BitVault::Payment do
   let(:payment) { BitVault::Payment.new(resource: unsigned_payment) }
 
   describe '#sign' do 
-    let(:transaction) { double('transaction', base58_hash: base58_hash, outputs: []) }
+    let(:transaction) { double('transaction', hex_hash: hex_hash, outputs: []) }
     let(:signatures) { double('signatures') }
-    let(:base58_hash) { 'abcdef123456' }
+    let(:hex_hash) { 'abcdef123456' }
     let(:wallet) { double('wallet', signatures: signatures, valid_output?: true) }
 
     before(:each) {
@@ -34,7 +34,7 @@ describe BitVault::Payment do
     context 'with valid inputs' do
       it 'calls sign on the resource' do
         expect(unsigned_payment).to receive(:sign).with(
-          transaction_hash: base58_hash,
+          transaction_hash: hex_hash,
           inputs: signatures)
         payment.sign(wallet)
       end

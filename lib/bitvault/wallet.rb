@@ -30,16 +30,16 @@ class BitVault::Wallet < BitVault::Base
   def transfer(options = {})
     raise ArgumentError, 'Must specify a source account' unless options[:source]
     raise ArgumentError, 'Must specify a destination account' unless options[:destination]
-    raise ArgumentError, 'Must specify an amount' unless options[:amount]
+    raise ArgumentError, 'Must specify a value' unless options[:value]
     raise 'Wallet must be unlocked before you can create a transfer' unless @multiwallet
 
     unsigned_transfer = @resource.transfers.create(
-      value: options[:amount],
+      value: options[:value],
       source: options[:source].url,
       destination: options[:destination].url)
     transaction = CoinOp::Bit::Transaction.data(unsigned_transfer)
     signed_transfer = unsigned_transfer.sign(
-      transaction_hash: transaction.base58_hash,
+      transaction_hash: transaction.hex_hash,
       inputs: @multiwallet.signatures(transaction))
     BitVault::Transaction.new(resource: signed_transfer)
   end

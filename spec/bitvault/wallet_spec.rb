@@ -53,21 +53,21 @@ describe BitVault::Wallet do
   describe '#transfer' do
     let(:account_1) { double('account') }
     let(:account_2) { double('account') }
-    let(:amount) { 10_000 }
+    let(:value) { 10_000 }
 
     context 'no source account provided' do
       it 'raises an error' do
-        expect { wallet.transfer(destination: account_2, amount: 10_000) }.to raise_error(ArgumentError)
+        expect { wallet.transfer(destination: account_2, value: 10_000) }.to raise_error(ArgumentError)
       end
     end
 
     context 'no destination account provided' do
       it 'raises an error' do
-        expect { wallet.transfer(source: account_1, amount: 10_000) }.to raise_error(ArgumentError)
+        expect { wallet.transfer(source: account_1, value: 10_000) }.to raise_error(ArgumentError)
       end
     end
 
-    context 'no amount provided' do
+    context 'no value provided' do
       it 'raises an error' do
         expect { wallet.transfer(destination: account_2, source: account_1) }.to raise_error(ArgumentError)
       end
@@ -75,30 +75,31 @@ describe BitVault::Wallet do
 
     context 'locked wallet' do
       it 'raises an error' do
-        expect { wallet.transfer(source: account_1, destination: account_2, amount: amount) }.to raise_error
+        expect { wallet.transfer(source: account_1, destination: account_2, value: value) }.to raise_error
       end
     end
 
     context 'valid arguments' do
-      let(:transfer) { wallet.transfer(source: account_1, destination: account_2, amount: amount) }
+      let(:transfer) { wallet.transfer(source: account_1, destination: account_2, value: value) }
       let(:unsigned_transfer) { double('unsigned_transfer') }
       let(:transaction) { double('transaction') }
       let(:signed_transfer) { double('signed_transfer') }
       let(:signatures) { double('signatures') }
+      let(:hex_hash) { 'abcdef123456' }
       before(:each) {
         wallet.unlock(passphrase)
         allow(wallet.resource.transfers).to receive(:create).and_return(unsigned_transfer)
         allow(wallet.multiwallet).to receive(:signatures).and_return(signatures)
         allow(CoinOp::Bit::Transaction).to receive(:data).and_return(transaction)
         allow(unsigned_transfer).to receive(:sign) { signed_transfer }
-        allow(transaction).to receive(:base58_hash) { 'abcdef123456' }
+        allow(transaction).to receive(:hex_hash) { hex_hash }
         allow(account_1).to receive(:url) { 'http://some.url/account1' }
         allow(account_2).to receive(:url) { 'http://some.url/account2' }
       }
 
       it 'calls create on transfers resource with the correct values' do
         expect(wallet.resource.transfers).to receive(:create).with(
-          value: amount,
+          value: value,
           source: account_1.url,
           destination: account_2.url)
         transfer
@@ -111,7 +112,7 @@ describe BitVault::Wallet do
 
       it 'signs the transfer' do
         expect(unsigned_transfer).to receive(:sign).with(
-          transaction_hash: 'abcdef123456',
+          transaction_hash: hex_hash,
           inputs: signatures)
         transfer
       end
