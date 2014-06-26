@@ -1,6 +1,7 @@
 require "pp"
 require "uri"
 require "yaml"
+require "pry-byebug"
 
 project_root = File.expand_path("#{File.dirname(__FILE__)}/../../")
 $:.unshift "#{project_root}/lib"
@@ -28,10 +29,14 @@ def log(message, data=nil)
   puts
 end
 
-def mask(hash, *keys)
+def mask(object, *keys)
   out = {}
   keys.each do |key|
-    out[key] = hash[key]
+    if object.is_a?(Hash)
+      out[key] = hash[key]
+    else
+      out[key] = object.send(key)
+    end
   end
   out[:etc] = "..."
   out

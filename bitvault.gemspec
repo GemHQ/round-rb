@@ -23,9 +23,13 @@ Gem::Specification.new do |s|
   s.add_dependency("rbnacl", "~> 2.0")
   s.add_dependency("coin-op", "0.1.0")
 
+  # RSpec test suite deps
   s.add_development_dependency("rspec")
   s.add_development_dependency("webmock")
   s.add_development_dependency("vcr")
   s.add_development_dependency("pry-byebug")
+
+  # Demo script deps
+  s.add_development_dependency("term-ansicolor")
 end
 

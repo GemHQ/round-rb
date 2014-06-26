@@ -17,17 +17,9 @@ if File.exists? saved_file
   exit
 end
 
-include CoinOp::Encodings
-include CoinOp::Crypto
+## Create an unauthed client
 
-MultiWallet = CoinOp::Bit::MultiWallet
-
-
-## Create a "sub-client" with its own authentication context
-
-client = bitvault.spawn
-client.context.set_token(api_token)
-
+client = BitVault::Patchboard.client
 
 # Create a user
 #
@@ -36,12 +28,9 @@ client.context.set_token(api_token)
 # API definition.  Action methods perform the actual HTTP requests
 # and wrap the results in further resource instances when appropriate.
 
-
-users = client.resources.users
-
 email = "matthew-#{Time.now.to_i}@bitvault.io"
 
-user = users.create(
+user = client.users.create(
   :email => email,
   :first_name => "Matthew",
   :last_name => "King",
@@ -58,20 +47,11 @@ log "Create a user with", mask(user, :email, :first_name, :last_name)
 
 ## Simulate a later session
 
-client = bitvault.spawn
-
-# Supply the client with the user password, required to manage the user
-# and its applications.  The context class used here determines which
-# credential to use based on the authorization scheme.
-
-client.context.set_basic(email, "incredibly_secure")
+client = BitVault::Patchboard.authed_client(email: email, password: "incredibly_secure")
 
 # Retrieve the user resource
 
-#user = client.resources.user(user.url).get
-
-user = client.resources.login(:email => email).get
-
+user = client.user
 
 ## Create an application.
 #
@@ -90,12 +70,13 @@ log "Created an application for the user", mask(application, :name, :api_token, 
 # requiring the user password.  Tokens can be reset easily,
 # password resets pose a major inconvenience to the user.
 
-# Supply the client with the authentication credential
-client.context.set_token(application.api_token)
+# Spawn new client with the authentication credential
+
+client = BitVault::Patchboard.authed_client(app_url: application.url, api_token: application.api_token)
 
 # List applications
-list = user.applications.list
-log "List the user applications", (list.map do |app|
+list = user.applications
+log "List the user applications", (list.map do |name, app|
   mask(app, :name, :api_token, :callback_url)
 end)
 
@@ -103,14 +84,14 @@ end)
 ## Reset or delete the application
 #
 
-reset = application.reset
+# reset = application.reset
 
-log "Reset an application's api token", {
-  :previous_token => application.api_token,
-  :new_token => reset.api_token
-}
+# log "Reset an application's api token", {
+#   :previous_token => application.api_token,
+#   :new_token => reset.api_token
+# }
 
-client.context.set_token(reset.api_token)
+# client.context.set_token(reset.api_token)
 
 
 ## Generate a MultiWallet with random seeds
@@ -130,24 +111,9 @@ client.context.set_token(reset.api_token)
 # two signatures.  Under normal circumstances, these signatures will be
 # derived from the primary and cosigner trees.
 
-new_wallet = MultiWallet.generate [:primary, :backup]
-primary_seed = new_wallet.trees[:primary].to_serialized_address(:private)
-
-
-## Encrypt the primary seed using a passphrase-derived key
-
 passphrase = "wrong pony generator brad"
-encrypted_seed = PassphraseBox.encrypt(passphrase, primary_seed)
-
-
-wallet = application.wallets.create(
-  :name => "my favorite wallet",
-  :network => "bitcoin_testnet",
-  :backup_public_seed => new_wallet.trees[:backup].to_serialized_address,
-  :primary_public_seed => new_wallet.trees[:primary].to_serialized_address,
-  :primary_private_seed => encrypted_seed
-)
-
+wallet = application.wallets.create(name: 'my favorite wallet', passphrase: passphrase)
+primary_seed = wallet.multiwallet.trees[:primary].to_serialized_address(:private)
 
 log "Create a co-signing wallet for an application", mask(
   wallet,

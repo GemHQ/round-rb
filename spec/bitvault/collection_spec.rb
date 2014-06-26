@@ -83,4 +83,25 @@ describe BitVault::Collection do
     end
   end
 
+  describe '#each' do
+    let(:subresource) { double('subresource', name: 'some_app') }
+    let(:subresources) { [subresource] }
+    let(:resource) { double('resource', list: subresources) }
+
+    context 'hash collection' do
+      before(:each) {
+        allow_any_instance_of(BitVault::Collection).to receive(:collection_type).and_return(Hash)
+        allow_any_instance_of(BitVault::Base).to receive(:name).and_return(subresource.name)
+      }
+
+      let(:collection) { BitVault::Collection.new(resource: resource) }
+
+      it 'returns the correct objects' do
+        collection.each do |name, app|
+          expect(app.resource).to eql(subresource)
+        end
+      end
+    end
+  end
+
 end
