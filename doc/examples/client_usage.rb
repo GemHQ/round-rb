@@ -1,8 +1,7 @@
 project_root = File.expand_path("#{File.dirname(__FILE__)}/../../")
 $:.unshift "#{project_root}/lib"
 
-API_HOST = 'http://localhost:8999'
-require "bitvault"
+require_relative "./setup"
 
 ## API discovery
 #
@@ -19,7 +18,7 @@ client = BitVault::Patchboard.client
 # * associated resources (applications)
 
 user = client.users.create(
-  email: 'julian@bitvault.io',
+  email: "julian-#{Time.now}@bitvault.io",
   first_name: 'Julian',
   last_name: 'Vergel de Dios',
   password: 'terrible_secret'
@@ -94,4 +93,4 @@ payment = account.pay([{ address: payment_address.string, amount: 20_000 }])
 account_1 = wallet.accounts['rubber bands']
 account_2 = wallet.accounts.create(name: 'travel expenses')
 
-wallet.transfer(amount: 10_000, source: account_1, destination: account_2)
+wallet.transfer(value: 10_000, source: account_1, destination: account_2)
