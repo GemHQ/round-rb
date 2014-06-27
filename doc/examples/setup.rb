@@ -7,7 +7,6 @@ project_root = File.expand_path("#{File.dirname(__FILE__)}/../../")
 $:.unshift "#{project_root}/lib"
 
 require "bitvault"
-gem "coin-op", "~> 0.1.0"
 require "coin-op"
 
 require "term/ansicolor"
