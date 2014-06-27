@@ -24,12 +24,12 @@ Gem::Specification.new do |s|
   s.add_dependency("coin-op", "0.2.0")
 
   # RSpec test suite deps
-  s.add_development_dependency("rspec")
-  s.add_development_dependency("webmock")
-  s.add_development_dependency("vcr")
-  s.add_development_dependency("pry-byebug")
+  s.add_development_dependency("rspec", "3.0.0")
+  s.add_development_dependency("webmock", "1.18.0")
+  s.add_development_dependency("vcr", "2.9.2")
+  s.add_development_dependency("pry-byebug", "1.3.3")
 
   # Demo script deps
-  s.add_development_dependency("term-ansicolor")
+  s.add_development_dependency("term-ansicolor", "1.3.0")
 end
 
