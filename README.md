@@ -45,6 +45,10 @@ __config/initializers/bitvault.rb__
     
 This is just a suggestion for a simple Rails setup, there are many other ways to do this.
 
+## Usage
+
+For detailed usage please visit the [documentation page](http://docs.bitvault.io)
+
 ## Awesome things you can do
 
 Now that you have this thing installed, let's do some cool stuff with it.
