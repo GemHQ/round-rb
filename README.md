@@ -1,36 +1,47 @@
 # BitVault Ruby Client
 
-
 ## Installation
 
-Required system dependencies:
+### Install [libsodium](https://github.com/jedisct1/libsodium) 
 
-* libsodium
+On OS X using [Brew](http://brew.sh/):
 
-Developed against Ruby 2.1.x.  To bootstrap:
+    $ brew install libsodium
 
-    $ gem install starter
+### Install gem dependencies:
 
-Rubygem dependencies can then be installed by running `rake gem:deps`.
+    $ bundle install
 
-There are two demo scripts, one to set up an account and an address for funding
-the account, another to issue payments from the account.
+### Build and install the gem:
 
-To run these scripts against the alpha server, check out the "development"
-branch:
+    $ gem build bitvault-rb.gemspec
+    $ gem install bitvault-rb
 
-    git checkout development
+## Configuration
 
-Then do this:
+You'll need to add bitvault-rb to your Gemfile:
 
-    ruby doc/examples/demo_account.rb
-    # follow instructions for funding from a testnet faucet
-    ruby doc/examples/demo_payment.rb
+    gem 'bitvault-rb'
 
-To run the demo script against an arbitrary instance of the BitVault API:
+In Rails you may want to create a single instance of a client to be reused many times and store your credentials in a YAML file:
 
-    ruby doc/examples/demo_account.rb <url>
-    ruby doc/examples/demo_payment.rb <url>
+__config/bitvault.yml__
+
+    production:
+        app_url: <PRODUCTION_APP_URL>
+        api_token: <PRODUCTION_API_TOKEN>
+    
+    development: 
+        app_url: <DEVELOPMENT_APP_URL>
+        api_token: <DEVELOPMENT_API_TOKEN>
+
+__config/initializers/bitvault.rb__
+
+    config = YAML::load(File.read("#{Rails.root}/config/bitvault.yml"))[Rails.env]
+
+    BITVAULT_CLIENT = BitVault::Patchboard.authed_client(app_url: config['app_url'], api_token: ['api_token'])
+    
+This is just a suggestion for a simple Rails setup, there are many other ways to do this.
 
 ## Awesome things you can do
 
@@ -38,7 +49,7 @@ Now that you have this thing installed, let's do some cool stuff with it.
 
 ### Spawning a client
 
-For most things, you will want to spawn an authenticated client with your credentials.
+If your use case requires you to have several clients authed with different credentials you can spawn as many as you'd like.
 
 You can do this 2 ways:
     
@@ -47,7 +58,9 @@ You can do this 2 ways:
 or
 
     client = BitVault::Patchboard.authed_client(app_url: <APP_URL>, api_token: <API_TOKEN>)
-    
+
+You can do basic user management with a client authed using user credentials, but in order to do any operations on wallets or accounts you'll need to do the second option to auth a client using application credentials.
+
 ### Wallets
 
 Once you've got a client with an Application context you can start to do fun stuff like create wallets:
