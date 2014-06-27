@@ -8,20 +8,22 @@ On OS X using [Brew](http://brew.sh/):
 
     $ brew install libsodium
 
+Follow the instructions on the [libsodium](https://github.com/jedisct1/libsodium) Github page for installation instructions on *nix systems.
+
 ### Install gem dependencies:
 
     $ bundle install
 
 ### Build and install the gem:
 
-    $ gem build bitvault-rb.gemspec
-    $ gem install bitvault-rb
+    $ gem build bitvault.gemspec
+    $ gem install bitvault
 
 ## Configuration
 
 You'll need to add bitvault-rb to your Gemfile:
 
-    gem 'bitvault-rb'
+    gem 'bitvault'
 
 In Rails you may want to create a single instance of a client to be reused many times and store your credentials in a YAML file:
 
