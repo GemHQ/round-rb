@@ -6,7 +6,7 @@ module BitVault
   class Patchboard < Patchboard
 
     BASE_URL = ::API_HOST if defined? ::API_HOST
-    BASE_URL ||= 'http://bitvault.pandastrike.com/'
+    BASE_URL ||= 'http://api.bitvault.io/'
 
     def self.authed_client(options = {})
       raise 'No credentials supplied' unless options[:email] or options[:app_url]
