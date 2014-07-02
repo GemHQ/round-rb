@@ -16,7 +16,7 @@ class BitVault::Account < BitVault::Base
     payment = self.payments.unsigned(payees)
     payment.sign(@wallet.multiwallet)
 
-    BitVault::Payment.new(resource: payment)
+    payment
   end
 
   def addresses

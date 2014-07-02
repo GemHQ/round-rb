@@ -48,7 +48,7 @@ describe BitVault::Payment do
   end
 
   describe 'delegate methods' do
-    [:hash, :status].each do |method|
+    [:status].each do |method|
       it "delegates #{method} to the resource" do
         expect(payment.resource).to receive(method)
         payment.send(method)

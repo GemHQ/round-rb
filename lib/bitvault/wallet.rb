@@ -35,13 +35,17 @@ class BitVault::Wallet < BitVault::Base
 
     unsigned_transfer = @resource.transfers.create(
       value: options[:value],
-      source: options[:source].url,
-      destination: options[:destination].url)
+      source: {
+        url: options[:source].url
+      }, 
+      destination: {
+        url: options[:destination].url
+      })
     transaction = CoinOp::Bit::Transaction.data(unsigned_transfer)
     signed_transfer = unsigned_transfer.sign(
       transaction_hash: transaction.hex_hash,
       inputs: @multiwallet.signatures(transaction))
-    BitVault::Transaction.new(resource: signed_transfer)
+    BitVault::Transfer.new(resource: signed_transfer)
   end
 
 end

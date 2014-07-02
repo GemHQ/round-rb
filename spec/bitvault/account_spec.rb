@@ -50,8 +50,7 @@ describe BitVault::Account do
       it 'returns a Payment model' do
         expect(account.payments).to receive(:unsigned)
         expect(payment_resource).to receive(:sign).with(account.wallet.multiwallet)
-        expect(payment).to be_a_kind_of(BitVault::Payment)
-        expect(payment.resource).to eql(payment_resource)
+        expect(payment).to eql(payment_resource)
       end
     end
   end

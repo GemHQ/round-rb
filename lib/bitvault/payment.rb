@@ -1,6 +1,6 @@
 class BitVault::Payment < BitVault::Base
 
-  def_delegators :@resource, :hash, :status
+  def_delegators :@resource, :status
 
   def sign(wallet)
     raise 'a wallet is required to sign a transaction' unless wallet
@@ -12,6 +12,10 @@ class BitVault::Payment < BitVault::Base
       transaction_hash: transaction.hex_hash,
       inputs: wallet.signatures(transaction)
     )
+  end
+
+  def transaction_hash
+    @resource[:hash]
   end
 
 end

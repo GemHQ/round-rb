@@ -31,22 +31,17 @@ wallet = client.wallet(url: wallet_data[:url])
 wallet.unlock(wallet_data[:passphrase])
 
 account = wallet.accounts[account_data[:name]]
-log "Fetched account", mask(account, :url, :name)
+log "Fetched account", mask(account, :name, :path, :balance, :pending_balance)
 
 
-## Request a payment of bitcoins from this account back to the faucet address.
-# faucet donation address mwwhVPiopW6HhhDtcSv3MUFLTB5ehhkgZg
+source_account = account
+destination_account = wallet.accounts.create(name: "spending-#{Time.now.to_i}")
 
-payees = [
-  {
-    address: "mwwhVPiopW6HhhDtcSv3MUFLTB5ehhkgZg",
-    amount: 500_000
-  }
-]
+log "Create destination account", mask(destination_account, :name, :path, :balance, :pending_balance)
 
-payment = account.pay(payees)
+transaction = wallet.transfer(source: source_account, destination: destination_account, value: 500_000)
 
-log "Signed payment", mask(payment, :status, :transaction_hash)
+log "Completed transfer", mask(transaction, :transaction_hash)
 
 
 # The client will then be able to check the confirmation status of the signed
@@ -54,8 +49,4 @@ log "Signed payment", mask(payment, :status, :transaction_hash)
 # service will post transaction statuses to the application's callback_url,
 # if supplied.
 
-log "Check transaction confirmations at:\nhttp://tbtc.blockr.io/tx/info/#{payment.transaction_hash}"
-
-
-
-
+log "Check transaction confirmations at:\nhttp://tbtc.blockr.io/tx/info/#{transaction.transaction_hash}"

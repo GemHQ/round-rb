@@ -2,16 +2,19 @@ require_relative "setup"
 
 if File.exists? saved_file
   data = YAML.load_file saved_file
-  address = data[:node][:address]
+  addresses = data[:nodes]
   puts
   puts <<-MESSAGE
   Settings from a previous run of this script are in #{saved_file}.
   If you have not already funded that wallet, you can remove the file.
-  Otherwise, fund this address:
-  #{address}
+  Otherwise, fund these addresses:
+
+  #{addresses.map {|address| address[:string]}.join("\n  ")}
+
   then run demo_payment.rb
-  You can check the state of transactions for the address at:
-  http://tbtc.blockr.io/address/info/#{address}
+  You can check the state of transactions for the addresses at:
+
+  #{addresses.map {|address| 'http://tbtc.blockr.io/address/info/' + address[:string]}.join("\n  ")}
   MESSAGE
   puts
   exit
@@ -137,10 +140,13 @@ log "Create an account within a wallet", mask(account, :name, :path, :balance, :
 # This is a BIP 16 "Pay to Script Hash" address, where the script in question
 # is a BIP 11 "multisig".
 
-incoming_address = account.addresses.create
+incoming_addresses = []
+6.times do
+  incoming_addresses << account.addresses.create
+end
 
-log "Generate a Bitcoin address to fund the account", mask(
-  incoming_address, :path, :string
+log "Generate a Bitcoin address to fund the account", (incoming_addresses.map do |address|
+  mask(address, :path, :string) end
 )
 
 
@@ -155,9 +161,11 @@ record = {
   api_token: client.context.api_token,
   wallet: {url: wallet.url, name: wallet.name, passphrase: passphrase},
   account: {url: account.url, name: account.name},
-  node: {
-    path: incoming_address.path,
-    address: incoming_address.string
+  nodes: incoming_addresses.map { |address|
+    {
+      path: address.path,
+      string: address.string
+    }
   }
 }
 File.open saved_file, "w" do |f|
@@ -165,20 +173,17 @@ File.open saved_file, "w" do |f|
 end
 
 puts <<-MESSAGE
-  Fund this address from a testnet faucet, so that you can make payments or transfers:
+  Fund these addresses from a testnet faucet, so that you can make payments or transfers:
 
-  #{incoming_address.string}
+  #{incoming_addresses.map {|address| address.string}.join("\n  ")}
 
   Then you can run demo_payment.rb
-
-  Fund this address from a testnet faucet so that you can make payments:
-  #{address}
 
   Suggested faucet:  http://faucet.xeno-genesis.com
   Once the transaction is confirmed (with 6 blocks) run demo_payment.rb
 
-  You can check the state of transactions for the address at:
-  http://tbtc.blockr.io/address/info/#{incoming_address.string}
+  You can check the state of transactions for the addresses at:
+  #{incoming_addresses.map {|address| 'http://tbtc.blockr.io/address/info/' + address.string}.join("\n  ")}
 MESSAGE
 
 

@@ -100,8 +100,8 @@ describe BitVault::Wallet do
       it 'calls create on transfers resource with the correct values' do
         expect(wallet.resource.transfers).to receive(:create).with(
           value: value,
-          source: account_1.url,
-          destination: account_2.url)
+          source: {url: account_1.url},
+          destination: {url: account_2.url})
         transfer
       end
 
@@ -117,8 +117,8 @@ describe BitVault::Wallet do
         transfer
       end
 
-      it 'returns a Transaction model' do
-        expect(transfer).to be_a_kind_of(BitVault::Transaction)
+      it 'returns a Transfer model' do
+        expect(transfer).to be_a_kind_of(BitVault::Transfer)
       end
     end
   end
