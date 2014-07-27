@@ -3,6 +3,51 @@ require "base64"
 
 module BitVault
 
+  def self.url
+    "http://api.bitvault.io/"
+  end
+
+  def self.client(url=nil)
+    @client ||= begin
+      url ||= BitVault.url
+      pb = BitVault::Patchboard.discover(url) { BitVault::Patchboard::Context.new }
+      pb.spawn
+    end
+  end
+
+  def self.authenticate(options)
+    url = options[:url] || BitVault.url
+    if app = options[:application]
+      authenticate_application(url, app)
+    elsif user = options[:user]
+      authenticate_user(url, user)
+    else
+      raise ArgumentError, "Supply either user or application authentication"
+    end
+  end
+
+  def self.authenticate_user(url, options)
+    email, password = options.values_at :email, :password
+    if email && password
+      _client = self.client(url)
+      _client.context.set_basic(email, password)
+      _client
+    else
+      raise ArgumentError, "Must provide email and password"
+    end
+  end
+
+  def self.authenticate_application(url, options)
+    app_url, token = options.values_at :url, :token
+    if url && token
+      _client = self.client(url)
+      _client.context.set_token(app_url, token)
+      _client
+    else
+      raise ArgumentError, "Must provide application url and token"
+    end
+  end
+
   class Patchboard < Patchboard
 
     BASE_URL = ::API_HOST if defined? ::API_HOST
@@ -48,6 +93,14 @@ module BitVault
         @application
       end
 
+      def set_user(*args)
+        @context.set_user(*args)
+      end
+
+      def set_application(*args)
+        @context.set_application(*args)
+      end
+
       def users
         unless @users
           users_resource = self.resources.users
@@ -80,6 +133,9 @@ module BitVault
         @app_url = app_url
         @api_token = api_token
       end
+
+      alias_method :set_user, :set_basic
+      alias_method :set_application, :set_token
 
       # Provided with the authentication scheme for an Authorization
       # header, the resource instance on which an action is being called,

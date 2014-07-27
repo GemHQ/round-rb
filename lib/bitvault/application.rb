@@ -6,4 +6,9 @@ class BitVault::Application < BitVault::Base
     @wallets ||= BitVault::WalletCollection.new(resource: @resource.wallets)
     @wallets
   end
+
+  def rules
+    @rules ||= BitVault::Rules.new(@resource.rules)
+  end
+
 end

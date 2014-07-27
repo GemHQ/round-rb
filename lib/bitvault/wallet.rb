@@ -10,8 +10,9 @@ class BitVault::Wallet < BitVault::Base
   end
 
   def accounts
-    @accounts ||= BitVault::AccountCollection.new(resource: @resource.accounts, wallet: self)
-    @accounts
+    @accounts ||= BitVault::AccountCollection.new(
+      resource: @resource.accounts, wallet: self
+    )
   end
 
   def unlock(passphrase)

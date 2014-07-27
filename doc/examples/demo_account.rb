@@ -20,9 +20,10 @@ if File.exists? saved_file
   exit
 end
 
-## Create an unauthed client
+## Create an unauthenticated client.  The API URL may be passed
+## the first argument on the command line.
 
-client = BitVault::Patchboard.client
+client = BitVault.client(ARGV[0])
 
 # Create a user
 #
@@ -31,13 +32,14 @@ client = BitVault::Patchboard.client
 # API definition.  Action methods perform the actual HTTP requests
 # and wrap the results in further resource instances when appropriate.
 
-email = "matthew-#{Time.now.to_i}@bitvault.io"
+email = "john-#{Time.now.to_i}@mmenterprises.com"
+password = "incredibly_secure"
 
 user = client.users.create(
   :email => email,
-  :first_name => "Matthew",
-  :last_name => "King",
-  :password => "incredibly_secure"
+  :first_name => "John",
+  :last_name => "Yossarian",
+  :password => password
 )
 log "Create a user with", mask(user, :email, :first_name, :last_name)
 
@@ -50,7 +52,7 @@ log "Create a user with", mask(user, :email, :first_name, :last_name)
 
 ## Simulate a later session
 
-client = BitVault::Patchboard.authed_client(email: email, password: "incredibly_secure")
+client = BitVault.authenticate :user => {:email => email, :password => "incredibly_secure"}
 
 # Retrieve the user resource
 
@@ -157,6 +159,7 @@ log "Generate a Bitcoin address to fund the account", (incoming_addresses.map do
 puts "Writing wallet information to #{saved_file} for use in next test."
 
 record = {
+  user: {email: email, password: password},
   app_url: application.url,
   api_token: client.context.api_token,
   wallet: {url: wallet.url, name: wallet.name, passphrase: passphrase},

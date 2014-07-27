@@ -21,7 +21,6 @@ class BitVault::Account < BitVault::Base
 
   def addresses
     @addresses ||= BitVault::AddressCollection.new(resource: @resource.addresses)
-    @addresses
   end
 
   def transactions
@@ -30,7 +29,6 @@ class BitVault::Account < BitVault::Base
 
   def payments
     @payments ||= BitVault::PaymentGenerator.new(resource: @resource.payments)
-    @payments
   end
 
 end 
