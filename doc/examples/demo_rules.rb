@@ -32,11 +32,20 @@ application = client.application
 wallet = client.wallet(:url => wallet_data[:url])
 account = wallet.accounts[account_data[:name]]
 
+log "The application starts with no active rules",
+  application.rules.to_hash
 
+# The unless clause is here in case the script had crashed,
+# as the whitelist would not have been deleted.
 unless whitelist = application.rules["gem:whitelist"]
   whitelist = application.rules.add("gem:whitelist")
 end
 
+log "Add rules using their names.  Whitelists are empty to begin with.",
+  mask(whitelist, :name, :data)
+
+log "Now the whitelist shows up in the application rules",
+  application.rules.refresh.to_hash
 
 whitelist = whitelist.set(
   "banana merchant" => {
@@ -54,10 +63,15 @@ whitelist = whitelist.set(
   }
 )
 
-whitelist.delete
+log "Set whitelist entries.  The 'memo' field is optional",
+  mask(whitelist, :name, :data)
+
+result = whitelist.delete
+
+log "When you delete a rule, the response contains the deleted content.",
+  mask(result, :name, :data)
 
 
-pp application.rules.refresh.keys
 
 
 

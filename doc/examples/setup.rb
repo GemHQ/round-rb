@@ -15,14 +15,14 @@ String.send :include, Term::ANSIColor
 # colored output to make it easier to see structure
 def log(message, data=nil)
   if data.is_a? String
-    puts "#{message.yellow} => #{data.dump.cyan}"
+    puts "#{message.yellow}:\n#{data.dump.cyan}"
   elsif data.nil?
     puts "#{message.yellow}"
   else
     begin
-      puts "#{message.yellow} => #{JSON.pretty_generate(data).cyan}"
+      puts "#{message.yellow}:\n#{JSON.pretty_generate(data).cyan}"
     rescue
-      puts "#{message.yellow} => #{data.inspect.cyan}"
+      puts "#{message.yellow}:\n#{data.inspect.cyan}"
     end
   end
   puts
@@ -32,7 +32,7 @@ def mask(object, *keys)
   out = {}
   keys.each do |key|
     if object.is_a?(Hash)
-      out[key] = hash[key]
+      out[key] = object[key]
     else
       out[key] = object.send(key)
     end

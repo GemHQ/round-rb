@@ -1,5 +1,17 @@
 module BitVault
 
+  class Wrapper
+    extend Forwardable
+
+    def_delegators :resource, :url
+
+    attr_reader :resource
+
+    def initialize(resource)
+      @resource = resource
+    end
+  end
+
   class DictWrapper
     include Enumerable
     extend Forwardable
@@ -9,6 +21,10 @@ module BitVault
     def initialize(resource)
       @resource = resource
       self.refresh
+    end
+
+    def wrap
+      raise NotImplementedError
     end
 
     def each(&block)
@@ -32,6 +48,10 @@ module BitVault
       @definitions.keys
     end
 
+    def to_hash
+      @cache.definitions
+    end
+
   end
 
   class Rules < DictWrapper
@@ -46,19 +66,9 @@ module BitVault
 
   end
 
-  class Wrapper
-    extend Forwardable
-
-    def_delegators :resource, :url
-
-    attr_reader :resource
-
-    def initialize(resource)
-      @resource = resource
-    end
-  end
-
   class Rule < Wrapper
+
+    def_delegators :resource, :name, :data
 
     def set(content)
       content.each do |name, spec|
@@ -72,7 +82,7 @@ module BitVault
     end
 
     def delete
-      @resource.delete
+      @resource.delete.response.data
     end
 
   end
