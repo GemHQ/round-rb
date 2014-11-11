@@ -1,6 +1,6 @@
 API_HOST = 'http://localhost:8999'
 
-require_relative '../lib/bitvault'
+require_relative '../lib/round'
 require 'webmock/rspec'
 require 'vcr'
 require 'pry-byebug'
@@ -18,8 +18,8 @@ RSpec.configure do |config|
   config.include WebMock::API
 
   config.before(:each) do
-    BitVault::Patchboard.class_variable_set(:@@patchboard, nil)
-    namespace = BitVault::Patchboard::Resources
+    Round::Patchboard.class_variable_set(:@@patchboard, nil)
+    namespace = Round::Patchboard::Resources
     namespace.constants.select { |c|
       namespace.const_get(c).is_a? Class
     }.each { |c|

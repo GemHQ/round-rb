@@ -1,4 +1,4 @@
-# BitVault Ruby Client
+# Gem Ruby Client
 
 ## Installation
 
