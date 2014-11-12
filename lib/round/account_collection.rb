@@ -3,7 +3,7 @@ class Round::AccountCollection < Round::Collection
   def initialize(options = {})
     raise ArgumentError, 'AccountCollection must be associated with a wallet' unless options[:wallet]
     @wallet = options[:wallet]
-    super(options)
+    super(options) {|account| account.wallet = @wallet}
   end
 
   def content_type

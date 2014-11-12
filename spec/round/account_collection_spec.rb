@@ -15,7 +15,7 @@ describe Round::AccountCollection do
     end
 
     it 'sets the wallet on each of the accounts' do
-      accounts.each do |name, account|
+      accounts.each do |account|
         expect(account.wallet).to eql(wallet)
       end
     end

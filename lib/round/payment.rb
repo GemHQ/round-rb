@@ -1,7 +1,5 @@
 class Round::Payment < Round::Base
 
-  def_delegators :@resource, :status
-
   def sign(wallet)
     raise 'a wallet is required to sign a transaction' unless wallet
 

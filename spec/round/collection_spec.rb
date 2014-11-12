@@ -18,25 +18,6 @@ describe Round::Collection do
       expect(collection).to have_received(:populate_data).with(options)
     end
 
-    context 'hash collection' do
-      before(:each) {
-        allow_any_instance_of(Round::Collection).to receive(:collection_type).and_return(Hash)
-      }
-
-      it 'instatiates collection with a Hash' do
-        expect(collection.collection).to be_a_kind_of(Hash)
-      end
-    end
-
-    context 'array collection' do
-      before(:each) {
-        allow_any_instance_of(Round::Collection).to receive(:collection_type).and_return(Array)
-      }
-
-      it 'instatiates collection with a Hash' do
-        expect(collection.collection).to be_a_kind_of(Array)
-      end
-    end
   end
 
   describe '#populate_data' do
@@ -52,21 +33,6 @@ describe Round::Collection do
     let(:subresources) { [] }
     let(:new_subresource) { double('subresource', name: 'bar') }
 
-    context 'hash collection' do
-      before(:each) {
-        allow_any_instance_of(Round::Collection).to receive(:collection_type).and_return(Hash)
-      }
-
-      it 'increases the count by 1' do
-        expect { collection.add(new_subresource) }.to change(collection, :count).by(1)
-      end
-
-      it 'indexes the subresource by name' do
-        collection.add(new_subresource)
-        expect(collection['bar']).to eql(new_subresource)
-      end
-    end
-
     context 'array collection' do
       before(:each) {
         allow_any_instance_of(Round::Collection).to receive(:collection_type).and_return(Array)
@@ -79,27 +45,6 @@ describe Round::Collection do
       it 'indexes the subresource by name' do
         collection.add(new_subresource)
         expect(collection).to include(new_subresource)
-      end
-    end
-  end
-
-  describe '#each' do
-    let(:subresource) { double('subresource', name: 'some_app') }
-    let(:subresources) { [subresource] }
-    let(:resource) { double('resource', list: subresources) }
-
-    context 'hash collection' do
-      before(:each) {
-        allow_any_instance_of(Round::Collection).to receive(:collection_type).and_return(Hash)
-        allow_any_instance_of(Round::Base).to receive(:name).and_return(subresource.name)
-      }
-
-      let(:collection) { Round::Collection.new(resource: resource) }
-
-      it 'returns the correct objects' do
-        collection.each do |name, app|
-          expect(app.resource).to eql(subresource)
-        end
       end
     end
   end

@@ -17,15 +17,5 @@ RSpec.configure do |config|
 
   config.include WebMock::API
 
-  config.before(:each) do
-    Round::Patchboard.class_variable_set(:@@patchboard, nil)
-    namespace = Round::Patchboard::Resources
-    namespace.constants.select { |c|
-      namespace.const_get(c).is_a? Class
-    }.each { |c|
-      namespace.send(:remove_const, c)
-    }
-  end
-
   config.order = 'random'
 end

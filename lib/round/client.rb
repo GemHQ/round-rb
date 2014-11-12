@@ -32,6 +32,10 @@ module Round
 
     end
 
+    def authenticate_developer(email, privkey)
+      @patchboard_client.context.authorize(Context::Scheme::DEVELOPER, email: email, privkey: privkey)
+    end
+
     def resources
       @patchboard_client.resources
     end
@@ -65,7 +69,7 @@ module Round
 
       def authorize(scheme, params)
         raise ArgumentError, "Unknown auth scheme" unless SCHEMES.include?(scheme)
-        @schemes[scheme] = compile_params(params)
+        @schemes[scheme] = params
       end
 
       def compile_params(params)
@@ -84,11 +88,21 @@ module Round
       def authorizer(schemes, resource, action)
         schemes = [schemes] if schemes.is_a? String
         schemes.each do |scheme|
-          if credential = @schemes[scheme]
+          if params = @schemes[scheme]
+            credential = nil
+            if scheme.eql?(Scheme::DEVELOPER)
+              credential = developer_signature(request[:body], params[:privkey])
+            else
+              credential = compile_params(params)
+            end
             return [scheme, credential]
           end
         end
         raise "Action: #{action}.  No authorization available for '#{schemes}'"
+      end
+
+      def developer_signature(request_body, privkey)
+        
       end
 
       def inspect

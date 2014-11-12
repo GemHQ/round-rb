@@ -1,5 +1,4 @@
 class Round::Account < Round::Base
-  def_delegators :@resource, :name, :path, :balance, :pending_balance
 
   attr_accessor :wallet
 

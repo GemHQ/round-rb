@@ -1,6 +1,4 @@
 class Round::Wallet < Round::Base
-  def_delegators :@resource, :name, :network, :cosigner_public_seed, 
-    :backup_public_seed, :primary_public_seed, :primary_private_seed
 
   attr_accessor :multiwallet
 

@@ -1,23 +1,18 @@
 class Round::Collection < Round::Base
   include Enumerable
+  attr_reader :collection
 
-  def_delegators :@collection, :[]
-
-  attr_accessor :collection
-
-  def each(&block)
-    @collection.each(&block)
-  end
-
-  def initialize(options = {})
+  def initialize(options = {}, &block)
     super(options)
     options.delete(:resource)
-    self.populate_data(options)
+    self.populate_data(options, &block)
   end
 
-  def populate_data(options)
+  def populate_data(options, &block)
+    @collection ||= []
     resource.list.each do |resource|
       content = self.content_type.new(options.merge(resource: resource))
+      yield content if block
       self.add(content)
     end
   end
@@ -34,4 +29,10 @@ class Round::Collection < Round::Base
     :name
   end
   
+  def method_missing(meth, *args, &block)
+    @collection.send(meth, *args, &block)
+  rescue
+    super
+  end
+
 end
