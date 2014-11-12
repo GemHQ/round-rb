@@ -9,4 +9,5 @@ class Round::Base
     @resource = options[:resource]
   end
 
+
 end

@@ -11,11 +11,6 @@ class Round::Collection < Round::Base
 
   def initialize(options = {})
     super(options)
-    if self.collection_type == Array
-      @collection = []
-    elsif self.collection_type == Hash
-      @collection = {}
-    end
     options.delete(:resource)
     self.populate_data(options)
   end
@@ -28,15 +23,7 @@ class Round::Collection < Round::Base
   end
 
   def add(content)
-    if self.collection_type == Array
-      @collection << content
-    elsif self.collection_type == Hash
-      @collection[content.send(self.content_key)] = content
-    end
-  end
-
-  def collection_type
-    Hash
+    @collection << content
   end
 
   def content_type

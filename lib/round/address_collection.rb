@@ -4,10 +4,6 @@ class Round::AddressCollection < Round::Collection
     Round::Address
   end
 
-  def collection_type
-    Array
-  end
-
   def create
     resource = @resource.create
     address = Round::Address.new(resource: resource)
