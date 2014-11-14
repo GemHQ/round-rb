@@ -9,8 +9,8 @@ module Round
 
   def self.client(url=nil)
     url ||= Round.url
-    @patchboard ||= ::Patchboard.discover(url) { Client::Context.new }
-    Client.new(url, @patchboard)
+    patchboard = ::Patchboard.discover(url) { Client::Context.new }
+    Client.new(url, patchboard)
   end
 
   class Client
