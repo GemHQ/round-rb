@@ -24,10 +24,6 @@ class Round::Collection < Round::Base
   def content_type
     Round::Base
   end
-
-  def content_key
-    :name
-  end
   
   def method_missing(meth, *args, &block)
     @collection.send(meth, *args, &block)

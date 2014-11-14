@@ -20,20 +20,24 @@ module Round
       @patchboard_client = patchboard.spawn
     end
 
-    def authenticate(options)
-
-    end
-
-    def authenticate_user(options)
-
-    end
-
-    def authenticate_application(options)
-
+    def authenticate_application(app_url, api_token, instance_id)
+      @app_url = app_url
+      @patchboard_client
+        .context
+        .authorize(Context::Scheme::APPLICATION, api_token: api_token, instance_id: instance_id)
     end
 
     def authenticate_developer(email, privkey)
-      @patchboard_client.context.authorize(Context::Scheme::DEVELOPER, email: email, privkey: privkey)
+      @patchboard_client
+        .context
+        .authorize(Context::Scheme::DEVELOPER, email: email, privkey: privkey)
+    end
+
+    def authenticate_device(user_url, api_token, user_token, device_id)
+      @user_url = user_url
+      @patchboard_client
+        .context
+        .authorize(Context::Scheme::DEVICE, api_token: api_token, user_token: user_token, device_id: device_id)
     end
 
     def resources
@@ -46,6 +50,14 @@ module Round
 
     def users
       @users ||= UserCollection.new(resource: resources.users)
+    end
+
+    def application
+      @application ||= Application.new(resource: resources.application(@app_url))
+    end
+
+    def user
+      @user ||= User.new(resource: resources.user(@user_url))
     end
 
     class Context
@@ -85,7 +97,7 @@ module Round
         end
       end
 
-      def authorizer(schemes, resource, action)
+      def authorizer(schemes, resource, action, request)
         schemes = [schemes] if schemes.is_a? String
         schemes.each do |scheme|
           if params = @schemes[scheme]
@@ -102,7 +114,11 @@ module Round
       end
 
       def developer_signature(request_body, privkey)
-        
+        body = request_body ? JSON.parse(request_body) : {}
+        key = OpenSSL::PKey::RSA.new privkey
+        content = "#{JSON.generate(body)}-#{DateTime.new.strftime('%Y/%m/%d')}"
+        signature = key.sign(OpenSSL::Digest::SHA256.new, content)
+        Base64.urlsafe_encode64(signature)
       end
 
       def inspect

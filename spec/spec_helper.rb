@@ -4,6 +4,7 @@ require_relative '../lib/round'
 require 'webmock/rspec'
 require 'vcr'
 require 'pry-byebug'
+require_relative 'helpers/developer'
 
 VCR.configure do |c|
   c.cassette_library_dir = 'spec/cassettes'
@@ -16,6 +17,7 @@ RSpec.configure do |config|
   config.filter_run :focus
 
   config.include WebMock::API
+  config.include Round::TestHelpers::Developer
 
   config.order = 'random'
 end
