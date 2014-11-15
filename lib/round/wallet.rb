@@ -26,25 +26,4 @@ class Round::Wallet < Round::Base
     )
   end
 
-  def transfer(options = {})
-    raise ArgumentError, 'Must specify a source account' unless options[:source]
-    raise ArgumentError, 'Must specify a destination account' unless options[:destination]
-    raise ArgumentError, 'Must specify a value' unless options[:value]
-    raise 'Wallet must be unlocked before you can create a transfer' unless @multiwallet
-
-    unsigned_transfer = @resource.transfers.create(
-      value: options[:value],
-      source: {
-        url: options[:source].url
-      }, 
-      destination: {
-        url: options[:destination].url
-      })
-    transaction = CoinOp::Bit::Transaction.data(unsigned_transfer)
-    signed_transfer = unsigned_transfer.sign(
-      transaction_hash: transaction.hex_hash,
-      inputs: @multiwallet.signatures(transaction))
-    Round::Transfer.new(resource: signed_transfer)
-  end
-
 end

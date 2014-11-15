@@ -9,28 +9,17 @@ describe Round::UserCollection do
 
   describe '#create' do
     context 'with a valid email and password' do
-      let(:params) { { email: 'julian@bitvault.io', password: 'terrible_secret' } }
-      let(:user) { user_collection.create(params) }
+      let(:email) { 'julian@gem.co' }
+      let(:passphrase) { 'terrible_secret' }
+      let(:user) { user_collection.create(email, passphrase) }
 
       it 'delegates to the resource' do
-        expect(user_collection.resource).to receive(:create).with(params)
+        expect(user_collection.resource).to receive(:create)
         user
       end
 
       it 'returns a User model' do
         expect(user).to be_a_kind_of(Round::User)
-      end
-    end
-
-    context 'missing password' do
-      it 'raises an error' do
-        expect { user_collection.create(email: email) }.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'missing name' do
-      it 'raises an error' do
-        expect { user_collection.create(password: password) }.to raise_error(ArgumentError)
       end
     end
   end

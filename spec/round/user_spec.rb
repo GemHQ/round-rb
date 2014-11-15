@@ -18,22 +18,5 @@ describe Round::User do
       end
     end
   end
-
-  describe '#applications' do
-    it 'returns an ApplicationCollection' do
-      expect(user.applications).to be_a_kind_of(Round::ApplicationCollection)
-    end
-
-    it 'only fetches once' do
-      expect(user.resource.applications).to receive(:list).once
-      user.applications
-      user.applications
-    end
-
-    it 'fetches twice when refresh is passed' do
-      expect(user.resource.applications).to receive(:list).twice
-      user.applications
-      user.applications(refresh: true)
-    end
-  end
+  
 end

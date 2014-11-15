@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'date'
 
 describe Round::Client::Context do
   let(:context) { Round::Client::Context.new }
@@ -31,7 +32,7 @@ describe Round::Client::Context do
   describe '#developer_signature' do
     let(:privkey) { developer_private_key }
     let(:request_body) { '{"name":"name"}' }
-    let(:date_string) { DateTime.new.strftime('%Y/%m/%d') }
+    let(:date_string) { Date.today.strftime('%Y/%m/%d') }
     let(:content) { "#{request_body}-#{date_string}" }
 
     context 'with a valid key' do

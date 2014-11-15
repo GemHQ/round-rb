@@ -22,7 +22,7 @@ describe Round::WalletCollection do
 
   describe '#create' do
     context 'with a valid passphrase and name' do
-      let(:wallet) { wallets.create(passphrase: passphrase, name: name) }
+      let(:wallet) { wallets.create(name, passphrase) }
 
       it 'returns a Wallet model' do
         expect(wallet).to be_a_kind_of(Round::Wallet)
@@ -35,15 +35,6 @@ describe Round::WalletCollection do
       it 'sets the multiwallet on the model' do
         expect(CoinOp::Bit::MultiWallet).to receive(:generate).once
         expect(wallet.multiwallet).to eql(multiwallet)
-      end
-
-      context 'with an existing wallet' do
-        let(:wallet) { wallets.create(passphrase: passphrase, name: name, multiwallet: multiwallet) }
-
-        it 'sets the existing wallet on the model' do
-          expect(CoinOp::Bit::MultiWallet).to_not receive(:generate)
-          expect(wallet.multiwallet).to eql(multiwallet)
-        end
       end
     end
 

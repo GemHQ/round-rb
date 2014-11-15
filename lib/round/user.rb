@@ -1,8 +1,14 @@
 class Round::User < Round::Base
 
-  def applications(options = {})
-  	@applications = Round::ApplicationCollection.new(resource: @resource.applications) if !@applications || options[:refresh]
-  	@applications
+  attr_reader :wallet
+
+  def initialize(options = {})
+    super
+    @wallet = options[:wallet]
+  end
+
+  def wallets
+    @wallets ||= WalletCollection.new(resource: @resource.wallets)
   end
 
 end

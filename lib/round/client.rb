@@ -1,5 +1,6 @@
 require "patchboard"
 require "base64"
+require "date"
 
 module Round
 
@@ -28,6 +29,7 @@ module Round
     end
 
     def authenticate_developer(email, privkey)
+      @developer_email = email
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVELOPER, email: email, privkey: privkey)
@@ -46,6 +48,10 @@ module Round
 
     def developers
       @developers ||= DeveloperCollection.new(resource: resources.developers)
+    end
+
+    def developer
+      @developer ||= Developer.new(resource: resources.developer_query(email: @developer_email).get)
     end
 
     def users
@@ -97,16 +103,19 @@ module Round
         end
       end
 
-      def authorizer(schemes, resource, action, request)
+      def authorizer(options = {})
+        schemes, resource, action, request = options.values_at(:schemes, :resource, :action, :request)
         schemes = [schemes] if schemes.is_a? String
         schemes.each do |scheme|
           if params = @schemes[scheme]
             credential = nil
             if scheme.eql?(Scheme::DEVELOPER)
-              credential = developer_signature(request[:body], params[:privkey])
-            else
-              credential = compile_params(params)
+              params = { 
+                email: params[:email],
+                signature: developer_signature(request[:body], params[:privkey])
+              }
             end
+            credential = compile_params(params)
             return [scheme, credential]
           end
         end
@@ -116,7 +125,8 @@ module Round
       def developer_signature(request_body, privkey)
         body = request_body ? JSON.parse(request_body) : {}
         key = OpenSSL::PKey::RSA.new privkey
-        content = "#{JSON.generate(body)}-#{DateTime.new.strftime('%Y/%m/%d')}"
+        today = Date.today.strftime('%Y/%m/%d')
+        content = "#{body.to_json}-#{today}"
         signature = key.sign(OpenSSL::Digest::SHA256.new, content)
         Base64.urlsafe_encode64(signature)
       end

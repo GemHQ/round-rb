@@ -20,21 +20,4 @@ describe Round::Application do
       application.update(params)
     end
   end
-
-  describe '#wallets' do
-    before(:each) {
-      allow(application_resource).to receive(:api_token)
-      allow(application_resource).to receive(:url)
-    }
-
-    it 'returns a WalletCollection' do
-      expect(application.wallets).to be_a_kind_of(Round::WalletCollection)
-    end
-
-    it 'only fetches once' do
-      expect(application.resource.wallets).to receive(:list).once
-      application.wallets
-      application.wallets
-    end
-  end
 end

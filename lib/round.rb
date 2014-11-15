@@ -8,6 +8,8 @@ end
 require_relative "round/client"
 require_relative "round/base"
 require_relative "round/collection"
+require_relative "round/developer"
+require_relative "round/developer_collection"
 require_relative "round/user"
 require_relative "round/user_collection"
 require_relative "round/rules"

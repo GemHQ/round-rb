@@ -4,12 +4,11 @@ class Round::WalletCollection < Round::Collection
     Round::Wallet
   end
 
-  def create(options = {})
-    raise ArgumentError, "Name and passphrase are required" unless options[:passphrase] and options[:name]
+  def create(name, passphrase, options = {})
 
     multiwallet = options[:multiwallet] || CoinOp::Bit::MultiWallet.generate([:primary, :backup])
     network = options[:network] || "bitcoin_testnet"
-    wallet_resource = self.create_wallet_resource(multiwallet, options[:passphrase], options[:name], network)
+    wallet_resource = self.create_wallet_resource(multiwallet, passphrase, name, network)
 
     wallet = Round::Wallet.new(resource: wallet_resource, multiwallet: multiwallet)
     self.add(wallet)
