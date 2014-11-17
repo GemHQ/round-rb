@@ -3,7 +3,7 @@ PATH
   specs:
     round (0.0.1)
       coin-op (= 0.2.1)
-      patchboard (= 0.5.0)
+      patchboard (~> 0.5.1)
       rbnacl (~> 2.0)
 
 GEM
@@ -25,14 +25,14 @@ GEM
     diff-lcs (1.2.5)
     ffi (1.9.6)
     hashie (2.1.2)
-    http (0.6.2)
+    http (0.6.3)
       http_parser.rb (~> 0.6.0)
     http_parser.rb (0.6.0)
     json (1.8.1)
     method_source (0.8.2)
     money-tree (0.8.7)
       ffi
-    patchboard (0.5.0)
+    patchboard (0.5.1)
       hashie (~> 2.0)
       http (~> 0.5)
       json (~> 1.8)

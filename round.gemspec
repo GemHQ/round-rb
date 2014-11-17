@@ -19,17 +19,17 @@ Gem::Specification.new do |s|
   ] + Dir["lib/**/*.rb"]
   s.require_path = "lib"
 
-  s.add_dependency("patchboard", "0.5.0")
+  s.add_dependency("patchboard", "~> 0.5")
   s.add_dependency("rbnacl", "~> 2.0")
-  s.add_dependency("coin-op", "0.2.1")
+  s.add_dependency("coin-op", "~> 0.2")
 
   # RSpec test suite deps
-  s.add_development_dependency("rspec", "~> 3.0.0")
-  s.add_development_dependency("webmock", "~> 1.18.0")
-  s.add_development_dependency("vcr", "~> 2.9.2")
-  s.add_development_dependency("pry-byebug", "~> 1.3.3")
+  s.add_development_dependency("rspec", "~> 3.0")
+  s.add_development_dependency("webmock", "~> 1.18")
+  s.add_development_dependency("vcr", "~> 2.9")
+  s.add_development_dependency("pry-byebug", "~> 1.3")
 
   # Demo script deps
-  s.add_development_dependency("term-ansicolor", "~> 1.3.0")
+  s.add_development_dependency("term-ansicolor", "~> 1.3")
 end
 

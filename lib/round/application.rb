@@ -4,4 +4,8 @@ class Round::Application < Round::Base
     @users ||= Round::UserCollection.new(resource: @resource.users)
   end
 
+  def authorize_instance(name)
+    @resource.authorize_instance(name: name)
+  end
+
 end

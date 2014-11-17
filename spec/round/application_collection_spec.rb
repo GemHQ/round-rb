@@ -12,7 +12,7 @@ describe Round::ApplicationCollection do
       allow(application_collection.resource).to receive(:create).and_return(application_resource)
     }
 
-    let(:application) { application_collection.create(name: name, callback_url: callback_url) }
+    let(:application) { application_collection.create(name, callback_url) }
 
     it 'delegates to the resource' do
       expect(application_collection.resource).to receive(:create)
