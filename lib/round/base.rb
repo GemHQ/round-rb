@@ -4,6 +4,7 @@ class Round::Base
   def initialize(options = {})
     raise ArgumentError, 'A resource must be set on this object' unless options[:resource]
     @resource = options[:resource]
+    @client = options[:client]
   end
 
   def method_missing(meth, *args, &block)

@@ -52,23 +52,23 @@ module Round
     end
 
     def developers
-      DeveloperCollection.new(resource: resources.developers)
+      DeveloperCollection.new(resource: resources.developers, client: self)
     end
 
     def developer(email)
-      Developer.new(resource: resources.developer_query(email: @developer_email).get)
+      Developer.new(resource: resources.developer_query(email: @developer_email).get, client: self)
     end
 
     def users
-      UserCollection.new(resource: resources.users)
+      UserCollection.new(resource: resources.users, client: self)
     end
 
     def application(app_url)
-      Application.new(resource: resources.application(app_url).get)
+      Application.new(resource: resources.application(app_url), client: self)
     end
 
     def user(email)
-      User.new(resource: resources.user_query(email: email).get)
+      User.new(resource: resources.user_query(email: email), client: self)
     end
 
     class Context
