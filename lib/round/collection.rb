@@ -14,7 +14,7 @@ class Round::Collection < Round::Base
       content = self.content_type.new(options.merge(resource: resource))
       yield content if block
       self.add(content)
-    end
+    end if resource.list
   end
 
   def add(content)

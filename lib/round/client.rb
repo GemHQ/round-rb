@@ -10,35 +10,35 @@ module Round
 
   def self.client(url=nil)
     url ||= Round.url
-    patchboard = ::Patchboard.discover(url) { Client::Context.new }
-    Client.new(url, patchboard)
+    @patchboard ||= ::Patchboard.discover(url) { Client::Context.new }
+    Client.new(@patchboard.spawn)
   end
 
   class Client
 
-    def initialize(url, patchboard)
-      @url = url
-      @patchboard_client = patchboard.spawn
+    def initialize(patchboard_client)
+      @patchboard_client = patchboard_client
     end
 
     def authenticate_application(app_url, api_token, instance_id)
-      @app_url = app_url
       @patchboard_client
         .context
         .authorize(Context::Scheme::APPLICATION, api_token: api_token, instance_id: instance_id)
+      self.application(app_url)
     end
 
     def authenticate_developer(email, privkey)
-      @developer_email = email
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVELOPER, email: email, privkey: privkey)
+      self.developer(email)
     end
 
-    def authenticate_device(api_token, user_token, device_id)
+    def authenticate_device(email, api_token, user_token, device_id)
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVICE, api_token: api_token, user_token: user_token, device_id: device_id)
+      self.user(email)
     end
 
     def authenticate_otp(api_token, key = nil, secret = nil)
@@ -52,27 +52,23 @@ module Round
     end
 
     def developers
-      @developers ||= DeveloperCollection.new(resource: resources.developers)
+      DeveloperCollection.new(resource: resources.developers)
     end
 
-    def developer
-      @developer ||= Developer.new(resource: resources.developer_query(email: @developer_email).get)
+    def developer(email)
+      Developer.new(resource: resources.developer_query(email: @developer_email).get)
     end
 
     def users
-      @users ||= UserCollection.new(resource: resources.users)
+      UserCollection.new(resource: resources.users)
     end
 
-    def application
-      @application ||= Application.new(resource: resources.application(@app_url).get)
+    def application(app_url)
+      Application.new(resource: resources.application(app_url).get)
     end
 
-    def user(email = nil)
-      if email
-        User.new(resource: resources.user_query(email: email).get)
-      else
-        User.new(resource: resources.user(@user_url).get)
-      end
+    def user(email)
+      User.new(resource: resources.user_query(email: email).get)
     end
 
     class Context

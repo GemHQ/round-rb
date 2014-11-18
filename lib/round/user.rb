@@ -12,7 +12,8 @@ class Round::User < Round::Base
     @wallets ||= Round::WalletCollection.new(resource: @resource.wallets)
   end
 
-  def authorize_device(name, device_id)
+  def authorize_device(name, device_id, api_token, key = nil, secret = nil)
+    @resource.context.authenticate_otp(api_token, key, secret)
     @resource = @resource.authorize_device(name: name, device_id: device_id)
   rescue Patchboard::Action::ResponseError => e
     authorization_header = e.headers['Www-Authenticate']
