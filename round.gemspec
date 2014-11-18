@@ -20,7 +20,8 @@ Gem::Specification.new do |s|
   s.require_path = "lib"
 
   s.add_dependency("patchboard", "~> 0.5")
-  s.add_dependency("rbnacl", "~> 2.0")
+  s.add_dependency("rbnacl", "~> 3.0.0")
+  s.add_dependency("rbnacl-libsodium", "~> 1.0.0")
   s.add_dependency("coin-op", "~> 0.2")
 
   # RSpec test suite deps
