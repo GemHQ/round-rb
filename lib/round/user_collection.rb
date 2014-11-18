@@ -1,4 +1,4 @@
-class Round::UserCollection < Round::Base
+class Round::UserCollection < Round::Collection
 
   def create(email, passphrase)
     multiwallet = CoinOp::Bit::MultiWallet.generate([:primary, :backup])

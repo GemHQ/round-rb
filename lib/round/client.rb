@@ -35,11 +35,16 @@ module Round
         .authorize(Context::Scheme::DEVELOPER, email: email, privkey: privkey)
     end
 
-    def authenticate_device(user_url, api_token, user_token, device_id)
-      @user_url = user_url
+    def authenticate_device(api_token, user_token, device_id)
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVICE, api_token: api_token, user_token: user_token, device_id: device_id)
+    end
+
+    def authenticate_otp(api_token, key = nil, secret = nil)
+      @patchboard_client
+        .context
+        .authorize(Context::Scheme::OTP, api_token: api_token, key: key, secret: secret)
     end
 
     def resources
@@ -59,11 +64,15 @@ module Round
     end
 
     def application
-      @application ||= Application.new(resource: resources.application(@app_url))
+      @application ||= Application.new(resource: resources.application(@app_url).get)
     end
 
-    def user
-      @user ||= User.new(resource: resources.user(@user_url))
+    def user(email = nil)
+      if email
+        User.new(resource: resources.user_query(email: email).get)
+      else
+        User.new(resource: resources.user(@user_url).get)
+      end
     end
 
     class Context

@@ -10,8 +10,8 @@ class Round::AccountCollection < Round::Collection
     Round::Account
   end
 
-  def create(options = {})
-    resource = @resource.create(options)
+  def create(name)
+    resource = @resource.create(name: name)
     account = Round::Account.new(resource: resource, wallet: @wallet)
     self.add(account)
     account

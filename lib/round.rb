@@ -5,6 +5,7 @@ module Round
 
 end
 
+require_relative "round/helpers"
 require_relative "round/client"
 require_relative "round/base"
 require_relative "round/collection"

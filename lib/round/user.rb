@@ -1,4 +1,5 @@
 class Round::User < Round::Base
+  include Round::Helpers
 
   attr_reader :wallet
 
@@ -8,7 +9,14 @@ class Round::User < Round::Base
   end
 
   def wallets
-    @wallets ||= WalletCollection.new(resource: @resource.wallets)
+    @wallets ||= Round::WalletCollection.new(resource: @resource.wallets)
+  end
+
+  def authorize_device(name, device_id)
+    @resource = @resource.authorize_device(name: name, device_id: device_id)
+  rescue Patchboard::Action::ResponseError => e
+    authorization_header = e.headers['Www-Authenticate']
+    { key: extract_params(authorization_header)[:key] }
   end
 
 end
