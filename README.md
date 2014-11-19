@@ -1,14 +1,8 @@
 # Gem Ruby Client
 
+For detailed usage please visit the [documentation page](https://guide.gem.co)
+
 ## Installation
-
-### Install [libsodium](https://github.com/jedisct1/libsodium) 
-
-On OS X using [Brew](http://brew.sh/):
-
-    $ brew install libsodium
-
-Follow the instructions on the [libsodium](https://github.com/jedisct1/libsodium) Github page for installation instructions on *nix systems.
 
 ### Install gem dependencies:
 
@@ -16,83 +10,90 @@ Follow the instructions on the [libsodium](https://github.com/jedisct1/libsodium
 
 ### Build and install the gem:
 
-    $ gem build bitvault.gemspec
-    $ gem install bitvault
+    $ gem build round.gemspec
+    $ gem install round-0.0.1.gem
 
 ## Configuration
 
-You'll need to add bitvault-rb to your Gemfile:
+You'll need to add `round` to your Gemfile:
 
-    gem 'bitvault'
+    gem 'round'
 
 In Rails you may want to create a single instance of a client to be reused many times and store your credentials in a YAML file:
 
-__config/bitvault.yml__
+__config/round.yml__
 
     production:
         app_url: <PRODUCTION_APP_URL>
         api_token: <PRODUCTION_API_TOKEN>
+        instance_id: <PRODUCTION_INSTANCE_ID>
     
     development: 
         app_url: <DEVELOPMENT_APP_URL>
         api_token: <DEVELOPMENT_API_TOKEN>
+        instance_id: <DEVELOPMENT_INSTANCE_ID>
 
-__config/initializers/bitvault.rb__
+__config/initializers/round.rb__
 
-    config = YAML::load(File.read("#{Rails.root}/config/bitvault.yml"))[Rails.env]
+    config = YAML::load(File.read("#{Rails.root}/config/round.yml"))[Rails.env]
 
-    BITVAULT_CLIENT = BitVault::Patchboard.authed_client(app_url: config['app_url'], api_token: ['api_token'])
+    ROUND_CLIENT = Round.client
+    ROUND_CLIENT.authenticate_application(config[:app_url], config[:api_token], config[:instance_id])
     
 This is just a suggestion for a simple Rails setup, there are many other ways to do this.
 
-## Usage
+## Authentication
 
-For detailed usage please visit the [documentation page](http://docs.bitvault.io)
+You must authenticate to interact with the API. Depending on what you are trying to do there are different authentication schemes available.
 
-## Awesome things you can do
+### Developer
 
-Now that you have this thing installed, let's do some cool stuff with it.
+Authenticating as a developer will allow you create and manage your applications. Authenticating in this way requires the developer's email, as well as their private key. The method will return a `Round::Developer` object.
 
-### Spawning a client
+    developer = ROUND_CLIENT.authenticate_developer(<DEVELOPER_EMAIL>, <DEVELOPER_PRIVATE_KEY>)
 
-If your use case requires you to have several clients authed with different credentials you can spawn as many as you'd like.
+### Application
 
-You can do this 2 ways:
-    
-    client = BitVault::Patchboard.authed_client(email: <EMAIL>, password: <PASSWORD>)
-    
-or
+Authenticating as an application will give you read-only access to your users and their wallets. This requires the `app_url`, the `api_token`, and an `instance_id`. The method will return a `Round::Application` object.
 
-    client = BitVault::Patchboard.authed_client(app_url: <APP_URL>, api_token: <API_TOKEN>)
+    application = ROUND_CLIENT.authenticate_application(<APP_URL>, <API_TOKEN>, <INSTANCE_ID>)
 
-You can do basic user management with a client authed using user credentials, but in order to do any operations on wallets or accounts you'll need to do the second option to auth a client using application credentials.
+Your `instance_id` is provided to you via email when you authorize an application instance using Developer auth:
+
+    developer = ROUND_CLIENT.authenticate_developer(<DEVELOPER_EMAIL>, <DEVELOPER_PRIVATE_KEY>)
+    application = developer.applications.first
+    application.authorize_instance
+
+### Device
+
+Authenticating as a device allows you to perform all actions on a wallet permitted by a user. Requires an `email`, an `api_token`, a `user_token`, and a `device_id`. The method will return a `Round::User` object.
+
+    user = ROUND_CLIENT.authenticate_device(<EMAIL>, <API_TOKEN>, <USER_TOKEN>, <DEVICE_ID>)
+
+The `user_token` is obtained by a user authorizing your application to operate on their wallet in the `User#authorize_device` call:
+
+    user = client.user(<EMAIL>)
+    key = user.authorize_device(<DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>)[:key]
+
+This will trigger an out of band email to the user that will include a one time pass that will allow the authorization to complete by running the same call with that value:
+
+    user.authorize_device(<DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>, key, <OTP_FROM_EMAIL>)
+
+## Basic Usage
 
 ### Wallets
 
-Once you've got a client with an Application context you can start to do fun stuff like create wallets:
+Once you've got a User authenticated with a device you can start to do fun stuff like create wallets:
 
-    wallet = client.application.wallets.create(name: <WALLET_NAME>, passphrase: <WALLET_PASSPHRASE>)
+    wallet = user.wallets.create(name: <WALLET_NAME>, passphrase: <WALLET_PASSPHRASE>)
     
 __IMPORTANT__: Creating a wallet this way will automatically generate your backup key tree. You can get it by accessing `BitVault::Wallet#multiwallet`. This will return the `CoinOp::Bit::MultiWallet` object containing both private seeds. __Make sure you save it somewhere__.
-
-Alternatively you can generate your own `Coin::Bit::MultiWallet` and pass it as an option to the wallet create call:
-
-    multiwallet = Coin::Bit::Multiwallet.generate [:primary, :backup]
-    wallet = client.application.wallets.create(name: <WALLET_NAME>, passphrase: <WALLET_PASSPHRASE>, multiwallet: multiwallet)
-    
-You can also access existing wallets by name:
-
-    wallet = client.application.wallets['my funds']
     
 ### Accounts
 
 Once you have a wallet you're going to want to send and receive funds from it, right? You do this by creating accounts within the wallet:
 
-    account = wallet.accounts.create(name: <ACCOUNT_NAME>)
-    
-Existing accounts can also be accessed by name, just like the wallets:
-
-    account = wallet.accounts['office supplies']
+    account = wallet.accounts.create(<ACCOUNT_NAME>)
     
 To receive payments, you'll have to generate a new address:
 
@@ -106,16 +107,4 @@ You can add as many payees as you need.
 Don't forget to unlock the wallet before trying to pay someone:
 
     account.wallet.unlock(<PASSPHRASE>)
-    
-### Transfers
-
-Need to move money between two accounts? Try this:
-
-    source_account = wallet.accounts['office supplies']
-    destination_account = wallet.accounts['furniture']
-    wallet.transfer(source: source_account, desination: destination_account, amount: <TRANSFER_AMOUNT>)
-    
-Again, don't forget to unlock the wallet before attempting this:
-
-    wallet.unlock(<PASSPHRASE>)
     
