@@ -1,3 +1,4 @@
+require 'rbnacl/libsodium'
 require 'coin-op'
 
 # Establish the namespace.

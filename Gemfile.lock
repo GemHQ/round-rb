@@ -2,9 +2,10 @@ PATH
   remote: .
   specs:
     round (0.0.1)
-      coin-op (= 0.2.1)
-      patchboard (~> 0.5.1)
-      rbnacl (~> 2.0)
+      coin-op (~> 0.2)
+      patchboard (~> 0.5)
+      rbnacl (~> 3.0.0)
+      rbnacl-libsodium (~> 1.0.0)
 
 GEM
   remote: http://rubygems.org/
@@ -43,8 +44,10 @@ GEM
     pry-byebug (1.3.3)
       byebug (~> 2.7)
       pry (~> 0.10)
-    rbnacl (2.0.0)
+    rbnacl (3.0.1)
       ffi
+    rbnacl-libsodium (1.0.0)
+      rbnacl (~> 3.0, >= 3.0.1)
     rspec (3.0.0)
       rspec-core (~> 3.0.0)
       rspec-expectations (~> 3.0.0)
@@ -71,9 +74,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  pry-byebug (~> 1.3.3)
+  pry-byebug (~> 1.3)
   round!
-  rspec (~> 3.0.0)
-  term-ansicolor (~> 1.3.0)
-  vcr (~> 2.9.2)
-  webmock (~> 1.18.0)
+  rspec (~> 3.0)
+  term-ansicolor (~> 1.3)
+  vcr (~> 2.9)
+  webmock (~> 1.18)

@@ -7,6 +7,10 @@ class Round::Base
     @client = options[:client]
   end
 
+  def refresh
+    @resource = @resource.get
+  end
+
   def method_missing(meth, *args, &block)
     @resource.send(meth, *args, &block)
   end

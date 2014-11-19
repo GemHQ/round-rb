@@ -8,13 +8,18 @@ class Round::Collection < Round::Base
     self.populate_data(options, &block)
   end
 
-  def populate_data(options, &block)
+  def populate_data(options = {}, &block)
     @collection ||= []
-    resource.list.each do |resource|
-      content = self.content_type.new(options.merge(resource: resource))
+    @resource.list.each do |resource|
+      content = self.content_type.new(options.merge(resource: resource, client: @client))
       yield content if block
       self.add(content)
-    end if resource.list
+    end if @resource.list
+  end
+
+  def refresh(options = {})
+    @collection = []
+    populate_data(options)
   end
 
   def add(content)

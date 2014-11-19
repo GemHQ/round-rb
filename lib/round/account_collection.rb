@@ -17,4 +17,8 @@ class Round::AccountCollection < Round::Collection
     account
   end
 
+  def refresh
+    super(wallet: @wallet)
+  end
+
 end
