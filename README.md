@@ -78,12 +78,12 @@ user = ROUND_CLIENT.authenticate_device(<EMAIL>, <API_TOKEN>, <USER_TOKEN>, <DEV
 The `user_token` is obtained by a user authorizing your application to operate on their wallet in the `User#authorize_device` call:
 ```ruby
 user = client.user(<EMAIL>)
-key = user.authorize_device(<DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>)[:key]
+key = user.begin_device_authorization(<DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>)
 ```
 
 This will trigger an out of band email to the user that will include a one time pass that will allow the authorization to complete by running the same call with that value:
 ```ruby
-user.authorize_device(<DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>, key, <OTP_FROM_EMAIL>)
+user.complete_device_authorization(<DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>, key, <OTP_FROM_EMAIL>)
 ```
 
 ## Basic Usage
