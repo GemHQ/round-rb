@@ -12,6 +12,10 @@ class Round::User < Round::Base
     @wallets ||= Round::WalletCollection.new(resource: @resource.wallets)
   end
 
+  def default_wallet
+    Wallet.new(resource: @resource.default_wallet, client: @client)
+  end
+
   def begin_device_authorization(name, device_id, api_token)
     @client.authenticate_otp(api_token, key, secret)
     @resource = @resource.authorize_device(name: name, device_id: device_id)

@@ -115,9 +115,11 @@ module Round
           if params = @schemes[scheme]
             credential = nil
             if scheme.eql?(Scheme::DEVELOPER)
+              timestamp = Time.now.to_i
               params = { 
                 email: params[:email],
-                signature: developer_signature(request[:body], params[:privkey])
+                signature: developer_signature(request[:body], params[:privkey], timestamp),
+                timestamp: timestamp
               }
             end
             credential = compile_params(params)
@@ -127,11 +129,10 @@ module Round
         raise "Action: #{action}.  No authorization available for '#{schemes}'"
       end
 
-      def developer_signature(request_body, privkey)
+      def developer_signature(request_body, privkey, timestamp)
         body = request_body ? JSON.parse(request_body) : {}
         key = OpenSSL::PKey::RSA.new privkey
-        today = Date.today.strftime('%Y/%m/%d')
-        content = "#{body.to_json}-#{today}"
+        content = "#{body.to_json}-#{timestamp}"
         signature = key.sign(OpenSSL::Digest::SHA256.new, content)
         Base64.urlsafe_encode64(signature)
       end
