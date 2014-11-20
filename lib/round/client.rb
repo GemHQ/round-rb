@@ -56,7 +56,7 @@ module Round
     end
 
     def developer(email)
-      Developer.new(resource: resources.developer_query(email: @developer_email).get, client: self)
+      Developer.new(resource: resources.developer_query(email: email).get, client: self)
     end
 
     def users
