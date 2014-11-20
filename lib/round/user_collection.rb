@@ -16,7 +16,7 @@ class Round::UserCollection < Round::Collection
       wallet: wallet
     }
     user_resource = @resource.create(params)
-    Round::User.new(resource: user_resource, wallet: multiwallet)
+    return multiwallet, Round::User.new(resource: user_resource)
   end
 
 end

@@ -1,13 +1,6 @@
 class Round::User < Round::Base
   include Round::Helpers
 
-  attr_reader :wallet
-
-  def initialize(options = {})
-    super
-    @wallet = options[:wallet]
-  end
-
   def wallets
     @wallets ||= Round::WalletCollection.new(resource: @resource.wallets)
   end
