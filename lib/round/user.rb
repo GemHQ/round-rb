@@ -10,7 +10,7 @@ class Round::User < Round::Base
   end
 
   def begin_device_authorization(name, device_id, api_token)
-    @client.authenticate_otp(api_token, key, secret)
+    @client.authenticate_otp(api_token)
     @resource = @resource.authorize_device(name: name, device_id: device_id)
   rescue Patchboard::Action::ResponseError => e
     authorization_header = e.headers['Www-Authenticate']
@@ -22,6 +22,9 @@ class Round::User < Round::Base
     @resource = @resource.authorize_device(name: name, device_id: device_id)
     @client.authenticate_device(self.email, api_token, self.user_token, device_id)
     self
+  rescue Patchboard::Action::ResponseError => e
+    authorization_header = e.headers['Www-Authenticate']
+    extract_params(authorization_header)[:key]
   end
 
 end
