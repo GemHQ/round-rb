@@ -14,7 +14,12 @@ class Round::User < Round::Base
     @resource = @resource.authorize_device(name: name, device_id: device_id)
   rescue Patchboard::Action::ResponseError => e
     authorization_header = e.headers['Www-Authenticate']
-    extract_params(authorization_header)[:key]
+    key = extract_params(authorization_header)[:key]
+    if key
+      key
+    else
+      raise Round::Client::OTPConflictError.new("This user has too many pending authorizations")
+    end
   end
 
   def complete_device_authorization(name, device_id, api_token, key = nil, secret = nil)
@@ -24,7 +29,12 @@ class Round::User < Round::Base
     self
   rescue Patchboard::Action::ResponseError => e
     authorization_header = e.headers['Www-Authenticate']
-    extract_params(authorization_header)[:key]
+    new_key = extract_params(authorization_header)[:key]
+    if new_key
+      new_key
+    else
+      raise Round::Client::UnknownKeyError.new("The OTP key you provided doesn't exist")
+    end
   end
 
 end

@@ -34,7 +34,7 @@ module Round
       self.developer(email)
     end
 
-    def authenticate_device(email, api_token, user_token, device_id)
+    def authenticate_device(api_token, user_token, device_id, email = nil, user_url = nil)
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVICE, api_token: api_token, user_token: user_token, device_id: device_id)
@@ -143,6 +143,16 @@ module Round
         %Q(#<#{self.class}:0x#{id})
       end
     end
+
+    class UnknownKeyError < StandardError
+      
+    end
+
+    class OTPConflictError < StandardError
+
+    end
+
+
   end
 
 end

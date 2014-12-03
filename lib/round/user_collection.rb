@@ -16,7 +16,7 @@ class Round::UserCollection < Round::Collection
       wallet: wallet
     }
     user_resource = @resource.create(params)
-    return multiwallet, Round::User.new(resource: user_resource)
+    return multiwallet.trees[:backup].to_serialized_address(:private), Round::User.new(resource: user_resource)
   end
 
 end
