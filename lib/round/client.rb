@@ -5,7 +5,7 @@ require "date"
 module Round
 
   def self.url
-    "https://api-develop.gem.co"
+    "https://developsb.gem.co"
   end
 
   def self.client(url=nil)
