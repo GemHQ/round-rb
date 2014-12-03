@@ -1,3 +1,5 @@
-class Round::Address < Round::Base
-  
+module Round
+  class Address < Round::Base
+    
+  end
 end

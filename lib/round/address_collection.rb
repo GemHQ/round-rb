@@ -1,13 +1,15 @@
-class Round::AddressCollection < Round::Collection
+module Round
+  class AddressCollection < Round::Collection
 
-  def content_type
-    Round::Address
-  end
+    def content_type
+      Round::Address
+    end
 
-  def create
-    resource = @resource.create
-    address = Round::Address.new(resource: resource)
-    self.add(address)
-    address
+    def create
+      resource = @resource.create
+      address = Round::Address.new(resource: resource)
+      self.add(address)
+      address
+    end
   end
 end

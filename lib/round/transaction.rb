@@ -1,3 +1,5 @@
-class Round::Transaction < Round::Base
+module Round
+  class Transaction < Round::Base
 
+  end
 end
