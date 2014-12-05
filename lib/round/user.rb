@@ -14,6 +14,7 @@ module Round
       @client.authenticate_otp(api_token)
       @resource = @resource.authorize_device(name: name, device_id: device_id)
     rescue Patchboard::Action::ResponseError => e
+      raise e unless e.status == 401
       authorization_header = e.headers['Www-Authenticate']
       key = extract_params(authorization_header)[:key]
       if key
@@ -29,6 +30,7 @@ module Round
       @client.authenticate_device(self.email, api_token, self.user_token, device_id)
       self
     rescue Patchboard::Action::ResponseError => e
+      raise e unless e.status == 401
       authorization_header = e.headers['Www-Authenticate']
       new_key = extract_params(authorization_header)[:key]
       if new_key
