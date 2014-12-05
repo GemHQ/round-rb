@@ -144,12 +144,16 @@ module Round
       end
     end
 
-    class UnknownKeyError < StandardError
-      
-    end
+    class UnknownKeyError < StandardError; end
+    class OTPConflictError < StandardError; end
 
-    class OTPConflictError < StandardError
+    class OTPAuthFailureError < StandardError
+      attr_reader :key
 
+      def initialize(key)
+        super()
+        @key = key
+      end
     end
 
 

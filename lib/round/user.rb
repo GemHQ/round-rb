@@ -34,7 +34,7 @@ module Round
       authorization_header = e.headers['Www-Authenticate']
       new_key = extract_params(authorization_header)[:key]
       if new_key
-        new_key
+        raise Round::Client::OTPAuthFailureError.new(new_key)
       else
         raise Round::Client::UnknownKeyError.new("The OTP key you provided doesn't exist")
       end
