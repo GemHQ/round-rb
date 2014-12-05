@@ -27,7 +27,7 @@ module Round
     def complete_device_authorization(name, device_id, api_token, key = nil, secret = nil)
       @client.authenticate_otp(api_token, key, secret)
       @resource = @resource.authorize_device(name: name, device_id: device_id)
-      @client.authenticate_device(self.email, api_token, self.user_token, device_id)
+      @client.authenticate_device(api_token, self.user_token, device_id, self.email)
       self
     rescue Patchboard::Action::ResponseError => e
       raise e unless e.status == 401
