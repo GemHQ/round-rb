@@ -17,7 +17,7 @@ module Round
       }
       user_resource = @resource.create(params)
       return multiwallet.trees[:backup].to_serialized_address(:private), 
-        Round::User.new(resource: user_resource, client: self.client)
+        Round::User.new(resource: user_resource, client: @client)
     end
 
   end

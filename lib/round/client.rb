@@ -4,24 +4,23 @@ require "date"
 
 module Round
 
-  def self.url
-    "https://developsb.gem.co"
-  end
+  MAINNET_URL = "https://api.gem.co"
+  SANDBOX_URL = "https://api-sandbox.gem.co"
 
-  def self.client(url = nil, options = {})
-    url ||= Round.url
-    options[:network] ||= :bitcoin_testnet
+  def self.client(network = :bitcoin_testnet, url = nil)
+    url ||= network.eql?(:bitcoin_testnet) ? SANDBOX_URL : MAINNET_URL
+
     @patchboard ||= ::Patchboard.discover(url) { Client::Context.new }
-    Client.new(@patchboard.spawn, options)
+    Client.new(@patchboard.spawn, network)
   end
 
   class Client
 
     attr_reader :network
 
-    def initialize(patchboard_client, options)
+    def initialize(patchboard_client, network)
       @patchboard_client = patchboard_client
-      @network = options[:network]
+      @network = network
     end
 
     def authenticate_application(app_url, api_token, instance_id)

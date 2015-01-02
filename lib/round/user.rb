@@ -3,7 +3,7 @@ module Round
     include Round::Helpers
 
     def wallets
-      @wallets ||= Round::WalletCollection.new(resource: @resource.wallets)
+      Round::WalletCollection.new(resource: @resource.wallets, client: @client)
     end
 
     def default_wallet
