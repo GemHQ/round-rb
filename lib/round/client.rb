@@ -8,16 +8,20 @@ module Round
     "https://developsb.gem.co"
   end
 
-  def self.client(url=nil)
+  def self.client(url = nil, options = {})
     url ||= Round.url
+    options[:network] ||= :bitcoin_testnet
     @patchboard ||= ::Patchboard.discover(url) { Client::Context.new }
-    Client.new(@patchboard.spawn)
+    Client.new(@patchboard.spawn, options)
   end
 
   class Client
 
-    def initialize(patchboard_client)
+    attr_reader :network
+
+    def initialize(patchboard_client, options)
       @patchboard_client = patchboard_client
+      @network = options[:network]
     end
 
     def authenticate_application(app_url, api_token, instance_id)
