@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "round"
-  s.version = "0.0.1"
+  s.version = "0.5.1"
   s.license = "MIT"
   s.authors = [
     "Matthew King",
@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.require_path = "lib"
 
   s.add_dependency("patchboard", "~> 0.5")
-  s.add_dependency("rbnacl", "~> 3.0.0")
+  s.add_dependency("rbnacl", "~> 3.1.0")
   s.add_dependency("rbnacl-libsodium", "~> 1.0.0")
   s.add_dependency("coin-op", "~> 0.2")
 
@@ -33,4 +33,3 @@ Gem::Specification.new do |s|
   # Demo script deps
   s.add_development_dependency("term-ansicolor", "~> 1.3")
 end
-

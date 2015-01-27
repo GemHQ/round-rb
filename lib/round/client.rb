@@ -15,6 +15,7 @@ module Round
   end
 
   class Client
+    include Round::Helpers
 
     attr_reader :network
 
@@ -74,6 +75,42 @@ module Round
       User.new(resource: resources.user_query(email: email), client: self)
     end
 
+    def begin_device_authorization(email, device_name, device_id, api_token)
+      self.authenticate_otp(api_token)
+      user(email).resource.authorize_device(name: device_name,
+                                            device_id: device_id)
+    rescue Patchboard::Action::ResponseError => e
+      authorization_header = e.headers['Www-Authenticate']
+      key = extract_params(authorization_header)[:key]
+      if key
+        key
+      elsif e.message == 'unauthorized'
+        raise Round::Client::OTPConflictError.new("This user has too many pending authorizations")
+      else
+        raise e
+      end
+    end
+
+    def complete_device_authorization(email, device_name, device_id, api_token,
+                                      key = nil, secret = nil)
+      self.authenticate_otp(api_token, key, secret)
+      resource = user(email).authorize_device(name: device_name,
+                                              device_id: device_id)
+
+      self.authenticate_device(email, api_token, resource.user_token, device_id)
+      User.new(resource: resource, client: self)
+
+    rescue Patchboard::Action::ResponseError => e
+      authorization_header = e.headers['Www-Authenticate']
+      new_key = extract_params(authorization_header)[:key]
+      if new_key
+        new_key
+      else
+        raise Round::Client::UnknownKeyError.new("The user or OTP key you provided doesn't exist")
+      end
+    end
+
+
     class Context
       module Scheme
         DEVELOPER = "Gem-Developer"
@@ -84,7 +121,7 @@ module Round
         OTP = "Gem-OOB-OTP"
       end
 
-      SCHEMES = [Scheme::DEVELOPER, Scheme::DEVELOPER_SESSION, 
+      SCHEMES = [Scheme::DEVELOPER, Scheme::DEVELOPER_SESSION,
         Scheme::DEVICE, Scheme::APPLICATION, Scheme::USER, Scheme::OTP]
 
       attr_accessor :schemes
@@ -119,7 +156,7 @@ module Round
             credential = nil
             if scheme.eql?(Scheme::DEVELOPER)
               timestamp = Time.now.to_i
-              params = { 
+              params = {
                 email: params[:email],
                 signature: developer_signature(request[:body], params[:privkey], timestamp),
                 timestamp: timestamp
@@ -163,4 +200,3 @@ module Round
   end
 
 end
-
