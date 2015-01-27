@@ -11,7 +11,7 @@ For detailed usage please visit the [documentation page](https://guide.gem.co)
 ### Build and install the gem:
 
     $ gem build round.gemspec
-    $ gem install round-0.0.1.gem
+    $ gem install round-0.5.1.gem
 
 ## Configuration
 
@@ -29,7 +29,7 @@ production:
     api_token: <PRODUCTION_API_TOKEN>
     instance_id: <PRODUCTION_INSTANCE_ID>
 
-development: 
+development:
     app_url: <DEVELOPMENT_APP_URL>
     api_token: <DEVELOPMENT_API_TOKEN>
     instance_id: <DEVELOPMENT_INSTANCE_ID>
@@ -42,7 +42,7 @@ config = YAML::load(File.read("#{Rails.root}/config/round.yml"))[Rails.env]
 ROUND_CLIENT = Round.client
 ROUND_CLIENT.authenticate_application(config[:app_url], config[:api_token], config[:instance_id])
 ```
-    
+
 This is just a suggestion for a simple Rails setup, there are many other ways to do this.
 
 ## Authentication
@@ -95,16 +95,16 @@ Once you've got a User authenticated with a device you can start to do fun stuff
 ```ruby
 wallet = user.wallets.create(name: <WALLET_NAME>, passphrase: <WALLET_PASSPHRASE>)
 ```
-    
+
 __IMPORTANT__: Creating a wallet this way will automatically generate your backup key tree. You can get it by accessing `BitVault::Wallet#multiwallet`. This will return the `CoinOp::Bit::MultiWallet` object containing both private seeds. __Make sure you save it somewhere__.
-    
+
 ### Accounts
 
 Once you have a wallet you're going to want to send and receive funds from it, right? You do this by creating accounts within the wallet:
 ```ruby
 account = wallet.accounts.create(<ACCOUNT_NAME>)
 ```
-    
+
 To receive payments, you'll have to generate a new address:
 ```ruby
 address = account.addresses.create
@@ -119,4 +119,4 @@ You can add as many payees as you need.
 Don't forget to unlock the wallet before trying to pay someone:
 ```ruby
 account.wallet.unlock(<PASSPHRASE>)
-```    
+```
