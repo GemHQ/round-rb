@@ -7,7 +7,16 @@ module Round
   MAINNET_URL = "https://api.gem.co"
   SANDBOX_URL = "https://api-sandbox.gem.co"
 
+  NETWORKS = {
+    testnet: :bitcoin_testnet,
+    bitcoin_testnet: :bitcoin_testnet,
+    testnet3: :bitcoin_testnet,
+    bitcoin: :bitcoin,
+    mainnet: :bitcoin,
+  }
+
   def self.client(network = :bitcoin_testnet, url = nil)
+    network = NETWORKS[network] || :bitcoin_testnet
     url ||= network.eql?(:bitcoin_testnet) ? SANDBOX_URL : MAINNET_URL
 
     @patchboard ||= ::Patchboard.discover(url) { Client::Context.new }
