@@ -6,6 +6,7 @@ module Round
       primary_seed = multiwallet.trees[:primary].to_serialized_address(:private)
       encrypted_seed = CoinOp::Crypto::PassphraseBox.encrypt(passphrase, primary_seed)
       wallet = {
+        name: "default",
         network: @client.network,
         backup_public_seed: multiwallet.trees[:backup].to_serialized_address,
         primary_public_seed: multiwallet.trees[:primary].to_serialized_address,
@@ -13,10 +14,10 @@ module Round
       }
       params = {
         email: email,
-        wallet: wallet
+        default_wallet: wallet
       }
       user_resource = @resource.create(params)
-      return multiwallet.trees[:backup].to_serialized_address(:private), 
+      return multiwallet.trees[:backup].to_serialized_address(:private),
         Round::User.new(resource: user_resource, client: @client)
     end
 
