@@ -11,7 +11,7 @@ For detailed usage please visit the [documentation page](https://guide.gem.co)
 ### Build and install the gem:
 
     $ gem build round.gemspec
-    $ gem install round-0.5.1.gem
+    $ gem install round-0.6.0.gem
 
 ## Configuration
 

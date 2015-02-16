@@ -1,4 +1,10 @@
 
+0.6.0 / 2015-02-16
+==================
+
+  * renamed wallet to default_wallet
+  * added network mapping to client
+
 0.5.1 / 2015-01-27
 ==================
 
