@@ -10,6 +10,7 @@ module Round
 
     def refresh
       @resource = @resource.get
+      self
     end
 
     def method_missing(meth, *args, &block)
