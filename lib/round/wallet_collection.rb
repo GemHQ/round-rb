@@ -14,7 +14,7 @@ module Round
       wallet = Round::Wallet.new(resource: wallet_resource, multiwallet: multiwallet)
       self.add(wallet)
       
-      wallet
+      return multiwallet.trees[:backup].to_serialized_address(:private), wallet
     end
 
     def create_wallet_resource(multiwallet, passphrase, name, network)
