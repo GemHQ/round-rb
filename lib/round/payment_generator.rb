@@ -1,10 +1,12 @@
 module Round
   class PaymentGenerator < Round::Base
 
-    def unsigned(payees)
+    def unsigned(payees, confirmations = 6)
       raise 'Must have list of payees' unless payees
 
-      payment_resource = @resource.create self.outputs_from_payees(payees)
+      payment_resource = @resource.create(
+        { confirmations: confirmations }.merge(self.outputs_from_payees(payees))
+      )
       Round::Payment.new(resource: payment_resource)
     end
 
