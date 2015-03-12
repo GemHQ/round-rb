@@ -2,3 +2,4 @@ log
 *.gem
 *~
 demo-*.yaml
+scripts/

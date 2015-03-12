@@ -9,11 +9,11 @@ module Round
       @wallet = options[:wallet]
     end
 
-    def pay(payees, options = {})
+    def pay(payees, confirmations = 6)
       raise ArgumentError, 'Payees must be specified' unless payees
       raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 
-      payment = self.payments.unsigned(payees)
+      payment = self.payments.unsigned(payees, confirmations)
       payment.sign(@wallet.multiwallet)
 
       payment
@@ -31,5 +31,5 @@ module Round
       @payments ||= Round::PaymentGenerator.new(resource: @resource.payments, client: @client)
     end
 
-  end 
+  end
 end
