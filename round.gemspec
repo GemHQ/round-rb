@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "round"
-  s.version = "0.6.0"
+  s.version = "0.6.3"
   s.license = "MIT"
   s.authors = [
     "Matthew King",

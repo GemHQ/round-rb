@@ -33,31 +33,41 @@ module Round
       @network = network
     end
 
-    def authenticate_application(app_url, api_token, instance_id)
+    def authenticate_application(app_url: nil, api_token: nil, instance_id: nil)
+      raise ArgumentError 'app_url is a required argument' unless app_url
+      raise ArgumentError 'api_token is a required argument' unless api_token
+      raise ArgumentError 'instance_id is a required argument' unless instance_id
+
       @patchboard_client
         .context
-        .authorize(Context::Scheme::APPLICATION, api_token: api_token, instance_id: instance_id)
+        .authorize(Context::Scheme::APPLICATION, 
+          api_token: api_token, instance_id: instance_id)
       self.application(app_url)
     end
 
-    def authenticate_developer(email, privkey)
+    def authenticate_developer(email: nil, privkey: nil)
+      raise ArgumentError 'email is a required argument' unless email
+      raise ArgumentError 'privkey is a required argument' unless privkey
+
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVELOPER, email: email, privkey: privkey)
-      self.developer(email)
+      self.developer(email).refresh
     end
 
-    def authenticate_device(api_token, user_token, device_id, email = nil, user_url = nil)
+    def authenticate_device(email: nil, api_token: nil, user_token: nil, device_id: nil)
       @patchboard_client
         .context
-        .authorize(Context::Scheme::DEVICE, api_token: api_token, user_token: user_token, device_id: device_id)
-      self.user(email)
+        .authorize(Context::Scheme::DEVICE, 
+          api_token: api_token, user_token: user_token, device_id: device_id)
+      self.user(email).refresh
     end
 
-    def authenticate_otp(api_token, key = nil, secret = nil)
+    def authenticate_otp(api_token: nil, key: nil, secret: nil)
       @patchboard_client
         .context
-        .authorize(Context::Scheme::OTP, api_token: api_token, key: key, secret: secret)
+        .authorize(Context::Scheme::OTP, 
+          api_token: api_token, key: key, secret: secret)
     end
 
     def resources
@@ -69,7 +79,8 @@ module Round
     end
 
     def developer(email)
-      Developer.new(resource: resources.developer_query(email: email).get, client: self)
+      raise ArgumentError 'email is a required argument' unless email
+      Developer.new(resource: resources.developer_query(email: email), client: self)
     end
 
     def users
@@ -77,15 +88,19 @@ module Round
     end
 
     def application(app_url)
+      raise ArgumentError 'app_url is a required argument' unless app_url
       Application.new(resource: resources.application(app_url), client: self)
     end
 
     def user(email)
+      raise ArgumentError 'email is a required argument' unless email
       User.new(resource: resources.user_query(email: email), client: self)
     end
 
-    def begin_device_authorization(email, device_name, device_id, api_token)
-      self.authenticate_otp(api_token)
+    def begin_device_authorization(email: nil, 
+      device_name: nil, device_id: nil, api_token: nil)
+
+      self.authenticate_otp(api_token: api_token)
       user(email).resource.authorize_device(name: device_name,
                                             device_id: device_id)
     rescue Patchboard::Action::ResponseError => e
@@ -100,14 +115,16 @@ module Round
       end
     end
 
-    def complete_device_authorization(email, device_name, device_id, api_token,
-                                      key = nil, secret = nil)
-      self.authenticate_otp(api_token, key, secret)
+    def complete_device_authorization(email: nil, 
+      device_name: nil, device_id: nil, api_token: nil,
+      key: nil, secret: nil)
+
+      self.authenticate_otp(api_token: api_token, key: key, secret: secret)
       resource = user(email).authorize_device(name: device_name,
                                               device_id: device_id)
 
-      self.authenticate_device(email, api_token, resource.user_token, device_id)
-      User.new(resource: resource, client: self)
+      self.authenticate_device(email: email, api_token: api_token, user_token: resource.user_token, device_id: device_id)
+      User.new(resource: resource, client: self).refresh
 
     rescue Patchboard::Action::ResponseError => e
       authorization_header = e.headers['Www-Authenticate']
