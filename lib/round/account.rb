@@ -20,15 +20,15 @@ module Round
     end
 
     def addresses
-      @addresses ||= Round::AddressCollection.new(resource: @resource.addresses)
+      @addresses ||= Round::AddressCollection.new(resource: @resource.addresses, client: @client)
     end
 
     def transactions
-      Round::TransactionCollection.new(resource: @resource.transactions)
+      Round::TransactionCollection.new(resource: @resource.transactions, client: @client)
     end
 
     def payments
-      @payments ||= Round::PaymentGenerator.new(resource: @resource.payments)
+      @payments ||= Round::PaymentGenerator.new(resource: @resource.payments, client: @client)
     end
 
   end 

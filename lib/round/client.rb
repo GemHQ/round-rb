@@ -45,7 +45,8 @@ module Round
       self.application(app_url)
     end
 
-    def authenticate_developer(email, privkey: nil)
+    def authenticate_developer(email: nil, privkey: nil)
+      raise ArgumentError 'email is a required argument' unless email
       raise ArgumentError 'privkey is a required argument' unless privkey
 
       @patchboard_client
@@ -54,7 +55,7 @@ module Round
       self.developer(email).refresh
     end
 
-    def authenticate_device(email, api_token: nil, user_token: nil, device_id: nil)
+    def authenticate_device(email: nil, api_token: nil, user_token: nil, device_id: nil)
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVICE, 
@@ -62,7 +63,7 @@ module Round
       self.user(email).refresh
     end
 
-    def authenticate_otp(api_token, key: nil, secret: nil)
+    def authenticate_otp(api_token: nil, key: nil, secret: nil)
       @patchboard_client
         .context
         .authorize(Context::Scheme::OTP, 
@@ -99,7 +100,7 @@ module Round
     def begin_device_authorization(email: nil, 
       device_name: nil, device_id: nil, api_token: nil)
 
-      self.authenticate_otp(api_token)
+      self.authenticate_otp(api_token: api_token)
       user(email).resource.authorize_device(name: device_name,
                                             device_id: device_id)
     rescue Patchboard::Action::ResponseError => e
@@ -118,11 +119,11 @@ module Round
       device_name: nil, device_id: nil, api_token: nil,
       key: nil, secret: nil)
 
-      self.authenticate_otp(api_token, key, secret)
+      self.authenticate_otp(api_token: api_token, key: key, secret: secret)
       resource = user(email).authorize_device(name: device_name,
                                               device_id: device_id)
 
-      self.authenticate_device(email, api_token, resource.user_token, device_id)
+      self.authenticate_device(email: email, api_token: api_token, user_token: resource.user_token, device_id: device_id)
       User.new(resource: resource, client: self).refresh
 
     rescue Patchboard::Action::ResponseError => e
