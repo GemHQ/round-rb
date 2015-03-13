@@ -26,7 +26,7 @@ module Round
 
     def add(content)
       @collection << content
-      if content.name
+      if content.respond_to? :name
         @hash[content.name] = content
       else
         @hash[content.key] = content
