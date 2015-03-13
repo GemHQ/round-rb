@@ -1,6 +1,8 @@
+require_relative 'lib/round/version'
+
 Gem::Specification.new do |s|
   s.name = "round"
-  s.version = "0.6.3"
+  s.version = Round::VERSION
   s.license = "MIT"
   s.authors = [
     "Matthew King",
