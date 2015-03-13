@@ -34,9 +34,9 @@ module Round
     end
 
     def authenticate_application(app_url: nil, api_token: nil, instance_id: nil)
-      raise ArgumentError 'app_url is a required argument' unless app_url
-      raise ArgumentError 'api_token is a required argument' unless api_token
-      raise ArgumentError 'instance_id is a required argument' unless instance_id
+      raise ArgumentError.new 'app_url is a required argument' unless app_url
+      raise ArgumentError.new 'api_token is a required argument' unless api_token
+      raise ArgumentError.new 'instance_id is a required argument' unless instance_id
 
       @patchboard_client
         .context
@@ -46,8 +46,8 @@ module Round
     end
 
     def authenticate_developer(email: nil, privkey: nil)
-      raise ArgumentError 'email is a required argument' unless email
-      raise ArgumentError 'privkey is a required argument' unless privkey
+      raise ArgumentError.new 'email is a required argument' unless email
+      raise ArgumentError.new 'privkey is a required argument' unless privkey
 
       @patchboard_client
         .context
@@ -79,7 +79,7 @@ module Round
     end
 
     def developer(email)
-      raise ArgumentError 'email is a required argument' unless email
+      raise ArgumentError.new 'email is a required argument' unless email
       Developer.new(resource: resources.developer_query(email: email), client: self)
     end
 
@@ -88,12 +88,12 @@ module Round
     end
 
     def application(app_url)
-      raise ArgumentError 'app_url is a required argument' unless app_url
+      raise ArgumentError.new 'app_url is a required argument' unless app_url
       Application.new(resource: resources.application(app_url), client: self)
     end
 
     def user(email)
-      raise ArgumentError 'email is a required argument' unless email
+      raise ArgumentError.new 'email is a required argument' unless email
       User.new(resource: resources.user_query(email: email), client: self)
     end
 
