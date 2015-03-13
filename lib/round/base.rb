@@ -17,5 +17,21 @@ module Round
       @resource.send(meth, *args, &block)
     end
 
+    def hash_identifier
+      send self.class.hash_identifier
+    end
+
+    def self.hash_identifier
+      "key"
+    end
+
+    def self.association(name, klass)
+      class_eval %Q{
+        def #{name}
+          #{klass}.new(resource: @resource.#{name}, client: @client)
+        end
+      }
+    end
+
   end
 end

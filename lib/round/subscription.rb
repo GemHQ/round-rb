@@ -16,9 +16,4 @@ module Round
     end
   end
 
-  module Subscriptions
-    def subscriptions
-      SubscriptionCollection.new(resource: @resource.subscriptions, client: @client)
-    end
-  end
 end

@@ -42,7 +42,7 @@ module Round
         .context
         .authorize(Context::Scheme::APPLICATION, 
           api_token: api_token, instance_id: instance_id)
-      self.application(app_url)
+      self.application(app_url).refresh
     end
 
     def authenticate_developer(email: nil, privkey: nil)

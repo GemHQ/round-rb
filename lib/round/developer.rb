@@ -1,13 +1,16 @@
 module Round
   class Developer < Round::Base
+    association :applications, "Round::ApplicationCollection"
 
-    def applications(options = {})
-      @applications ||= Round::ApplicationCollection.new(resource: @resource.applications, client: @client)
-    end
-
+    def self.hash_identifier
+      "email"
+    end 
   end
 
   class DeveloperCollection < Round::Base
+    def content_type
+      Round::Developer
+    end
 
     def create(email, pubkey)
       raise ArgumentError, 'Email and pubkey is required' unless email and pubkey

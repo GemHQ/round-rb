@@ -6,12 +6,12 @@ module Round
     def initialize(options = {}, &block)
       super(options)
       options.delete(:resource)
-      self.populate_data(options, &block)
+      populate_data(options, &block)
     end
 
     def populate_data(options = {}, &block)
-      @collection ||= []
-      @hash ||= {}
+      @collection = []
+      @hash = {}
       @resource.list.each do |resource|
         content = self.content_type.new(options.merge(resource: resource, client: @client))
         yield content if block
@@ -26,11 +26,7 @@ module Round
 
     def add(content)
       @collection << content
-      if content.respond_to? :name
-        @hash[content.name] = content
-      else
-        @hash[content.key] = content
-      end
+      @hash[content.hash_identifier] = content
     end
 
     def content_type

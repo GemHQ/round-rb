@@ -1,17 +1,11 @@
 module Round
   class Wallet < Round::Base
 
-    attr_accessor :multiwallet
+    attr_reader :multiwallet
 
     def initialize(options = {})
       @multiwallet = options[:multiwallet]
       super(options)
-    end
-
-    def accounts
-      @accounts ||= Round::AccountCollection.new(
-        resource: @resource.accounts, wallet: self
-      )
     end
 
     def unlock(passphrase)
@@ -25,6 +19,14 @@ module Round
           backup: @resource.backup_public_seed
         }
       )
+    end
+
+    def accounts
+      Round::AccountCollection.new(resource: @resource.accounts, wallet: self)
+    end
+
+    def self.hash_identifier
+      "name"
     end
 
   end

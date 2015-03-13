@@ -1,6 +1,8 @@
 module Round
   class Account < Round::Base
-    include Round::Subscriptions
+    association :addresses, "Round::AddressCollection"
+    association :transactions, "Round::TransactionCollection"
+    association :subscriptions, "Round::SubscriptionCollection"
 
     attr_accessor :wallet
 
@@ -14,10 +16,8 @@ module Round
       raise ArgumentError, 'Payees must be specified' unless payees
       raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 
-      payment = self.unsigned_payment(payees, confirmations)
+      payment = unsigned_payment(payees, confirmations)
       payment.sign(@wallet.multiwallet)
-
-      payment
     end
 
     def unsigned_payment(payees, confirmations = 6)
@@ -43,16 +43,8 @@ module Round
       { outputs: outputs }
     end
 
-    def addresses
-      @addresses ||= Round::AddressCollection.new(resource: @resource.addresses, client: @client)
-    end
-
-    def transactions
-      Round::TransactionCollection.new(resource: @resource.transactions, client: @client)
-    end
-
-    def payments
-      @payments ||= Round::PaymentGenerator.new(resource: @resource.payments, client: @client)
+    def self.hash_identifier
+      "name"
     end
 
   end

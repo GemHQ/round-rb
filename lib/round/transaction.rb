@@ -12,10 +12,15 @@ module Round
         transaction_hash: transaction.hex_hash,
         inputs: wallet.signatures(transaction)
       )
+      self
     end
 
     def transaction_hash
       @resource[:hash]
+    end
+
+    def self.hash_identifier
+      "hash"
     end
 
   end

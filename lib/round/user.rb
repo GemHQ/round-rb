@@ -1,17 +1,18 @@
 module Round
   class User < Round::Base
+    association :wallets, "Round::WalletCollection"
+    association :default_wallet, "Round::Wallet"
 
-    def wallets
-      Round::WalletCollection.new(resource: @resource.wallets, client: @client)
+    def self.hash_identifier
+      "email"
     end
-
-    def default_wallet
-      Wallet.new(resource: @resource.default_wallet, client: @client)
-    end
-
   end
 
   class UserCollection < Round::Collection
+
+    def content_type
+      Round::User
+    end
 
     def create(email, passphrase)
       multiwallet = CoinOp::Bit::MultiWallet.generate([:primary, :backup], @client.network)
