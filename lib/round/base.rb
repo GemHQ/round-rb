@@ -18,7 +18,7 @@ module Round
     end
 
     def hash_identifier
-      send self.class.hash_identifier
+      send :[], self.class.hash_identifier
     end
 
     def self.hash_identifier
