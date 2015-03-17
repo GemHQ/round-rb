@@ -27,7 +27,7 @@ module Round
         { confirmations: confirmations }.merge(self.outputs_from_payees(payees))
       )
 
-      Round::Transaction.new(resource: payment_resource)
+      Round::Transaction.new(resource: payment_resource, client: @client)
     end
 
     def outputs_from_payees(payees)
@@ -63,7 +63,7 @@ module Round
 
     def create(name)
       resource = @resource.create(name: name)
-      account = Round::Account.new(resource: resource, wallet: @wallet)
+      account = Round::Account.new(resource: resource, wallet: @wallet, client: @client)
       self.add(account)
       account
     end

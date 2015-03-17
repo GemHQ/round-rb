@@ -13,7 +13,7 @@ module Round
 
     def create
       resource = @resource.create
-      address = Round::Address.new(resource: resource)
+      address = Round::Address.new(resource: resource, client: @client)
       self.add(address)
       address
     end
