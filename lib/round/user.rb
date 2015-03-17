@@ -16,7 +16,7 @@ module Round
 
     def create(email, passphrase)
       multiwallet = CoinOp::Bit::MultiWallet.generate([:primary, :backup], @client.network)
-      primary_seed = multiwallet.trees[:primary].to_serialized_address(:private)
+      primary_seed = CoinOp::Encodings.hex(multiwallet.trees[:primary].seed)
       encrypted_seed = CoinOp::Crypto::PassphraseBox.encrypt(passphrase, primary_seed)
       wallet = {
         name: "default",
@@ -30,7 +30,8 @@ module Round
         default_wallet: wallet
       }
       user_resource = @resource.create(params)
-      return multiwallet.trees[:backup].to_serialized_address(:private),
+      backup_seed = CoinOp::Encodings.hex(multiwallet.trees[:backup].seed)
+      return backup_seed,
         Round::User.new(resource: user_resource, client: @client)
     end
 

@@ -10,9 +10,10 @@ module Round
 
     def unlock(passphrase)
       primary_seed = CoinOp::Crypto::PassphraseBox.decrypt(passphrase, @resource.primary_private_seed)
+      primary_master = MoneyTree::Master.new(seed_hex: primary_seed)
       @multiwallet = CoinOp::Bit::MultiWallet.new(
         private: {
-          primary: primary_seed
+          primary: primary_master
         },
         public: {
           cosigner: @resource.cosigner_public_seed,
@@ -50,8 +51,7 @@ module Round
     end
 
     def create_wallet_resource(multiwallet, passphrase, name, network)
-      primary_seed = multiwallet.trees[:primary].to_serialized_address(:private)
-
+      primary_seed = CoinOp::Encodings.hex(multiwallet.trees[:primary].seed)
       ## Encrypt the primary seed using a passphrase-derived key
       encrypted_seed = CoinOp::Crypto::PassphraseBox.encrypt(passphrase, primary_seed)
 
