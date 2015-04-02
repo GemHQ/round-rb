@@ -33,28 +33,30 @@ module Round
       @network = network
     end
 
-    def authenticate_application(app_url: nil, api_token: nil, instance_id: nil)
+    def authenticate_application_instance(app_url: nil, api_token: nil, instance_id: nil)
       raise ArgumentError.new 'app_url is a required argument' unless app_url
       raise ArgumentError.new 'api_token is a required argument' unless api_token
-      raise ArgumentError.new 'instance_id is a required argument' unless instance_id
 
       @patchboard_client
         .context
         .authorize(Context::Scheme::APPLICATION, 
           api_token: api_token, instance_id: instance_id)
-      @patchboard_client
-        .context
-        .authorize(Context::Scheme::IDENTIFY, 
-          api_token: api_token)
+      authenticate_application(api_token: api_token)
 
       self.application(app_url).refresh
     end
 
-    def authenticate_device(email: nil, api_token: nil, user_token: nil, device_id: nil)
+    def authenticate_application(api_token: nil)
+      @patchboard_client
+        .context
+        .authorize(Context::Scheme::IDENTIFY, api_token: api_token)
+    end
+
+    def authenticate_device(email: nil, api_token: nil, device_id: nil)
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVICE, 
-          api_token: api_token, user_token: user_token, device_id: device_id)
+          api_token: api_token, device_id: device_id)
       @patchboard_client
         .context
         .authorize(Context::Scheme::IDENTIFY, 
@@ -87,8 +89,7 @@ module Round
         IDENTIFY = "Gem-Identify"
       end
 
-      SCHEMES = [Scheme::DEVELOPER, Scheme::DEVELOPER_SESSION,
-        Scheme::DEVICE, Scheme::APPLICATION, Scheme::USER, Scheme::OTP]
+      SCHEMES = [Scheme::DEVICE, Scheme::APPLICATION, Scheme::IDENTIFY]
 
       attr_accessor :schemes
 
@@ -119,28 +120,11 @@ module Round
         schemes = [schemes] if schemes.is_a? String
         schemes.each do |scheme|
           if params = @schemes[scheme]
-            credential = nil
-            if scheme.eql?(Scheme::DEVELOPER)
-              timestamp = Time.now.to_i
-              params = {
-                email: params[:email],
-                signature: developer_signature(request[:body], params[:privkey], timestamp),
-                timestamp: timestamp
-              }
-            end
             credential = compile_params(params)
             return [scheme, credential]
           end
         end
         raise "Action: #{action}.  No authorization available for '#{schemes}'"
-      end
-
-      def developer_signature(request_body, privkey, timestamp)
-        body = request_body ? JSON.parse(request_body) : {}
-        key = OpenSSL::PKey::RSA.new privkey
-        content = "#{body.to_json}-#{timestamp}"
-        signature = key.sign(OpenSSL::Digest::SHA256.new, content)
-        Base64.urlsafe_encode64(signature)
       end
 
       def inspect

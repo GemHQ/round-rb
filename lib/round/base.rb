@@ -15,6 +15,8 @@ module Round
 
     def method_missing(meth, *args, &block)
       @resource.send(meth, *args, &block)
+    rescue
+      @resource.attributes[meth]
     end
 
     def hash_identifier
