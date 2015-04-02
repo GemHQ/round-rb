@@ -16,7 +16,7 @@ module Round
       raise ArgumentError, 'Payees must be specified' unless payees
       raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 
-      payment = unsigned_payment(payees, confirmations)
+      payment = @resource.transactions.create(payees, confirmations)
       payment.sign(@wallet.multiwallet)
     end
 

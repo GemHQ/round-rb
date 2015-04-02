@@ -2,6 +2,7 @@ module Round
   class User < Round::Base
     association :wallets, "Round::WalletCollection"
     association :default_wallet, "Round::Wallet"
+    association :devices, "Round::DeviceCollection"
 
     def self.hash_identifier
       "email"

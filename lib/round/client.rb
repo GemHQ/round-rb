@@ -42,17 +42,12 @@ module Round
         .context
         .authorize(Context::Scheme::APPLICATION, 
           api_token: api_token, instance_id: instance_id)
-      self.application(app_url).refresh
-    end
-
-    def authenticate_developer(email: nil, privkey: nil)
-      raise ArgumentError.new 'email is a required argument' unless email
-      raise ArgumentError.new 'privkey is a required argument' unless privkey
-
       @patchboard_client
         .context
-        .authorize(Context::Scheme::DEVELOPER, email: email, privkey: privkey)
-      self.developer(email).refresh
+        .authorize(Context::Scheme::IDENTIFY, 
+          api_token: api_token)
+
+      self.application(app_url).refresh
     end
 
     def authenticate_device(email: nil, api_token: nil, user_token: nil, device_id: nil)
@@ -60,27 +55,15 @@ module Round
         .context
         .authorize(Context::Scheme::DEVICE, 
           api_token: api_token, user_token: user_token, device_id: device_id)
-      self.user(email).refresh
-    end
-
-    def authenticate_otp(api_token: nil, key: nil, secret: nil)
       @patchboard_client
         .context
-        .authorize(Context::Scheme::OTP, 
-          api_token: api_token, key: key, secret: secret)
+        .authorize(Context::Scheme::IDENTIFY, 
+          api_token: api_token)
+      self.user(email).refresh
     end
 
     def resources
       @patchboard_client.resources
-    end
-
-    def developers
-      DeveloperCollection.new(resource: resources.developers, client: self)
-    end
-
-    def developer(email)
-      raise ArgumentError.new 'email is a required argument' unless email
-      Developer.new(resource: resources.developer_query(email: email), client: self)
     end
 
     def users
@@ -97,54 +80,11 @@ module Round
       User.new(resource: resources.user_query(email: email), client: self)
     end
 
-    def begin_device_authorization(email: nil, 
-      device_name: nil, device_id: nil, api_token: nil)
-
-      self.authenticate_otp(api_token: api_token)
-      user(email).resource.authorize_device(name: device_name,
-                                            device_id: device_id)
-    rescue Patchboard::Action::ResponseError => e
-      authorization_header = e.headers['Www-Authenticate']
-      key = extract_params(authorization_header)[:key]
-      if key
-        key
-      elsif e.message == 'unauthorized'
-        raise Round::Client::OTPConflictError.new("This user has too many pending authorizations")
-      else
-        raise e
-      end
-    end
-
-    def complete_device_authorization(email: nil, 
-      device_name: nil, device_id: nil, api_token: nil,
-      key: nil, secret: nil)
-
-      self.authenticate_otp(api_token: api_token, key: key, secret: secret)
-      resource = user(email).authorize_device(name: device_name,
-                                              device_id: device_id)
-
-      self.authenticate_device(email: email, api_token: api_token, user_token: resource.user_token, device_id: device_id)
-      User.new(resource: resource, client: self).refresh
-
-    rescue Patchboard::Action::ResponseError => e
-      authorization_header = e.headers['Www-Authenticate']
-      new_key = extract_params(authorization_header)[:key]
-      if new_key
-        new_key
-      else
-        raise Round::Client::UnknownKeyError.new("The user or OTP key you provided doesn't exist")
-      end
-    end
-
-
     class Context
       module Scheme
-        DEVELOPER = "Gem-Developer"
-        DEVELOPER_SESSION = "Gem-Developer-Session"
         DEVICE = "Gem-Device"
         APPLICATION = "Gem-Application"
-        USER = "Gem-User"
-        OTP = "Gem-OOB-OTP"
+        IDENTIFY = "Gem-Identify"
       end
 
       SCHEMES = [Scheme::DEVELOPER, Scheme::DEVELOPER_SESSION,
