@@ -20,6 +20,8 @@ Gem::Specification.new do |s|
     README.md
   ] + Dir["lib/**/*.rb"]
   s.require_path = "lib"
+  s.cert_chain = ['certs/jvergeldedios.pem']
+  s.signing_key = File.expand_path("/Volumes/IRONKEY/gem-private_key.pem") if $0 =~ /gem\z/
 
   s.add_dependency("patchboard", "~> 0.5")
   s.add_dependency("rbnacl", "~> 3.1.0")
