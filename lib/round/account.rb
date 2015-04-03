@@ -12,7 +12,7 @@ module Round
       @wallet = options[:wallet]
     end
 
-    def pay(payees, confirmations = 6)
+    def pay(payees, confirmations)
       raise ArgumentError, 'Payees must be specified' unless payees
       raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 

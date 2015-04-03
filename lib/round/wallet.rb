@@ -39,7 +39,6 @@ module Round
     end
 
     def create(name, passphrase, options = {})
-
       multiwallet = options[:multiwallet] || CoinOp::Bit::MultiWallet.generate([:primary, :backup])
       network = options[:network] || "bitcoin_testnet"
       wallet_resource = self.create_wallet_resource(multiwallet, passphrase, name, network)

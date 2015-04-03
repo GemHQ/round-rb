@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   ]
   s.email = [
     "matthew@pandastrike.com",
-    "julian.vergeldedios@gmail.com"
+    "julian@gem.co"
   ]
   s.homepage = "https://github.com/GemHQ/round-rb"
   s.summary = "Ruby client for the Gem API"
