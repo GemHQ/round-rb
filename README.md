@@ -75,15 +75,14 @@ Authenticating as a device allows you to perform all actions on a wallet permitt
 ```ruby
 user = ROUND_CLIENT.authenticate_device(<EMAIL>, <API_TOKEN>, <USER_TOKEN>, <DEVICE_ID>)
 ```
-The `user_token` is obtained by a user authorizing your application to operate on their wallet in the `User#authorize_device` call:
+The `user_token` is obtained by a user authorizing your application to operate on their wallet. This level of authorization is received through the `completeDeviceAuthorization` call:
 ```ruby
-user = client.user(<EMAIL>)
-key = user.begin_device_authorization(<DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>)
+key = ROUND_CLIENT.begin_device_authorization(<EMAIL>, <DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>)
 ```
 
 This will trigger an out of band email to the user that will include a one time pass that will allow the authorization to complete by running the same call with that value:
 ```ruby
-user.complete_device_authorization(<DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>, key, <OTP_FROM_EMAIL>)
+ROUND_CLIENT.complete_device_authorization(<EMAIL>, <DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>, key, <OTP_FROM_EMAIL>)
 ```
 
 ## Basic Usage
@@ -96,7 +95,7 @@ Once you've got a User authenticated with a device you can start to do fun stuff
 wallet = user.wallets.create(name: <WALLET_NAME>, passphrase: <WALLET_PASSPHRASE>)
 ```
 
-__IMPORTANT__: Creating a wallet this way will automatically generate your backup key tree. You can get it by accessing `BitVault::Wallet#multiwallet`. This will return the `CoinOp::Bit::MultiWallet` object containing both private seeds. __Make sure you save it somewhere__.
+__IMPORTANT__: Creating a wallet this way will automatically generate your backup key tree. You can get it by accessing `Round::Wallet#multiwallet`. This will return the `CoinOp::Bit::MultiWallet` object containing both private seeds. __Make sure you save it somewhere__.
 
 ### Accounts
 
