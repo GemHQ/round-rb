@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.cert_chain = ['certs/jvergeldedios.pem']
 
   s.add_dependency("patchboard", "~> 0.5.2")
-  s.add_dependency("http", "0.5.1")
+  s.add_dependency("http", "0.6.0")
   s.add_dependency("rbnacl", "~> 3.1.0")
   s.add_dependency("rbnacl-libsodium", "~> 1.0.0")
   s.add_dependency("coin-op", "~> 0.2")

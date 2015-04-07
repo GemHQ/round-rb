@@ -3,7 +3,7 @@ PATH
   specs:
     round (0.7.0)
       coin-op (~> 0.2)
-      http (= 0.5.1)
+      http (= 0.6.0)
       patchboard (~> 0.5.2)
       rbnacl (~> 3.1.0)
       rbnacl-libsodium (~> 1.0.0)
@@ -27,8 +27,8 @@ GEM
     diff-lcs (1.2.5)
     ffi (1.9.8)
     hashie (2.1.2)
-    http (0.5.1)
-      http_parser.rb
+    http (0.6.0)
+      http_parser.rb (~> 0.6.0)
     http_parser.rb (0.6.0)
     json (1.8.2)
     method_source (0.8.2)
