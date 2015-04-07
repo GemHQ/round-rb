@@ -99,20 +99,18 @@ module Round
 
       # Is there a list of accepted params somewhere?
       def authorize(scheme, params)
-        raise ArgumentError, "Unknown auth scheme" unless SCHEMES.include?(scheme)
+        raise ArgumentError, 'Params cannot be empty.' if params.empty?
+        raise ArgumentError, 'Unknown auth scheme' unless SCHEMES.include?(scheme)
         @schemes[scheme] = params
       end
 
       def compile_params(params)
-        raise ArgumentError, 'params cannot be empty' if params.empty?
         params.map do |key, value|
           %Q(#{key}="#{value}")
         end.join(', ')
       end
 
-      def authorizer(options = {})
-        schemes, action = options.values_at(:schemes, :action)
-        schemes = [schemes] if schemes.is_a? String
+      def authorizer(schemes: [], action: 'NULL ACTION', **kwargs)
         schemes.each do |scheme|
           if (params = @schemes[scheme])
             credential = compile_params(params)
