@@ -29,37 +29,19 @@ describe Round::Client::Context do
     end
   end
 
-  describe '#developer_signature' do
-    let(:privkey) { developer_private_key }
-    let(:request_body) { '{"name":"name"}' }
-    let(:date_string) { Date.today.strftime('%Y/%m/%d') }
-    let(:content) { "#{request_body}-#{date_string}" }
-
-    context 'with a valid key' do
-      let(:signature) { context.developer_signature(request_body, privkey) }
-      let(:decoded_signature) { Base64.urlsafe_decode64(signature) }
-
-      it 'generates valid base64' do
-        expect {
-          decoded_signature
-        }.to_not raise_error
-      end
-
-      it 'generates a valid signature' do
-        key = OpenSSL::PKey::RSA.new privkey
-        valid = key.verify(OpenSSL::Digest::SHA256.new, decoded_signature, content)
-        expect(valid).to be(true)
+  describe '#compile_params' do
+    context 'when params is empty' do
+      it 'raises error' do
+        expect { context.compile_params({}) }.to raise_error(ArgumentError)
       end
     end
 
-    context 'with an invalid key' do
-      let(:signature) { context.developer_signature(request_body, 'bogus_key') }
-
-      it 'raises an error' do
-        expect {
-          signature
-        }.to raise_error
+    context 'when params not empty' do
+      it 'joins them into param string' do
+        response = context.compile_params({a:1, b:2, c:3})
+        expect(response).to eq 'a="1", b="2", c="3"'
       end
     end
   end
+
 end
