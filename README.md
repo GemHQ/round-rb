@@ -1,123 +1,176 @@
-# Gem Ruby Client
+# round-py: A Python client for the Gem API
+The round client is designed to interact with Gem's API to make building blockchain apps drop dead simple.  All the complexity of the bitcoin protocol and crypto has been abstracted away so you can focus on building your product.  Here are a few of the many great things the API and clients provide:
 
-For detailed usage please visit the [documentation page](https://guide.gem.co)
+* Multi-signature wallets with Gem as a cosigner
+* Webhook notifications automatically subscribed for you
+* Integrated 2FA solution with arbitrary endpoints to build into your app
+* Simplified balance inqueries
+* Easy address management
+* Hardware Security Modules for co-signing key
+* Rules engine for transactions
+* SDKs for many popular languages
 
-## Installation
+## Support information
+* __Support email__: [support@gem.co](mailto:support@gem.co)
+* __Support IRC chat__: `#gemhq` on `irc.freenode.net`
+* __Issues__:  Use github issues
+* __Slack room__:  Send email to support requesting access to the slack room for this client
+* __Detailed API Docs__:  http://guide.gem.co
 
-### Install gem dependencies:
+## Installing round-py:
+### Prerequisites:
+* Python 2.7
+* Git and a python extension build environment.
+* libffi
+* [virtualenv](http://pypi.python.org/pypi/virtualenv)/[virtualenvwrapper](https://virtualenvwrapper.readthedocs.org/en/latest/) or a similar virtual environment solution is recommended. (`sudo` is bad)
 
-    $ git clone https://github.com/gemhq/round-rb
-    $ cd round-rb
-    $ bundle install
+#### [Linux (debian-based, tested on Ubuntu 14.04)](docs/install.md#linux-debian-based-tested-on-ubuntu-1404)
+#### [Mac OSX](docs/install.md#mac-osx)
+#### [Heroku](docs/install.md#heroku)
 
-### Build and install the gem:
+## Getting Started Tutorial
+#### Table of Contents
+* [Introduction](README.md#Introduction)
+* [1. Run the client](README.md#1-run-the-client)
+* [2. Configure your application and API token](README.md#2-configure-your-applicaiton-and-api-token)
+* [3. Create your User and Wallet](README.md#3-create-your-user-and-wallet)
+* [4. Authenticate your User](README.md#4-authenticate-your-user)
+* [5. Access the wallet and Default Account](README.md#5-access-the-wallet-and-default-account)
+* [6. Generate an Address and Add Funds](README.md#6-generate-an-address-and-add-funds)
+* [7. Make a Payment](README.md#7-make-a-payment)
+* [Advanced Topics](docs/advanced.md)
+	* [More about Wallets and Accounts](docs/advanced.md#wallets-and-accounts)
+	* [More about Transactions](docs/advanced.md#transactions-and-payments)
+	* [Subscriptions](docs/advanced.md#subscriptions)
+	* [Integrated 2FA](docs/advanced.md#integrated-2fa)
+	* [Operational/Custodail wallet models](docs/advanced.md#operationalcustodial-wallets)
+	* [Operational/Custodial payments](docs/advanced.md#payments)
 
-    $ bundle exec rake build
-    $ bundle exec rake install
+### Introduction
+This tutorial will have you run through setting up your application and creating your own wallet as a user of your application.  By the end of the tutorial, you will have created your User, wallet, account, an address as well as fund it and then make a payment using the bitcoin testnet network.
 
-## Configuration
+This tutorial assumes that you have completed the developer signup and that you have successfully [installed the client](docs/install.md)
 
-You'll need to add `round` to your Gemfile:
+### 1. Run the Client
+In this step you will learn how to instantiate the API client for the given networks.
 
-    gem 'round'
+1. start your favorite interactive shell and import the round library
 
-In Rails you may want to create a single instance of a client to be reused many times and store your credentials in a YAML file:
+	```bash
+	$ python
+	>>> import round
+	```
 
-__config/round.yml__
+1. Create the client object using the sandbox stack
 
-```yaml
-production:
-    app_url: <PRODUCTION_APP_URL>
-    api_token: <PRODUCTION_API_TOKEN>
-    instance_id: <PRODUCTION_INSTANCE_ID>
+	```python
+	# the default client is set to sandbox the testnet stack
+	client = round.client()
 
-development:
-    app_url: <DEVELOPMENT_APP_URL>
-    api_token: <DEVELOPMENT_API_TOKEN>
-    instance_id: <DEVELOPMENT_INSTANCE_ID>
-```
+	# if you want to configure the client for production mainnet
+	client = round.client('https://api-v2.gem.co', 'production')
+	```
 
-__config/initializers/round.rb__
-```ruby
-config = YAML::load(File.read("#{Rails.root}/config/round.yml"))[Rails.env]
+[[top]](README.md#getting-started-tutorial)
 
-ROUND_CLIENT = Round.client
-ROUND_CLIENT.authenticate_application(config[:app_url], config[:api_token], config[:instance_id])
-```
+### 2. Configure your applicaiton and API Token
+In this step your application and you will retrieve the API Token for the application and set your applications redirect url.  The url is used to push the user back to your app after they complete an out of band challenge.
 
-This is just a suggestion for a simple Rails setup, there are many other ways to do this.
+1. Set the redirect url by clicking in the options gear and selecting `add redirect url`
 
-## Authentication
+1. In the [console](https://sandbox.gem.co) copy your api_token by clicking on show
 
-You must authenticate to interact with the API. Depending on what you are trying to do there are different authentication schemes available.
+1. Go back to your shell session and set a variable for api_token
 
-### Developer
+	```python
+	api_token = u'q234t09ergoasgr-9_qt4098qjergjia-asdf2490'
+	```
 
-Authenticating as a developer will allow you create and manage your applications. Authenticating in this way requires the developer's email, as well as their private key. The method will return a `Round::Developer` object.
-```ruby
-developer = ROUND_CLIENT.authenticate_developer(<DEVELOPER_EMAIL>, <DEVELOPER_PRIVATE_KEY>)
-```
+[[top]](README.md#getting-started-tutorial)
 
-### Application
+### 3. Create your User and Wallet
+In this step you will create your own personal Gem user and wallet authorized on your application.  This is an end-user account, which will have a 2-of-3 multisig bitcoin wallet.
 
-Authenticating as an application will give you read-only access to your users and their wallets. This requires the `app_url`, the `api_token`, and an `instance_id`. The method will return a `Round::Application` object.
-```ruby
-application = ROUND_CLIENT.authenticate_application(<APP_URL>, <API_TOKEN>, <INSTANCE_ID>)
-```
-Your `instance_id` is provided to you via email when you authorize an application instance using Developer auth:
-```ruby
-developer = ROUND_CLIENT.authenticate_developer(<DEVELOPER_EMAIL>, <DEVELOPER_PRIVATE_KEY>)
-application = developer.applications.first
-application.authorize_instance
-```
+1. Create your user and wallet:
 
-### Device
+	```python
+	#  Store the device token for future authentication
+	device_id, user = client.users.create(
+	        first_name = "YOUR FIRST NAME",
+			last_name = "YOUR LAST NAME",
+			email = "YOUR EMAIL ADDRESS",
+			passphrase = "aReallyStrongPassphrase",
+			device_name = "SOME DEVICE NAME",
+			api_token = "YOUR API TOKEN"
+            redirect_uri = "http://something/user-device-approved")
+	```
 
-Authenticating as a device allows you to perform all actions on a wallet permitted by a user. Requires an `email`, an `api_token`, a `user_token`, and a `device_id`. The method will return a `Round::User` object.
-```ruby
-user = ROUND_CLIENT.authenticate_device(<EMAIL>, <API_TOKEN>, <USER_TOKEN>, <DEVICE_ID>)
-```
-The `user_token` is obtained by a user authorizing your application to operate on their wallet. This level of authorization is received through the `completeDeviceAuthorization` call:
-```ruby
-key = ROUND_CLIENT.begin_device_authorization(<EMAIL>, <DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>)
-```
+1. Your application should **store the device_id permanently** as this will be required to authenticate from your app as this user.
+1. You will receive an email from Gem asking you to confirm your account and finish setup.  Please follow the instructions. At the end of the User sign up flow, you'll be redirected to the redirect_uri provided in users.create (if you provided one).
 
-This will trigger an out of band email to the user that will include a one time pass that will allow the authorization to complete by running the same call with that value:
-```ruby
-ROUND_CLIENT.complete_device_authorization(<EMAIL>, <DEVICE_NAME>, <DEVICE_ID>, <API_TOKEN>, key, <OTP_FROM_EMAIL>)
-```
+[[top]](README.md#getting-started-tutorial)
 
-## Basic Usage
+### 4. Authenticate your User
+In this step you will learn how to authenticate to the Gem API on a User's device to get a fully functional User object with which to perform wallet actions.
 
-### Wallets
+1. Call the authenticate_device method from the client object
 
-Once you've got a User authenticated with a device you can start to do fun stuff like create wallets:
+	```python
+	full_user = client.authenticate_device(
+						api_token = api_token,
+						device_id = device_id,
+						email = email)
+	```
 
-```ruby
-wallet = user.wallets.create(name: <WALLET_NAME>, passphrase: <WALLET_PASSPHRASE>)
-```
+[[top]](README.md#getting-started-tutorial)
 
-__IMPORTANT__: Creating a wallet this way will automatically generate your backup key tree. You can get it by accessing `Round::Wallet#multiwallet`. This will return the `CoinOp::Bit::MultiWallet` object containing both private seeds. __Make sure you save it somewhere__.
+### 5. Access the wallet and Default Account
+In this section you'll learn how to get to the default account of a wallet.  A wallet is a collection of accounts.  [Learn more about the wallet and acocunts]([docs/wallet-and-account-details.md)
 
-### Accounts
+1. Get the default wallet and then default account
 
-Once you have a wallet you're going to want to send and receive funds from it, right? You do this by creating accounts within the wallet:
-```ruby
-account = wallet.accounts.create(<ACCOUNT_NAME>)
-```
+	```python
+	my_account = full_user.wallets['default'].accounts['default']
+	```
 
-To receive payments, you'll have to generate a new address:
-```ruby
-address = account.addresses.create
-```
+[[top]](README.md#getting-started-tutorial)
 
-Sending payments is easy too:
-```ruby
-account.pay([{address: <PAYEE_ADDRESS>, amount: <AMOUNT_TO_PAY>}])
-```
+### 6. Generate an Address and Add Funds
+In this section you'll learn how to create an address to fund with testnet coins aka funny money.
 
-You can add as many payees as you need.
-Don't forget to unlock the wallet before trying to pay someone:
-```ruby
-account.wallet.unlock(<PASSPHRASE>)
-```
+1. Create an address
+
+	```python
+	address = my_account.addresses.create()
+	print address.string, address.path
+	```
+1. Copy the address string and go to a faucet to fund it:
+	1. [TP's TestNet Faucet](https://tpfaucet.appspot.com/)
+	1. [Mojocoin Testnet3 Faucet](http://faucet.xeno-genesis.com/)
+
+Payments have to be confirmed by the network and on Testnet that can be slow.  To monitor for confirmations: input the address into the following url `https://live.blockcypher.com/btc-testnet/address/<YOUR ADDRESS>`.  The current standard number of confirmations for a transaction to be considered safe is 6.
+
+You will be able to make a payment on a single confirmation.  While you wait for that to happen, feel free to read more details about:
+[Wallets and Accounts](docs/Advanced-Topics.md#More-About-Wallets-and-Accounts)
+
+[[top]](README.md#getting-started-tutorial)
+
+### 7. Make a Payment
+In this section you’ll learn how to create a payment a multi-signature payment in an HD wallet.  Once your address gets one more more confirmations we’ll be able to send a payment out of the wallet.  To make a payment, you'll unlock a wallet, generate a list of payees and then call the pay method.
+
+1. Unlock the wallet:
+
+	```python
+	wallet.unlock(<YOUR PASSWORD>)
+	```
+1. Make a payment
+
+	```python
+	transaction = account.pay([{‘address’:’ mxzdT4ShBudVtZbMqPMh9NVM3CS56Fp11s’, ‘amount’:25000}], utxo_confirmations = 1, 'https://my.mobileapp.com/user_redirect')
+	```
+
+The pay call takes a list of payee objects.  A payee is a dict of `{'address':ADDRESS, 'amount':amount}` where address is the bitcoin address and amount is the number of satoshis.  `utxo_confirmations` default to 6 and represents the number of confirmations an unspent output needs to have in order to be selected for the transaction.  The last argument is the redirect uri for Gem to send the user back to your application after the user submits their MFA challenge.
+
+**CONGRATS** - now build something cool.
+
+[[top]](README.md#getting-started-tutorial)
