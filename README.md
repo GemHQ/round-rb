@@ -6,12 +6,14 @@ For detailed usage please visit the [documentation page](https://guide.gem.co)
 
 ### Install gem dependencies:
 
+    $ git clone https://github.com/gemhq/round-rb
+    $ cd round-rb
     $ bundle install
 
 ### Build and install the gem:
 
-    $ gem build round.gemspec
-    $ gem install round-0.6.0.gem
+    $ bundle exec rake build
+    $ bundle exec rake install
 
 ## Configuration
 
