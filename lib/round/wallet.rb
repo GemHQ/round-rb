@@ -27,7 +27,7 @@ module Round
     end
 
     def self.hash_identifier
-      "name"
+      'name'
     end
 
   end
