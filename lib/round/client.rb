@@ -4,8 +4,8 @@ require "date"
 
 module Round
 
-  MAINNET_URL = "https://api.gem.co"
-  SANDBOX_URL = "https://api-sandbox.gem.co"
+  MAINNET_URL = 'https://api.gem.co'
+  SANDBOX_URL = 'https://api-sandbox.gem.co'
 
   NETWORKS = {
     testnet: :bitcoin_testnet,
@@ -73,20 +73,20 @@ module Round
     end
 
     def application(app_url)
-      raise ArgumentError.new 'app_url is a required argument' unless app_url
+      raise ArgumentError, 'app_url is a required argument' unless app_url
       Application.new(resource: resources.application(app_url), client: self)
     end
 
     def user(email)
-      raise ArgumentError.new 'email is a required argument' unless email
+      raise ArgumentError, 'email is a required argument' unless email
       User.new(resource: resources.user_query(email: email), client: self)
     end
 
     class Context
       module Scheme
-        DEVICE = "Gem-Device"
-        APPLICATION = "Gem-Application"
-        IDENTIFY = "Gem-Identify"
+        DEVICE = 'Gem-Device'
+        APPLICATION = 'Gem-Application'
+        IDENTIFY = 'Gem-Identify'
       end
 
       SCHEMES = [Scheme::DEVICE, Scheme::APPLICATION, Scheme::IDENTIFY]
@@ -129,14 +129,14 @@ module Round
       end
     end
 
-    class UnknownKeyError < StandardError; end
-    class OTPConflictError < StandardError; end
+    UnknownKeyError = Class.new(StandardError)
+    OTPConflictError = Class.new(StandardError)
 
     class OTPAuthFailureError < StandardError
       attr_reader :key
 
       def initialize(key)
-        super()
+        super
         @key = key
       end
     end

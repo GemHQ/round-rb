@@ -43,5 +43,4 @@ describe Round::Client::Context do
       end
     end
   end
-
 end
