@@ -50,6 +50,15 @@ describe Round::UserCollection do
         wallet = @user.wallets.create('wallet2', 'passphrase2')
         expect { wallet.unlock('incorrect') }.to raise_error
       end
+
+      context 'that users account' do
+        it 'should query transactions' do
+          wallet = @user.wallets.create('wallet1', 'passphrase1')
+          account = wallet.accounts.first
+          expect { account.transactions(type: 'outgoing') }
+            .to_not raise_error
+        end
+      end
     end
   end
 end

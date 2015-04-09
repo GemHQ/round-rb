@@ -11,6 +11,13 @@ module Round
       @wallet = options[:wallet]
     end
 
+    def transactions(**query)
+      Round::TransactionCollection.new(
+        resource: @resource.transactions(query),
+        client: @client
+      )
+    end
+
     def pay(payees, confirmations)
       raise ArgumentError, 'Payees must be specified' unless payees
       raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
