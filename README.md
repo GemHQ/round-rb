@@ -1,5 +1,7 @@
 # Gem Ruby Client
 
+[![Join the chat at https://gitter.im/GemHQ/round-rb](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/GemHQ/round-rb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 For detailed usage please visit the [documentation page](https://guide.gem.co)
 
 ## Installation
