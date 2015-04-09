@@ -29,7 +29,6 @@ module Round
     def self.hash_identifier
       'name'
     end
-
   end
 
   class WalletCollection < Round::Collection
@@ -38,14 +37,11 @@ module Round
       Round::Wallet
     end
 
-    def create(name, passphrase, options = {})
-      multiwallet = options[:multiwallet] || CoinOp::Bit::MultiWallet.generate([:primary, :backup])
-      network = options[:network] || 'bitcoin_testnet'
-      wallet_resource = self.create_wallet_resource(multiwallet, passphrase, name, network)
-
+    def create(name, passphrase, network: 'bitcoin_testnet',
+               multiwallet: CoinOp::Bit::MultiWallet.generate([:primary, :backup]))
+      wallet_resource = create_wallet_resource(multiwallet, passphrase, name, network)
       wallet = Round::Wallet.new(resource: wallet_resource, multiwallet: multiwallet)
-      self.add(wallet)
-      
+      add(wallet)
       wallet
     end
 
