@@ -33,10 +33,7 @@ module Round
       @network = network
     end
 
-    def authenticate_application_instance(app_url: nil, api_token: nil, instance_id: nil)
-      raise ArgumentError.new 'app_url is a required argument' unless app_url
-      raise ArgumentError.new 'api_token is a required argument' unless api_token
-
+    def authenticate_application_instance(app_url:, api_token:, instance_id: nil)
       @patchboard_client
         .context
         .authorize(Context::Scheme::APPLICATION, 
@@ -46,7 +43,7 @@ module Round
       self.application(app_url).refresh
     end
 
-    def authenticate_application(api_token: nil)
+    def authenticate_application(api_token:)
       @patchboard_client
         .context
         .authorize(Context::Scheme::IDENTIFY, api_token: api_token)
@@ -73,12 +70,10 @@ module Round
     end
 
     def application(app_url)
-      raise ArgumentError, 'app_url is a required argument' unless app_url
       Application.new(resource: resources.application(app_url), client: self)
     end
 
     def user(email)
-      raise ArgumentError, 'email is a required argument' unless email
       User.new(resource: resources.user_query(email: email), client: self)
     end
 
