@@ -40,7 +40,7 @@ module Round
 
     def create(name, passphrase, options = {})
       multiwallet = options[:multiwallet] || CoinOp::Bit::MultiWallet.generate([:primary, :backup])
-      network = options[:network] || "bitcoin_testnet"
+      network = options[:network] || 'bitcoin_testnet'
       wallet_resource = self.create_wallet_resource(multiwallet, passphrase, name, network)
 
       wallet = Round::Wallet.new(resource: wallet_resource, multiwallet: multiwallet)

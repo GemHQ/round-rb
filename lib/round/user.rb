@@ -1,11 +1,11 @@
 module Round
   class User < Round::Base
-    association :wallets, "Round::WalletCollection"
-    association :default_wallet, "Round::Wallet"
-    association :devices, "Round::DeviceCollection"
+    association :wallets, 'Round::WalletCollection'
+    association :default_wallet, 'Round::Wallet'
+    association :devices, 'Round::DeviceCollection'
 
     def self.hash_identifier
-      "email"
+      'email'
     end
   end
 
@@ -32,10 +32,10 @@ module Round
         default_wallet: wallet,
         device_name: device_name
       }
-      user_resource = @resource.create(params)
+      user_resource = resource.create(params)
       user = Round::User.new(resource: user_resource, client: @client)
       device_id = user.device_id
-      return device_id, user
+      [device_id, user]
     end
 
   end
