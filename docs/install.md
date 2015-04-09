@@ -1,47 +1,22 @@
-## Installing round-py:
+## Installing round-rb:
 
 
 ### Prerequisites:
 
-* Python 2.7
-* Git and a python extension build environment.
-* libffi
-
-#### Virtualenv (optional)
-
-1. Install virtualenv & wrapper
-
-  ```bash
-  $ pip install --user virtualenv
-  $ pip install --user virtualenvwrapper
-  ```
-
-2. Edit your ~/.bashrc or ~/.bash_profile
-
-  ```bash
-  export PATH="${HOME}/.local/bin:${PATH}"
-  export WORKON_HOME="${HOME}/.virtualenvs"
-  source ${HOME}/.local/bin/virtualenvwrapper.sh
-  ```
-
-3. Make an environment
-
-  ```bash
-  $ mkvirtualenv py27
-  ```
+* Ruby 2.1.5
 
 ### Linux (debian-based, tested on Ubuntu 14.04)
 
 1. Install system dependencies (*this is the only time you need sudo!*)
 
   ```bash
-  $ sudo apt-get install gcc make libffi-dev python-dev python-pip git
+  $ sudo apt-get install gcc make libffi-dev 
   ```
 
 2. Install the client
 
   ```bash
-  $ pip install round
+  $ gem install round
   ```
 
  [[back]](../README.md)
@@ -63,9 +38,9 @@
   $ export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig/
   ```
 
-4. Pip install the client
+4. Gem install the client
   ```bash
-  $ pip install round
+  $ gem install round
   ```
 
  [[back]](../README.md)
