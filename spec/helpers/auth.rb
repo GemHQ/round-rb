@@ -23,7 +23,8 @@ module Round::TestHelpers::Auth
     client
   end
 
-  def app_auth_user(email: "email#{rand(100..10000).to_s}@gmail.com")
+  def app_auth_user(email: "email#{rand(100..10000).to_s}@mailinator.com")
+    puts "App auth user created with at #{email}"
     app_auth_client.users.create(
       first_name: TestCreds::FIRST_NAME, 
       last_name: TestCreds::LAST_NAME, 
@@ -35,13 +36,18 @@ module Round::TestHelpers::Auth
 
   def device_auth_user
     device_id, user = app_auth_user(email: random_email)
-    puts 'This will sleep for 45 seconds while you complete the steps in your email.'
-    puts 'If thou dost not complete this, thine tests shall fail.'
-    sleep 45
-    app_auth_client.authenticate_device(
-      api_token: TestCreds::API_TOKEN,
-      device_id: device_id,
-      email: user.email
-    )
+    3.times do 
+      puts 'This will sleep for 45 seconds while you complete the steps in your email.'
+      puts 'If thou dost not complete this, thine tests shall fail.'
+      sleep 45
+      begin
+        return app_auth_client.authenticate_device(
+          api_token: TestCreds::API_TOKEN,
+          device_id: device_id,
+          email: user.email
+        )
+      rescue
+      end
+    end
   end
 end
