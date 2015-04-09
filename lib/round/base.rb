@@ -28,11 +28,9 @@ module Round
     end
 
     def self.association(name, klass)
-      class_eval %Q{
-        def #{name}
-          #{klass}.new(resource: @resource.#{name}, client: @client)
-        end
-      }
+      define_method(name) do
+        Kernel.const_get(klass).new(resource: @resource.send(name), client: @client)
+      end
     end
 
   end
