@@ -32,11 +32,13 @@ module Round
       Round::Transaction
     end
 
-    def create(payees, confirmations = 6)
+    def create(payees, confirmations = 6, redirect_uri: nil)
       raise 'Must have list of payees' unless payees
 
       payment_resource = @resource.create(
-        { utxo_confirmations: confirmations, payees: payees }
+        utxo_confirmations: confirmations,
+        payees: payees,
+        redirect_uri: redirect_uri
       )
 
       Round::Transaction.new(resource: payment_resource, client: @client)

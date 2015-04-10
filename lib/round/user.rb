@@ -15,7 +15,8 @@ module Round
       Round::User
     end
 
-   def create(first_name:, last_name:, email:, passphrase:, device_name:)
+   def create(first_name:, last_name:, email:, passphrase:,
+              device_name:, redirect_uri: nil)
       multiwallet = CoinOp::Bit::MultiWallet.generate([:primary], @client.network)
       primary_seed = CoinOp::Encodings.hex(multiwallet.trees[:primary].seed)
       encrypted_seed = CoinOp::Crypto::PassphraseBox.encrypt(passphrase, primary_seed)
@@ -30,7 +31,8 @@ module Round
         first_name: first_name,
         last_name: last_name,
         default_wallet: wallet,
-        device_name: device_name
+        device_name: device_name,
+        redirect_uri: redirect_uri
       }
       user_resource = resource.create(params)
       user = Round::User.new(resource: user_resource, client: @client)
