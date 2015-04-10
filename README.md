@@ -93,16 +93,17 @@ In this step you will create your own personal Gem user and wallet authorized on
 
 	```ruby
 	#  Store the device token for future authentication
-	device_id, user = client.users.create(
+	device_token, user = client.users.create(
                       first_name: 'YOUR FIRST NAME',
                       last_name: 'YOUR LAST NAME',
                       email: 'YOUR EMAIL ADDRESS',
                       passphrase: 'aReallyStrongPassphrase',
                       device_name: 'SOME DEVICE NAME',
+                      redirect_uri: 'http://something/user-device-approved')
                     )
 	```
 
-2. Your application should **store the device_id permanently** as this will be required to authenticate from your app as this user.
+2. Your application should **store the device_token permanently** as this will be required to authenticate from your app as this user.
 3. You (acting as a user) will receive an email from Gem asking you to confirm your account and finish setup.  Please follow the instructions. At the end of the User sign up flow, you'll be redirected to the redirect_uri provided in users.create (if you provided one).
 
 [[top]](README.md#getting-started-tutorial)
@@ -165,10 +166,11 @@ In this section you’ll learn how to create a payment a multi-signature payment
 1. Make a payment
 
 	```ruby
-	transaction = account.pay([{address: 'mxzdT4ShBudVtZbMqPMh9NVM3CS56Fp11s', amount: 25000}], 1)
+	transaction = account.pay([{address: 'mxzdT4ShBudVtZbMqPMh9NVM3CS56Fp11s', amount: 25000}], 1, 'http://some-redirect-uri.com/)
 	```
 
 The pay call takes a list of payee objects.  A payee is a hash of `{address: ADDRESS, amount: amount}` where address is the bitcoin address and amount is the number of satoshis.  `utxo_confirmations` default to 6 and represents the number of confirmations an unspent output needs to have in order to be selected for the transaction.  
+The last argument is the redirect uri for Gem to send the user back to your application after the user submits their MFA challenge.
 
 **CONGRATS** - now build something cool.
 
