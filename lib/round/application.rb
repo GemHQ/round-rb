@@ -24,7 +24,7 @@ module Round
       params.merge!(callback_url: callback_url) if callback_url
       app_resource = @resource.create(params)
       app = Round::Application.new(resource: app_resource, client: @client)
-      self.add(app)
+      add(app)
       app
     end
 
