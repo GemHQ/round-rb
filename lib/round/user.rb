@@ -34,8 +34,8 @@ module Round
       }
       user_resource = resource.create(params)
       user = Round::User.new(resource: user_resource, client: @client)
-      device_id = user.device_id
-      [device_id, user]
+      device_token = user.device_id
+      [device_token, user]
     end
 
   end

@@ -49,11 +49,11 @@ module Round
         .authorize(Context::Scheme::IDENTIFY, api_token: api_token)
     end
 
-    def authenticate_device(email:, api_token:, device_id:)
+    def authenticate_device(email:, api_token:, device_token:)
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVICE, 
-          api_token: api_token, device_id: device_id)
+          api_token: api_token, device_id: device_token)
       @patchboard_client
         .context
         .authorize(Context::Scheme::IDENTIFY, 

@@ -4,9 +4,9 @@ describe Round::UserCollection do
 
   describe 'an application authed user' do
     # this user was not authenticated with the device
-    let!(:device_id_and_user) { app_auth_user }
-    let!(:user) { device_id_and_user[1] }
-    let!(:device_id) { device_id_and_user[0] }
+    let!(:device_token_and_user) { app_auth_user }
+    let!(:user) { device_token_and_user[1] }
+    let!(:device_token) { device_token_and_user[0] }
 
     it 'should have appropriate fields' do
       expect(user.email).to_not be_nil
