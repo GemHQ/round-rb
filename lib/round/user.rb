@@ -32,8 +32,8 @@ module Round
         last_name: last_name,
         default_wallet: wallet,
         device_name: device_name,
-        redirect_uri: redirect_uri
       }
+      params[:redirect_uri] = redirect_uri if redirect_uri
       user_resource = resource.create(params)
       user = Round::User.new(resource: user_resource, client: @client)
       device_token = user.device_id
