@@ -53,7 +53,7 @@ module Round
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVICE, 
-          api_token: api_token, device_id: device_token)
+          api_token: api_token, device_token: device_token)
       @patchboard_client
         .context
         .authorize(Context::Scheme::IDENTIFY, 

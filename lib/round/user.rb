@@ -36,7 +36,7 @@ module Round
       params[:redirect_uri] = redirect_uri if redirect_uri
       user_resource = resource.create(params)
       user = Round::User.new(resource: user_resource, client: @client)
-      device_token = user.device_id
+      device_token = user.device_token
       [device_token, user]
     end
 
