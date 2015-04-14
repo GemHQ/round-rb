@@ -55,7 +55,7 @@ In this step you will learn how to instantiate the API client for the given netw
 
 	```bash
 	$ irb
-	> import round
+	> require 'round'
 	```
 
 1. Create the client object using the sandbox stack
