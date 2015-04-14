@@ -36,17 +36,13 @@ module Round::TestHelpers::Auth
 
   def device_auth_user
     device_token, user = app_auth_user(email: random_email)
-    3.times do
-      puts 'This will sleep for 45 seconds while you complete the steps in your email.'
-      puts 'If thou dost not complete this, thine tests shall fail.'
-      sleep 45
-      user = app_auth_client.authenticate_device(
-        api_token: TestCreds::API_TOKEN,
-        device_token: device_token,
-        email: user.email
-      ) rescue nil
-      return user if user
-    end
-    raise 'Test user did not authenticate via email / MFA.'
+    puts 'This will sleep for 60 seconds while you complete the steps in your email.'
+    puts 'If thou dost not complete this, thine tests shall fail.'
+    sleep 60
+    app_auth_client.authenticate_device(
+      api_token: TestCreds::API_TOKEN,
+      device_token: device_token,
+      email: user.email
+    )
   end
 end
