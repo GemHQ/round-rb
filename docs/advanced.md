@@ -8,7 +8,7 @@ The wallet itself is a BIP32 hierarchical deterministic (HD) wallet.  The Gem wa
 The Gem wallet has convenience methods to make managing the wallet easy to do.  There are key methods to use off of the wallet object:
 
 * `wallet.balance`: returns the total balance of all accounts
-* `wallet.is_locked()`: returns True if locked
+* `wallet.locked?`: returns true if locked
 * `wallet.accounts`: returns a collection of round accounts.
 
 [[top]](README.md#round-rb-advanced-topics) [[back]](../README.md)
@@ -115,19 +115,16 @@ You will start to receive a webhook subscription at the provided url for incomin
 For example - the following snippet will retrieve the user in a given subscription 
 
 ```ruby
-AHH ERROR AJKSFJASLFAKSFJKALJSF
+# COMING SOON
 # generate the client
 client = Round.client
 
 # Authenticate with application credentials
-app = client.authenticate_application(api_token: api_token)
+#app = client.authenticate_application(api_token: api_token)
 
 # get the user given the user key from a subscription.
-sub_user_key = ‘2309rjefvgnu1340jvfvj24r0j’
-user = None
-
-for u in app.users.itervalues():
-	user = u if u.attributes[u’key’] == sub_user_key
+#sub_user_key = ‘2309rjefvgnu1340jvfvj24r0j’
+#user = nil
 ```
 
 [[top]](README.md#round-rb-advanced-topics) [[back]](../README.md)
