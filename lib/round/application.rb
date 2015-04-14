@@ -1,14 +1,14 @@
 module Round
   class Application < Round::Base
-    association :users, "Round::UserCollection"
-    association :wallets, "Round::WalletCollection"
+    association :users, 'Round::UserCollection'
+    association :wallets, 'Round::WalletCollection'
 
     def authorize_instance(name)
       @resource.authorize_instance(name: name)
     end
 
     def self.hash_identifier
-      "name"
+      'name'
     end
 
   end
@@ -24,7 +24,7 @@ module Round
       params.merge!(callback_url: callback_url) if callback_url
       app_resource = @resource.create(params)
       app = Round::Application.new(resource: app_resource, client: @client)
-      self.add(app)
+      add(app)
       app
     end
 

@@ -6,12 +6,13 @@ module Round
       raise 'a wallet is required to sign a transaction' unless wallet
 
       transaction = CoinOp::Bit::Transaction.data(@resource)
-      raise "bad change address" unless wallet.valid_output?(transaction.outputs.last)
+      raise 'bad change address' unless wallet.valid_output?(transaction.outputs.last)
       
-      @resource = @resource.update( signatures: {
-          transaction_hash: transaction.hex_hash,
-          inputs: wallet.signatures(transaction)
-        }
+      @resource = @resource.update( 
+         signatures: {
+           transaction_hash: transaction.hex_hash,
+           inputs: wallet.signatures(transaction)
+         }
       )
       return @resource.mfa_uri, self
     end
@@ -21,7 +22,7 @@ module Round
     end
 
     def self.hash_identifier
-      "hash"
+      'hash'
     end
 
   end
@@ -32,11 +33,13 @@ module Round
       Round::Transaction
     end
 
-    def create(payees, confirmations = 6)
+    def create(payees, confirmations = 6, redirect_uri: nil)
       raise 'Must have list of payees' unless payees
 
       payment_resource = @resource.create(
-        { utxo_confirmations: confirmations, payees: payees }
+        utxo_confirmations: confirmations,
+        payees: payees,
+        redirect_uri: redirect_uri
       )
 
       Round::Transaction.new(resource: payment_resource, client: @client)

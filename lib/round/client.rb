@@ -1,11 +1,11 @@
-require "patchboard"
-require "base64"
-require "date"
+require 'patchboard'
+require 'base64'
+require 'date'
 
 module Round
 
-  MAINNET_URL = "https://api.gem.co"
-  SANDBOX_URL = "https://api-sandbox.gem.co"
+  MAINNET_URL = 'https://api.gem.co'
+  SANDBOX_URL = 'https://api-sandbox.gem.co'
 
   NETWORKS = {
     testnet: :bitcoin_testnet,
@@ -16,8 +16,8 @@ module Round
   }
 
   def self.client(network = :bitcoin_testnet, url = nil)
-    network = NETWORKS[network] || :bitcoin_testnet
-    url ||= network.eql?(:bitcoin_testnet) ? SANDBOX_URL : MAINNET_URL
+    network = NETWORKS.fetch(network, :bitcoin_testnet)
+    url ||= network == :bitcoin_testnet ? SANDBOX_URL : MAINNET_URL
 
     @patchboard ||= ::Patchboard.discover(url) { Client::Context.new }
     Client.new(@patchboard.spawn, network)
@@ -33,10 +33,7 @@ module Round
       @network = network
     end
 
-    def authenticate_application_instance(app_url: nil, api_token: nil, instance_id: nil)
-      raise ArgumentError.new 'app_url is a required argument' unless app_url
-      raise ArgumentError.new 'api_token is a required argument' unless api_token
-
+    def authenticate_application_instance(app_url:, api_token:, instance_id: nil)
       @patchboard_client
         .context
         .authorize(Context::Scheme::APPLICATION, 
@@ -46,17 +43,17 @@ module Round
       self.application(app_url).refresh
     end
 
-    def authenticate_application(api_token: nil)
+    def authenticate_application(api_token:)
       @patchboard_client
         .context
         .authorize(Context::Scheme::IDENTIFY, api_token: api_token)
     end
 
-    def authenticate_device(email: nil, api_token: nil, device_id: nil)
+    def authenticate_device(email:, api_token:, device_token:)
       @patchboard_client
         .context
         .authorize(Context::Scheme::DEVICE, 
-          api_token: api_token, device_id: device_id)
+          api_token: api_token, device_token: device_token)
       @patchboard_client
         .context
         .authorize(Context::Scheme::IDENTIFY, 
@@ -73,20 +70,18 @@ module Round
     end
 
     def application(app_url)
-      raise ArgumentError.new 'app_url is a required argument' unless app_url
       Application.new(resource: resources.application(app_url), client: self)
     end
 
     def user(email)
-      raise ArgumentError.new 'email is a required argument' unless email
       User.new(resource: resources.user_query(email: email), client: self)
     end
 
     class Context
       module Scheme
-        DEVICE = "Gem-Device"
-        APPLICATION = "Gem-Application"
-        IDENTIFY = "Gem-Identify"
+        DEVICE = 'Gem-Device'
+        APPLICATION = 'Gem-Application'
+        IDENTIFY = 'Gem-Identify'
       end
 
       SCHEMES = [Scheme::DEVICE, Scheme::APPLICATION, Scheme::IDENTIFY]
@@ -97,29 +92,22 @@ module Round
         @schemes = {}
       end
 
+      # Is there a list of accepted params somewhere?
       def authorize(scheme, params)
-        raise ArgumentError, "Unknown auth scheme" unless SCHEMES.include?(scheme)
+        raise ArgumentError, 'Params cannot be empty.' if params.empty?
+        raise ArgumentError, 'Unknown auth scheme' unless SCHEMES.include?(scheme)
         @schemes[scheme] = params
       end
 
       def compile_params(params)
-        if params.empty?
-          # crappy alternative to raising an error when there are no params
-          # TODO: probably should raise an error
-          "data=none"
-        else
-          params.map {|key, value|
-            #super hacky. but it's late.
-            value.tr!('=', '') if key.eql?(:signature)
-            %Q[#{key}="#{value}"]}.join(", ")
-        end
+        params.map do |key, value|
+          %Q(#{key}="#{value}")
+        end.join(', ')
       end
 
-      def authorizer(options = {})
-        schemes, resource, action, request = options.values_at(:schemes, :resource, :action, :request)
-        schemes = [schemes] if schemes.is_a? String
+      def authorizer(schemes: [], action: 'NULL ACTION', **kwargs)
         schemes.each do |scheme|
-          if params = @schemes[scheme]
+          if (params = @schemes[scheme])
             credential = compile_params(params)
             return [scheme, credential]
           end
@@ -134,14 +122,14 @@ module Round
       end
     end
 
-    class UnknownKeyError < StandardError; end
-    class OTPConflictError < StandardError; end
+    UnknownKeyError = Class.new(StandardError)
+    OTPConflictError = Class.new(StandardError)
 
     class OTPAuthFailureError < StandardError
       attr_reader :key
 
       def initialize(key)
-        super()
+        super
         @key = key
       end
     end

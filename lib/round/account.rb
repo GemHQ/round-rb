@@ -1,8 +1,7 @@
 module Round
   class Account < Round::Base
-    association :addresses, "Round::AddressCollection"
-    association :transactions, "Round::TransactionCollection"
-    association :subscriptions, "Round::SubscriptionCollection"
+    association :addresses, 'Round::AddressCollection'
+    association :subscriptions, 'Round::SubscriptionCollection'
 
     attr_accessor :wallet
 
@@ -12,11 +11,18 @@ module Round
       @wallet = options[:wallet]
     end
 
-    def pay(payees, confirmations)
+    def transactions(**query)
+      Round::TransactionCollection.new(
+        resource: @resource.transactions(query),
+        client: @client
+      )
+    end
+
+    def pay(payees, confirmations, redirect_uri = nil)
       raise ArgumentError, 'Payees must be specified' unless payees
       raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 
-      payment = self.transactions.create(payees, confirmations)
+      payment = self.transactions.create(payees, confirmations, redirect_uri: redirect_uri)
       payment.sign(@wallet.multiwallet)
     end
 
@@ -31,7 +37,7 @@ module Round
     def initialize(options = {})
       raise ArgumentError, 'AccountCollection must be associated with a wallet' unless options[:wallet]
       @wallet = options[:wallet]
-      super(options) {|account| account.wallet = @wallet}
+      super(options) { |account| account.wallet = @wallet }
     end
 
     def content_type
@@ -41,7 +47,7 @@ module Round
     def create(name)
       resource = @resource.create(name: name)
       account = Round::Account.new(resource: resource, wallet: @wallet, client: @client)
-      self.add(account)
+      add(account)
       account
     end
 
