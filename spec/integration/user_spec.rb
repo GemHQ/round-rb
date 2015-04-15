@@ -33,7 +33,9 @@ describe Round::UserCollection do
       end
 
       it 'should be able to create a wallet' do
-        expect(@user.wallets.create('wallet', 'passphrase')).to_not be_nil
+        wallet = @user.wallets.create('wallet', 'passphrase')
+        expect(wallet).to_not be_nil
+        expect { wallet.backup_key }.to raise_error
       end
 
       it 'has a wallet with an account' do
