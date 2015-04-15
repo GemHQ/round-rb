@@ -1,6 +1,7 @@
 module Round::TestHelpers::Auth 
   module TestCreds
     API_TOKEN = ENV['GEM_API_TOKEN'] || raise('Set ENV variable: GEM_API_TOKEN')
+    ADMIN_TOKEN = ENV['GEM_ADMIN_TOKEN'] || raise('Set ENV var: GEM_ADMIN_TOKEN')
     EMAIL = ENV['GEM_EMAIL']
                 #ayn 
     PASSPHRASE = rand(1000..1000000).to_s
@@ -17,15 +18,27 @@ module Round::TestHelpers::Auth
     e
   end
 
-  def app_auth_client
-    client = Round.client
-    client.authenticate_application(api_token: TestCreds::API_TOKEN)
+  def identify_auth_client
+    #client = Round.client(:bitcoin_testnet)
+    client = Round.client(:bitcoin_testnet, 'http://localhost:8999/')
+    client.authenticate_identify(
+      api_token: TestCreds::API_TOKEN
+    )
     client
   end
 
-  def app_auth_user(email: "email#{rand(100..10000).to_s}@mailinator.com")
+  def app_auth_client
+    client = identify_auth_client
+    app = client.authenticate_application(
+      api_token: TestCreds::API_TOKEN,
+      admin_token: TestCreds::ADMIN_TOKEN
+    )
+    [app, client]
+  end
+
+  def identify_auth_user(email: "email#{rand(100..10000).to_s}@mailinator.com")
     puts "App auth user created with at #{email}"
-    app_auth_client.users.create(
+    identify_auth_client.users.create(
       first_name: TestCreds::FIRST_NAME, 
       last_name: TestCreds::LAST_NAME, 
       passphrase: TestCreds::PASSPHRASE, 
@@ -35,11 +48,11 @@ module Round::TestHelpers::Auth
   end
 
   def device_auth_user
-    device_token, user = app_auth_user(email: random_email)
+    device_token, user = identify_auth_user(email: random_email)
     puts 'This will sleep for 60 seconds while you complete the steps in your email.'
     puts 'If thou dost not complete this, thine tests shall fail.'
     sleep 60
-    app_auth_client.authenticate_device(
+    identify_auth_client.authenticate_device(
       api_token: TestCreds::API_TOKEN,
       device_token: device_token,
       email: user.email

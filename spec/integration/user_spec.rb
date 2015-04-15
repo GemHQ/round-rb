@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe Round::UserCollection do
 
-  describe 'an application authed user' do
+  describe 'with identify auth' do
     # this user was not authenticated with the device
-    let!(:device_token_and_user) { app_auth_user }
+    let!(:device_token_and_user) { identify_auth_user }
     let!(:user) { device_token_and_user[1] }
     let!(:device_token) { device_token_and_user[0] }
 
