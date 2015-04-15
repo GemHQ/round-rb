@@ -75,6 +75,7 @@ to see all the attributes of an object:
 ```ruby
 puts account.attributes
 ```
+
 To access a particular attribute:
 
 ```ruby
@@ -115,16 +116,16 @@ You will start to receive a webhook subscription at the provided url for incomin
 For example - the following snippet will retrieve the user in a given subscription 
 
 ```ruby
-# COMING SOON
 # generate the client
 client = Round.client
 
 # Authenticate with application credentials
-#app = client.authenticate_application(api_token: api_token)
+app = client.authenticate_application(api_token: api_token,
+                                       admin_token: admin_token)
 
-# get the user given the user key from a subscription.
-#sub_user_key = ‘2309rjefvgnu1340jvfvj24r0j’
-#user = nil
+# The notification sent to you will contain the user key.
+sub_user_key = ‘2309rjefvgnu1340jvfvj24r0j’
+user = app.user_from_key(sub_user_key)
 ```
 
 [[top]](README.md#round-rb-advanced-topics) [[back]](../README.md)
@@ -149,8 +150,8 @@ There are certain scenarios where you want to implement a wallet that you are in
 
 ### Configure 
 
-* Create a new instance token in the management console.  
-	* Instance tokens are used in the application authentication scheme.  When authenticating as an application, you will have full control of the applications wallets and allows a read only view of end user data if your app supports both.
+* Create a new admin token in the management console.  
+	* Admin tokens are used in the application authentication scheme.  When authenticating as an application, you will have full control of the applications wallets and allows a read only view of end user data if your app supports both.
 * __Keep the token safe__
 
 [[top]](README.md#round-rb-advanced-topics) [[back]](../README.md)
@@ -159,18 +160,19 @@ There are certain scenarios where you want to implement a wallet that you are in
 To authenticate as an application to get to an application wallet and/or pull information about the application call:
 
 ```ruby
-app = client.authenticate_application(app_url: app_url, 
-                                      api_token: api_token, 
-                                      instance_id: instance_id)
+app = client.authenticate_application(admin_token: admin_token, 
+                                      api_token: api_token)
 ```
 
 [[top]](README.md#round-rb-advanced-topics) [[back]](../README.md)
 
 ### Wallet creation
 
-`backup_key, totp_secret, wallet = app.wallets.create(<PASSPHRASE>)`
+```ruby
+wallet = app.wallets.create(<PASSPHRASE>)
+backup_key = wallet.backup_key
+```
 
-* The totp secret is to be stored in a config file on the server operating the round client for this wallet.  This will be a part of the payment process.
 * The backup key is the root node that can derive all accounts, addresses.  This key will only be returned once via this call.  __YOU MUST STORE IT IN A SAFE PLACE OFFLINE__.  If you loose the backup_key and then later forget the passphrase to unlock the primary key, you will not be able to recover the wallet.
 * The wallet is the full wallet.  You can generate the accounts, addresses etc same as an end user in the previous steps.
 
@@ -180,9 +182,12 @@ app = client.authenticate_application(app_url: app_url,
 In this section you’ll learn how to make a payment for an operational/custodial wallet.
 
 1. Authenticate as the application
-	1. `app = client.authenticate_application(app_url, api_token, instance_token)`
+	1. `app = client.authenticate_application(
+    admin_token: admin_token, 
+    api_token: api_token,
+  )`
 1. Unlock the wallet.
-	1. `wallet.unlock(passphrase, top_secret)`
+	1. `wallet.unlock(passphrase)`
 1. make a payment
 	1. `account.pay(payee,4)`
 
