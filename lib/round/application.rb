@@ -7,10 +7,6 @@ module Round
       @resource.authorize_instance(name: name)
     end
 
-    def wallets
-      Round::WalletCollection.new(resource: @resource.wallets, client: @client, uses_app: true)
-    end
-
     def user_from_key(key)
       users.detect { |u| u.key == key }
     end

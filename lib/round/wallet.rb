@@ -37,20 +37,12 @@ module Round
 
   class WalletCollection < Round::Collection
 
-    def initialize(**kwargs)
-      @uses_app = kwargs[:uses_app]
-      super
-    end
-
     def content_type
       Round::Wallet
     end
 
     def create(name, passphrase, network: 'bitcoin_testnet',
-               multiwallet: CoinOp::Bit::MultiWallet.generate([:primary]))
-      if @uses_app
-        multiwallet = CoinOp::Bit::MultiWallet.generate([:primary, :backup])
-      end
+               multiwallet: CoinOp::Bit::MultiWallet.generate([:primary, :backup]))
       wallet_resource = create_wallet_resource(multiwallet, passphrase, name, network)
       wallet = Round::Wallet.new(resource: wallet_resource, multiwallet: multiwallet)
       add(wallet)
