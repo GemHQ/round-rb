@@ -126,10 +126,10 @@ In this step you will learn how to authenticate to the Gem API on a User's devic
 ### 5. Access the wallet and Default Account
 [Wallets and Accounts](docs/advanced.md#wallets-and-accounts)
 
-1. Get the default wallet and then default account
+1. Get the wallet and then default account
 
 	```ruby
-	my_account = full_user.wallets['default'].accounts['default']
+	my_account = full_user.wallet.accounts['default']
 	```
 
 [[top]](README.md#getting-started-tutorial)

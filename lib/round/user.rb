@@ -7,6 +7,10 @@ module Round
     def self.hash_identifier
       'email'
     end
+    
+    def wallet
+      wallets.first
+    end
   end
 
   class UserCollection < Round::Collection
