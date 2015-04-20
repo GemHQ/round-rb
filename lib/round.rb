@@ -1,5 +1,6 @@
 require 'rbnacl/libsodium'
 require 'coin-op'
+require 'rotp'
 
 # Establish the namespace.
 module Round

@@ -22,6 +22,10 @@ module Round
       )
     end
 
+    def backup_key
+      @multiwallet.private_seed(:backup) 
+    end
+
     def accounts
       Round::AccountCollection.new(resource: @resource.accounts, wallet: self)
     end

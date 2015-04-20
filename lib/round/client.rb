@@ -33,17 +33,17 @@ module Round
       @network = network
     end
 
-    def authenticate_application_instance(app_url:, api_token:, instance_id: nil)
+    def authenticate_application(api_token:, admin_token:)
       @patchboard_client
         .context
         .authorize(Context::Scheme::APPLICATION, 
-          api_token: api_token, instance_id: instance_id)
-      authenticate_application(api_token: api_token)
+          api_token: api_token, admin_token: admin_token)
+      authenticate_identify(api_token: api_token)
 
-      self.application(app_url).refresh
+      self.application.refresh
     end
 
-    def authenticate_application(api_token:)
+    def authenticate_identify(api_token:)
       @patchboard_client
         .context
         .authorize(Context::Scheme::IDENTIFY, api_token: api_token)
@@ -69,8 +69,8 @@ module Round
       UserCollection.new(resource: resources.users, client: self)
     end
 
-    def application(app_url)
-      Application.new(resource: resources.application(app_url), client: self)
+    def application
+      Application.new(resource: resources.app.get, client: self)
     end
 
     def user(email)
@@ -86,7 +86,7 @@ module Round
 
       SCHEMES = [Scheme::DEVICE, Scheme::APPLICATION, Scheme::IDENTIFY]
 
-      attr_accessor :schemes
+      attr_accessor :schemes, :mfa_token
 
       def initialize
         @schemes = {}
@@ -100,9 +100,11 @@ module Round
       end
 
       def compile_params(params)
-        params.map do |key, value|
+        compiled = params.map do |key, value|
           %Q(#{key}="#{value}")
         end.join(', ')
+        compiled << ", mfa_token=#{@mfa_token}" if @mfa_token
+        compiled
       end
 
       def authorizer(schemes: [], action: 'NULL ACTION', **kwargs)
