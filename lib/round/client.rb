@@ -70,7 +70,7 @@ module Round
     end
 
     def application
-      Application.new(resource: resources.app.get(), client: self)
+      Application.new(resource: resources.app.get, client: self)
     end
 
     def user(email)
@@ -86,7 +86,7 @@ module Round
 
       SCHEMES = [Scheme::DEVICE, Scheme::APPLICATION, Scheme::IDENTIFY]
 
-      attr_accessor :schemes
+      attr_accessor :schemes, :mfa_token
 
       def initialize
         @schemes = {}
@@ -100,9 +100,11 @@ module Round
       end
 
       def compile_params(params)
-        params.map do |key, value|
+        compiled = params.map do |key, value|
           %Q(#{key}="#{value}")
         end.join(', ')
+        compiled << ", mfa_token=#{@mfa_token}" if @mfa_token
+        compiled
       end
 
       def authorizer(schemes: [], action: 'NULL ACTION', **kwargs)

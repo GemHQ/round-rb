@@ -1,4 +1,8 @@
 module Round
+  API_TOKEN = 'api_token'
+  TOTP_SECRET = 'totp_secret'
+  SUBSCRIPTION_TOKEN = 'subscription_token'
+
   class Application < Round::Base
     association :users, 'Round::UserCollection'
     association :wallets, 'Round::WalletCollection'
@@ -15,6 +19,23 @@ module Round
       'name'
     end
 
+    def totp=(totp_secret)
+      @totp = ROTP::TOTP.new(totp_secret)
+    end
+
+    def get_mfa
+      @totp.now
+    end
+
+    def with_mfa!(token)
+      context.mfa_token = token
+      self
+    end
+
+    def reset(*resets)
+      @resource.reset(resets)
+      self
+    end
   end
 
   class ApplicationCollection < Round::Collection

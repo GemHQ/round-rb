@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency('patchboard', '~> 0.5.2')
   s.add_dependency('http', '0.6.0')
+  s.add_dependency('rotp', '2.1.0')
   s.add_dependency('rbnacl', '~> 3.1.0')
   s.add_dependency('rbnacl-libsodium', '~> 1.0.0')
   s.add_dependency('coin-op', '~> 0.2')

@@ -25,5 +25,19 @@ describe Round::Application do
       expect(app.users.size).to eq size + 1
       expect(app.user_from_key(user.key).key).to eq user.key
     end
+
+    # Uncomment this if you'd like to test resetting tokens.
+    # This will break other tests and force you to reassign ENV vars.
+    #it 'should reset api_token' do
+      #api_token = app.api_token
+      #app.totp = Round::TestHelpers::Auth::TestCreds::TOTP_SECRET
+      #token = app.get_mfa
+      #puts token
+      #new_app = app.with_mfa!(token).reset(Round::API_TOKEN)
+      #new_app.refresh
+      #expect(new_app.api_token).to_not eq api_token
+      #puts 'NEW API TOKEN'
+      #puts new_app.api_token
+    #end
   end
 end

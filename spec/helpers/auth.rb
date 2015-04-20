@@ -2,6 +2,7 @@ module Round::TestHelpers::Auth
   module TestCreds
     API_TOKEN = ENV['GEM_API_TOKEN'] || raise('Set ENV variable: GEM_API_TOKEN')
     ADMIN_TOKEN = ENV['GEM_ADMIN_TOKEN'] || raise('Set ENV var: GEM_ADMIN_TOKEN')
+    TOTP_SECRET = ENV['GEM_TOTP_SECRET'] || raise('Set ENV var: GEM_TOTP_SECRET')
     EMAIL = ENV['GEM_EMAIL']
                 #ayn 
     PASSPHRASE = rand(1000..1000000).to_s

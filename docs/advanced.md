@@ -139,7 +139,7 @@ Example of how to incorporate 2FA into your app.
 def login_user(user)
 	user.send_mfa(phone_number: 5555551212)
 	verify_password
-	unlock_account(user) if user.verify_mfa(USER_ENTERED_MFA) 
+	unlock_account(user) if user.verify_mfa(<USER_ENTERED_MFA>) 
 end
 ```
 
