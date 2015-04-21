@@ -12,6 +12,7 @@ module Round
     end
 
     def transactions(**query)
+      query[:status] = query[:status].join(',') if query[:status]
       Round::TransactionCollection.new(
         resource: @resource.transactions(query),
         client: @client

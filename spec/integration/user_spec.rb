@@ -50,7 +50,7 @@ describe Round::UserCollection do
       context 'that users account' do
         it 'should query transactions' do
           account = @user.wallet.accounts.first
-          expect { account.transactions(type: 'outgoing') }
+          expect { account.transactions(type: 'outgoing', status: ['unsigned', 'unconfirmed']) }
             .to_not raise_error
         end
       end
