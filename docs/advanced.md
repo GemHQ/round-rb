@@ -29,6 +29,7 @@ A pending_balance in Gem is any address involved in a transaction with 0 confirm
 
 ## Transactions and Payments
 Transaction collections have a relationship to an account. You can specify the following query parameters for transactions:
+For status, you can pass an array of multiple conditions.
 * `status: ['unsigned', 'unconfirmed', 'confirmed', 'rejected', 'canceled']`
 * `type: ['incoming', 'outgoing', 'transfer_in', 'transfer_out', 'change']`
 

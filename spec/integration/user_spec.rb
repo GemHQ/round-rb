@@ -32,31 +32,25 @@ describe Round::UserCollection do
         @user = device_auth_user
       end
 
-      it 'should be able to create a wallet' do
-        wallet = @user.wallets.create('wallet', 'passphrase')
-        expect(wallet).to_not be_nil
-      end
-
       it 'has a wallet with an account' do
-        wallet = @user.wallets.create('wallet1', 'passphrase1')
+        wallet = @user.wallet
         expect(wallet.accounts.size).to eq 1
       end
 
       it 'can unlock your wallet' do
-        wallet = @user.wallets.create('wallet2', 'passphrase2')
-        expect { wallet.unlock('passphrase2') }.to_not raise_error
+        wallet = @user.wallet
+        expect { wallet.unlock(Round::TestHelpers::Auth::TestCreds::PASSPHRASE) }
+          .to_not raise_error
       end
 
       it 'can try to unlock a wallet unsuccessfully' do
-        wallet = @user.wallets.create('wallet2', 'passphrase2')
-        expect { wallet.unlock('incorrect') }.to raise_error
+        expect { @user.wallet.unlock('incorrect') }.to raise_error
       end
 
       context 'that users account' do
         it 'should query transactions' do
-          wallet = @user.wallets.create('wallet1', 'passphrase1')
-          account = wallet.accounts.first
-          expect { account.transactions(type: 'outgoing') }
+          account = @user.wallet.accounts.first
+          expect { account.transactions(type: 'outgoing', status: ['unsigned', 'unconfirmed']) }
             .to_not raise_error
         end
       end
