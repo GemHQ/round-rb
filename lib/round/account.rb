@@ -45,8 +45,11 @@ module Round
       Round::Account
     end
 
-    def create(name)
-      resource = @resource.create(name: name)
+    def create(name:, network:)
+      unless [:testnet, :bitcoin].include?(network)
+        raise ArgumentError, 'Network must be :testnet or :bitcoin.'
+      end
+      resource = @resource.create(name: name, network: network)
       account = Round::Account.new(resource: resource, wallet: @wallet, client: @client)
       add(account)
       account

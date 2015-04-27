@@ -14,6 +14,7 @@ describe Round::Application do
 
     it 'should have accounts' do
       wallet = app.wallets.create('name', 'p2')
+      binding.pry
       account = wallet.accounts['default']
       expect(account.respond_to?(:pay)).to eq true
       expect(wallet.backup_key).to_not be_nil

@@ -14,7 +14,7 @@ module Round
            inputs: wallet.signatures(transaction)
          }
       )
-      return @resource.mfa_uri, self
+      self
     end
 
     def transaction_hash

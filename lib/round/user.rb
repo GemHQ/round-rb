@@ -26,7 +26,6 @@ module Round
       encrypted_seed = CoinOp::Crypto::PassphraseBox.encrypt(passphrase, primary_seed)
       wallet = {
         name: 'default',
-        network: @client.network,
         primary_public_seed: multiwallet.trees[:primary].to_serialized_address,
         primary_private_seed: encrypted_seed
       }
