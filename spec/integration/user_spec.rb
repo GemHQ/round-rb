@@ -39,8 +39,9 @@ describe Round::UserCollection do
 
       it 'can unlock your wallet' do
         wallet = @user.wallet
-        expect { wallet.unlock(Round::TestHelpers::Auth::TestCreds::PASSPHRASE) }
-          .to_not raise_error
+        expect do
+          wallet.unlock(Round::TestHelpers::Auth::TestCreds::PASSPHRASE)
+        end.to_not raise_error
       end
 
       it 'can try to unlock a wallet unsuccessfully' do
