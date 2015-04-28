@@ -34,6 +34,7 @@ module Round::TestHelpers::Auth
       api_token: TestCreds::API_TOKEN,
       admin_token: TestCreds::ADMIN_TOKEN
     )
+    app.totp = TestCreds::TOTP_SECRET
     [app, client]
   end
 

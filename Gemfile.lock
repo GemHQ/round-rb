@@ -1,8 +1,25 @@
+GIT
+  remote: https://github.com/GemHQ/coin-op
+  revision: c356e4de0dc4bda26c1c33c2463fb96a52e4f0bd
+  branch: vendor
+  specs:
+    coin-op (0.2.4)
+      bitcoin-ruby (= 0.0.6)
+      hashie (~> 2.0)
+      rbnacl-libsodium (~> 1.0)
+
+GIT
+  remote: https://github.com/GemHQ/money-tree
+  revision: d72b971afca783befa6943660ed205b0423fd194
+  branch: remove-network-state
+  specs:
+    money-tree (0.8.9)
+      ffi
+
 PATH
   remote: .
   specs:
     round (0.7.0)
-      coin-op (~> 0.2)
       http (= 0.6.0)
       patchboard (~> 0.5.2)
       rbnacl (~> 3.1.0)
@@ -12,12 +29,9 @@ PATH
 GEM
   remote: http://rubygems.org/
   specs:
-    addressable (2.3.6)
+    addressable (2.3.8)
     bitcoin-ruby (0.0.6)
     coderay (1.1.0)
-    coin-op (0.2.3)
-      bitcoin-ruby (= 0.0.6)
-      money-tree (~> 0.8)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)
@@ -28,13 +42,11 @@ GEM
     http_parser.rb (0.6.0)
     json (1.8.2)
     method_source (0.8.2)
-    money-tree (0.8.9)
-      ffi
     patchboard (0.5.2)
       hashie (~> 2.0)
       http (~> 0.5)
       json (~> 1.8)
-    pry (0.10.0)
+    pry (0.10.1)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
@@ -43,25 +55,26 @@ GEM
     rbnacl-libsodium (1.0.2)
       rbnacl (~> 3.0, >= 3.0.1)
     rotp (2.1.0)
-    rspec (3.0.0)
-      rspec-core (~> 3.0.0)
-      rspec-expectations (~> 3.0.0)
-      rspec-mocks (~> 3.0.0)
-    rspec-core (3.0.2)
-      rspec-support (~> 3.0.0)
-    rspec-expectations (3.0.2)
+    rspec (3.2.0)
+      rspec-core (~> 3.2.0)
+      rspec-expectations (~> 3.2.0)
+      rspec-mocks (~> 3.2.0)
+    rspec-core (3.2.3)
+      rspec-support (~> 3.2.0)
+    rspec-expectations (3.2.1)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.0.0)
-    rspec-mocks (3.0.2)
-      rspec-support (~> 3.0.0)
-    rspec-support (3.0.2)
-    safe_yaml (1.0.3)
-    slop (3.5.0)
+      rspec-support (~> 3.2.0)
+    rspec-mocks (3.2.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.2.0)
+    rspec-support (3.2.2)
+    safe_yaml (1.0.4)
+    slop (3.6.0)
     term-ansicolor (1.3.0)
       tins (~> 1.0)
-    tins (1.3.0)
+    tins (1.5.1)
     vcr (2.9.3)
-    webmock (1.18.0)
+    webmock (1.21.0)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
 
@@ -69,6 +82,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  coin-op!
+  money-tree!
   pry
   round!
   rspec (~> 3.0)

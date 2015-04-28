@@ -23,8 +23,12 @@ describe Round::Application do
       wallet = app.wallets.create('name', 'p2')
       testnet_a = wallet.accounts.create(name: 'test', network: :testnet)
       bitcoin_a = wallet.accounts.create(name: 'bit', network: :bitcoin)
-      expect(testnet_a.addresses.create.string[0]).to eq '2'
-      expect(bitcoin_a.addresses.create.string[0]).to eq '3'
+      testnet_addr = testnet_a.addresses.create.string
+      expect(testnet_addr[0]).to eq '2'
+      bitcoin_addr = bitcoin_a.addresses.create.string
+      expect(bitcoin_addr[0]).to eq '3'
+      binding.pry
+      puts 'hello'
     end
 
     it 'should view users' do

@@ -1,10 +1,11 @@
 module Round
   class Wallet < Round::Base
 
-    attr_reader :multiwallet
+    attr_reader :multiwallet, :application
 
     def initialize(options = {})
       @multiwallet = options[:multiwallet]
+      @application = options[:application]
       super(options)
     end
 
@@ -37,6 +38,11 @@ module Round
 
   class WalletCollection < Round::Collection
 
+    def initialize(options={}, &block)
+      super
+      @parent = options[:parent]
+    end
+
     def content_type
       Round::Wallet
     end
@@ -44,7 +50,10 @@ module Round
     def create(name, passphrase, network: 'bitcoin_testnet',
                multiwallet: CoinOp::Bit::MultiWallet.generate([:primary, :backup]))
       wallet_resource = create_wallet_resource(multiwallet, passphrase, name)
-      wallet = Round::Wallet.new(resource: wallet_resource, multiwallet: multiwallet)
+      multiwallet.import(
+        cosigner: wallet_resource.cosigner_public_seed,
+      )
+      wallet = Round::Wallet.new(resource: wallet_resource, multiwallet: multiwallet, application: @application)
       add(wallet)
       wallet
     end

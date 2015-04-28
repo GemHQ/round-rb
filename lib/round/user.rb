@@ -21,7 +21,7 @@ module Round
 
    def create(first_name:, last_name:, email:, passphrase:,
               device_name:, redirect_uri: nil)
-      multiwallet = CoinOp::Bit::MultiWallet.generate([:primary], @client.network)
+      multiwallet = CoinOp::Bit::MultiWallet.generate([:primary])
       primary_seed = CoinOp::Encodings.hex(multiwallet.trees[:primary].seed)
       encrypted_seed = CoinOp::Crypto::PassphraseBox.encrypt(passphrase, primary_seed)
       wallet = {

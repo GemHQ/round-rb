@@ -19,12 +19,17 @@ module Round
       )
     end
 
-    def pay(payees, confirmations, redirect_uri = nil)
+    def pay(payees, confirmations, redirect_uri = nil, mfa_token: nil)
       raise ArgumentError, 'Payees must be specified' unless payees
       raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 
       payment = self.transactions.create(payees, confirmations, redirect_uri: redirect_uri)
-      payment.sign(@wallet.multiwallet)
+      signed = payment.sign(@wallet.multiwallet, network: network.to_sym)
+      if mfa_token && wallet.application
+        @client.context.mfa_token = mfa_token
+        signed.approve
+      end
+      signed
     end
 
     def self.hash_identifier
