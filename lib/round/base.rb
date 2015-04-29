@@ -2,10 +2,9 @@ module Round
   class Base
     attr_reader :resource
 
-    def initialize(options = {})
-      raise ArgumentError, 'A resource must be set on this object' unless options[:resource]
-      @resource = options[:resource]
-      @client = options[:client]
+    def initialize(resource:, client:, **kwargs)
+      @resource = resource
+      @client = client
     end
 
     def refresh

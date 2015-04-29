@@ -1,10 +1,11 @@
 module Round
   class Wallet < Round::Base
 
-    attr_reader :multiwallet
+    attr_reader :multiwallet, :application
 
     def initialize(options = {})
       @multiwallet = options[:multiwallet]
+      @application = options[:application]
       super(options)
     end
 
@@ -27,7 +28,11 @@ module Round
     end
 
     def accounts
-      Round::AccountCollection.new(resource: @resource.accounts, wallet: self)
+      Round::AccountCollection.new(
+        resource: @resource.accounts,
+        wallet: self,
+        client: @client
+      )
     end
 
     def self.hash_identifier
@@ -36,6 +41,11 @@ module Round
   end
 
   class WalletCollection < Round::Collection
+
+    def initialize(options, &block)
+      super
+      @application = options[:application]
+    end
 
     def content_type
       Round::Wallet
