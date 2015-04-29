@@ -93,7 +93,7 @@ In this step you will create your own personal Gem user and wallet authorized on
 
 	```ruby
 	#  Store the device token for future authentication
-	device_token, user = client.users.create(
+	device_token = client.users.create(
                       first_name: 'YOUR FIRST NAME',
                       last_name: 'YOUR LAST NAME',
                       email: 'YOUR EMAIL ADDRESS',

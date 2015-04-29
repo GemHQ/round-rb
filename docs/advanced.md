@@ -163,6 +163,7 @@ To authenticate as an application to get to an application wallet and/or pull in
 ```ruby
 app = client.authenticate_application(admin_token: admin_token, 
                                       api_token: api_token)
+app.totp = <YOUR TOTP SECRET>
 ```
 
 [[top]](README.md#round-rb-advanced-topics) [[back]](../README.md)
@@ -187,10 +188,11 @@ In this section you’ll learn how to make a payment for an operational/custodia
     admin_token: admin_token, 
     api_token: api_token,
   )`
+  1. `app.totp = <YOUR TOTP SECRET>`
 1. Unlock the wallet.
 	1. `wallet.unlock(passphrase)`
 1. make a payment
-	1. `account.pay(payee,4)`
+	1. `account.pay(payee,4, 'http://some-redirect-uri/')`
 
 The Gem client will use the top_secret to generate an MFA token that will be sent as part of the payment calls and verify on the Gem API side.
 
