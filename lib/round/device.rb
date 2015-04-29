@@ -3,7 +3,8 @@ module Round
 
   end
 
-  class DeviceCollection < Collection
+  class DeviceCollection < Base
+
     def create(name, redirect_uri: nil)
       params = { name: name }
       params[:redirect_uri] = redirect_uri if redirect_uri

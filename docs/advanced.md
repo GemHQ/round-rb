@@ -2,6 +2,23 @@
 
 ## Wallets and Accounts
 
+### Existing users
+
+To get & authorize an existing user, do the following:
+
+```ruby
+client.authenticate_identify(api_token: <API_TOKEN>)
+user = client.user(<USER_EMAIL>)
+device_token, mfa_uri = user.devices.create('some device name')
+# redirect the user to mfa_uri to confirm the authorization.
+full_user = client.authenticate_device(
+              api_token: <API_TOKEN>,
+              device_token: device_token,
+              email: user.email
+            )
+# do cool stuff on behalf of the user
+```
+
 ### Wallets
 The wallet itself is a BIP32 hierarchical deterministic (HD) wallet.  The Gem wallet takes the approach of calling the root node a wallet.  Going to depth1 gets you to the Account nodes and depth2 the addresses underneath the accounts.  
 

@@ -2,10 +2,19 @@ module Round
   class User < Round::Base
     association :wallets, 'Round::WalletCollection'
     association :default_wallet, 'Round::Wallet'
-    association :devices, 'Round::DeviceCollection'
 
     def self.hash_identifier
       'email'
+    end
+
+    def devices
+      resource = @client.resources.devices_query(
+        email: self.refresh.email
+      )
+      Round::DeviceCollection.new(
+        resource: resource,
+        client: @client
+      )
     end
     
     def wallet
