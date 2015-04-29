@@ -17,13 +17,13 @@ describe Round::Application do
       account = wallet.accounts['default']
       expect(account.respond_to?(:pay)).to eq true
       expect(wallet.backup_key).to_not be_nil
+      account.addresses.create
     end
 
     it 'should view users' do
       size = app.users.size
-      _, user = identify_auth_user
+      identify_auth_user
       expect(app.users.size).to eq size + 1
-      expect(app.user_from_key(user.key).key).to eq user.key
     end
 
     # Uncomment this if you'd like to test resetting tokens.
