@@ -28,8 +28,9 @@ module Round
       if wallet.application
         mfa_token = mfa_token || @wallet.application.get_mfa
         signed.approve(mfa_token)
+        signed.refresh
       end
-      signed.refresh
+      signed
     end
 
     def self.hash_identifier
