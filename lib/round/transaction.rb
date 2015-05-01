@@ -6,7 +6,6 @@ module Round
       raise 'a wallet is required to sign a transaction' unless wallet
 
       transaction = CoinOp::Bit::Transaction.data(@resource, network: network)
-      binding.pry
       raise 'bad change address' unless wallet.valid_output?(transaction.outputs.last)
       
       @resource = @resource.update( 

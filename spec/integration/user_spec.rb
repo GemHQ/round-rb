@@ -29,8 +29,26 @@ describe Round::UserCollection do
       context 'that users account' do
         it 'should query transactions' do
           account = @user.wallet.accounts.first
-          expect { account.transactions(type: 'outgoing', status: ['unsigned', 'unconfirmed']) }
-            .to_not raise_error
+          expect do
+            account.transactions(type: 'outgoing', status: ['unsigned', 'unconfirmed'])
+          end.to_not raise_error
+        end
+
+        it 'should create different kinds of addresses' do
+          bitcoin_account = @user.wallet.accounts.create(name: 'bitcoin', network: :bitcoin)
+          testnet_account = @user.wallet.accounts.create(name: 'testnet', network: :testnet)
+          bitcoin_address = bitcoin_account.addresses.create.string
+          testnet_address = testnet_account.addresses.create.string
+          expect(bitcoin_address[0]).to eq '3'
+          expect(testnet_address[0]).to eq '2'
+          #puts 'ahhh'
+          #puts @user.email
+          #puts Round::TestHelpers::Auth::TestCreds::PASSPHRASE
+          #puts 'ahhhh'
+          #puts bitcoin_address
+          #puts testnet_address
+          #binding.pry
+          #puts 2
         end
       end
     end
