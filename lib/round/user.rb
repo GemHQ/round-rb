@@ -2,10 +2,19 @@ module Round
   class User < Round::Base
     association :wallets, 'Round::WalletCollection'
     association :default_wallet, 'Round::Wallet'
-    association :devices, 'Round::DeviceCollection'
 
     def self.hash_identifier
       'email'
+    end
+
+    def devices
+      resource = @client.resources.devices_query(
+        email: self.refresh.email
+      )
+      Round::DeviceCollection.new(
+        resource: resource,
+        client: @client
+      )
     end
     
     def wallet
@@ -39,8 +48,7 @@ module Round
       params[:redirect_uri] = redirect_uri if redirect_uri
       user_resource = resource.create(params)
       user = Round::User.new(resource: user_resource, client: @client)
-      device_token = user.device_token
-      [device_token, user]
+      user.metadata.device_token
     end
 
   end

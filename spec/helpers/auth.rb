@@ -50,14 +50,15 @@ module Round::TestHelpers::Auth
   end
 
   def device_auth_user
-    device_token, user = identify_auth_user(email: random_email)
+    email = random_email
+    device_token = identify_auth_user(email: email)
     puts 'This will sleep for 60 seconds while you complete the steps in your email.'
     puts 'If thou dost not complete this, thine tests shall fail.'
     sleep 60
     identify_auth_client.authenticate_device(
       api_token: TestCreds::API_TOKEN,
       device_token: device_token,
-      email: user.email
+      email: email
     )
   end
 end

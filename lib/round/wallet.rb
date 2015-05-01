@@ -28,7 +28,11 @@ module Round
     end
 
     def accounts
-      Round::AccountCollection.new(resource: @resource.accounts, wallet: self)
+      Round::AccountCollection.new(
+        resource: @resource.accounts,
+        wallet: self,
+        client: @client
+      )
     end
 
     def self.hash_identifier
@@ -38,9 +42,9 @@ module Round
 
   class WalletCollection < Round::Collection
 
-    def initialize(options={}, &block)
+    def initialize(options, &block)
       super
-      @parent = options[:parent]
+      @application = options[:application]
     end
 
     def content_type
@@ -51,9 +55,14 @@ module Round
                multiwallet: CoinOp::Bit::MultiWallet.generate([:primary, :backup]))
       wallet_resource = create_wallet_resource(multiwallet, passphrase, name)
       multiwallet.import(
-        cosigner: wallet_resource.cosigner_public_seed,
+        cosigner_public_seed: wallet_resource.cosigner_public_seed
       )
-      wallet = Round::Wallet.new(resource: wallet_resource, multiwallet: multiwallet, application: @application)
+      wallet = Round::Wallet.new(
+        resource: wallet_resource,
+        multiwallet: multiwallet,
+        application: @application,
+        client: @client
+      )
       add(wallet)
       wallet
     end

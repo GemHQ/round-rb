@@ -25,9 +25,10 @@ module Round
 
       payment = self.transactions.create(payees, confirmations, redirect_uri: redirect_uri)
       signed = payment.sign(@wallet.multiwallet, network: network.to_sym)
-      if mfa_token && wallet.application
-        @client.context.mfa_token = mfa_token
-        signed.approve
+      if wallet.application
+        mfa_token = mfa_token || @wallet.application.get_mfa
+        signed.approve(mfa_token)
+        signed.refresh
       end
       signed
     end

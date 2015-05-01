@@ -33,9 +33,8 @@ describe Round::Application do
 
     it 'should view users' do
       size = app.users.size
-      _, user = identify_auth_user
+      identify_auth_user
       expect(app.users.size).to eq size + 1
-      expect(app.user_from_key(user.key).key).to eq user.key
     end
 
     # Uncomment this if you'd like to test resetting tokens.

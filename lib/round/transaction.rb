@@ -18,6 +18,11 @@ module Round
       self
     end
 
+    def approve(mfa_token)
+      @client.context.mfa_token = mfa_token
+      @resource.approve({})
+    end
+
     def transaction_hash
       @resource[:hash]
     end
