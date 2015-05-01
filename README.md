@@ -167,6 +167,7 @@ In this section you’ll learn how to create a payment a multi-signature payment
 
 	```ruby
 	transaction = account.pay([{address: 'mxzdT4ShBudVtZbMqPMh9NVM3CS56Fp11s', amount: 25000}], 1, 'http://some-redirect-uri.com/)
+  puts transaction.mfa_uri # redirect your user to this URI to complete payment!
 	```
 
 The pay call takes a list of payee objects.  A payee is a hash of `{address: ADDRESS, amount: amount}` where address is the bitcoin address and amount is the number of satoshis.  `utxo_confirmations` default to 6 and represents the number of confirmations an unspent output needs to have in order to be selected for the transaction.  
