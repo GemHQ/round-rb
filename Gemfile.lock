@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     round (0.7.0)
-      coin-op (~> 0.2)
+      coin-op (~> 0.3)
       http (= 0.6.0)
       patchboard (~> 0.5.2)
       rbnacl (~> 3.1.0)
@@ -15,9 +15,11 @@ GEM
     addressable (2.3.6)
     bitcoin-ruby (0.0.6)
     coderay (1.1.0)
-    coin-op (0.2.3)
+    coin-op (0.3.0)
       bitcoin-ruby (= 0.0.6)
+      hashie (~> 2.0)
       money-tree (~> 0.8)
+      rbnacl-libsodium (~> 1.0)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)

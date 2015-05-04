@@ -2,6 +2,23 @@
 
 ## Wallets and Accounts
 
+### Existing users
+
+To get & authorize an existing user, do the following:
+
+```ruby
+client.authenticate_identify(api_token: <API_TOKEN>)
+user = client.user(<USER_EMAIL>)
+device_token, mfa_uri = user.devices.create('some device name')
+# redirect the user to mfa_uri to confirm the authorization.
+full_user = client.authenticate_device(
+              api_token: <API_TOKEN>,
+              device_token: device_token,
+              email: user.email
+            )
+# do cool stuff on behalf of the user
+```
+
 ### Wallets
 The wallet itself is a BIP32 hierarchical deterministic (HD) wallet.  The Gem wallet takes the approach of calling the root node a wallet.  Going to depth1 gets you to the Account nodes and depth2 the addresses underneath the accounts.  
 
@@ -163,6 +180,7 @@ To authenticate as an application to get to an application wallet and/or pull in
 ```ruby
 app = client.authenticate_application(admin_token: admin_token, 
                                       api_token: api_token)
+app.totp = <YOUR TOTP SECRET>
 ```
 
 [[top]](README.md#round-rb-advanced-topics) [[back]](../README.md)
@@ -187,10 +205,11 @@ In this section you’ll learn how to make a payment for an operational/custodia
     admin_token: admin_token, 
     api_token: api_token,
   )`
+  1. `app.totp = <YOUR TOTP SECRET>`
 1. Unlock the wallet.
 	1. `wallet.unlock(passphrase)`
 1. make a payment
-	1. `account.pay(payee,4)`
+	1. `account.pay(payee,4, 'http://some-redirect-uri/')`
 
 The Gem client will use the top_secret to generate an MFA token that will be sent as part of the payment calls and verify on the Gem API side.
 

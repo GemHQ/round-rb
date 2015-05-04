@@ -43,6 +43,10 @@ module Round
       self.application.refresh
     end
 
+    def context
+      @patchboard_client.context
+    end
+
     def authenticate_identify(api_token:)
       @patchboard_client
         .context
