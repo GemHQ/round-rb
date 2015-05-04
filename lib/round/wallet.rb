@@ -24,7 +24,8 @@ module Round
     end
 
     def backup_key
-      @multiwallet.private_seed(:backup) 
+      # TODO: Gem format
+      @multiwallet.private_seed(:backup, network: :bitcoin) 
     end
 
     def accounts
