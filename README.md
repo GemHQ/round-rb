@@ -165,12 +165,12 @@ In this section you’ll learn how to create a payment a multi-signature payment
 1. Unlock the wallet:
 
 	```ruby
-	wallet.unlock(<YOUR PASSWORD>)
+	my_account.wallet.unlock(<YOUR PASSWORD>)
 	```
 1. Make a payment
 
 	```ruby
-	transaction = account.pay([{address: 'mxzdT4ShBudVtZbMqPMh9NVM3CS56Fp11s', amount: 25000}], 1, 'http://some-redirect-uri.com/)
+	transaction = my_account.pay([{address: 'mxzdT4ShBudVtZbMqPMh9NVM3CS56Fp11s', amount: 25000}], 1, 'http://some-redirect-uri.com/')
   puts transaction.mfa_uri # redirect your user to this URI to complete payment!
 	```
 
