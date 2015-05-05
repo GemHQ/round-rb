@@ -70,7 +70,7 @@ In this step you will learn how to instantiate the API client for the given netw
 
 [[top]](README.md#getting-started-tutorial)
 
-### 2. Configure your applicaiton and API Token
+### 2. Configure your application and API Token
 In this step your application and you will retrieve the API Token for the application and set your applications redirect url.  The url is used to push the user back to your app after they complete an out of band challenge.
 
 1. Set the redirect url by clicking in the options gear and selecting `add redirect url`
