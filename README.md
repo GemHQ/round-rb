@@ -88,9 +88,11 @@ In this step your application and you will retrieve the API Token for the applic
 In this step you will create your own personal Gem user and wallet authorized on your application.  This is an end-user account, which will have a 2-of-3 multisig bitcoin wallet.
 
 1. Authenticate your client
+
 	```ruby
 	client.authenticate_identify(api_token: api_token)
 	```
+
 1. Create your user and wallet:
 
 	```ruby
