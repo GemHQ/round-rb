@@ -1,11 +1,12 @@
 GIT
   remote: https://github.com/GemHQ/coin-op
-  revision: c356e4de0dc4bda26c1c33c2463fb96a52e4f0bd
+  revision: 2a9b0c6aff9f8dc220fe4f23a0205bf8a4de128b
   branch: vendor
   specs:
     coin-op (0.2.4)
       bitcoin-ruby (= 0.0.6)
       hashie (~> 2.0)
+      pry
       rbnacl-libsodium (~> 1.0)
 
 GIT
