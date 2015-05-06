@@ -24,16 +24,17 @@ describe Round::Application do
       testnet_a = wallet.accounts.create(name: 'test', network: :testnet)
       bitcoin_a = wallet.accounts.create(name: 'bit', network: :bitcoin)
       litecoin_a = wallet.accounts.create(name: 'lite', network: :litecoin)
+      dogecoin_a = wallet.accounts.create(name: 'doge', network: :dogecoin)
       testnet_addr = testnet_a.addresses.create.string
       expect(testnet_addr[0]).to eq '2'
       bitcoin_addr = bitcoin_a.addresses.create.string
       expect(bitcoin_addr[0]).to eq '3'
       litecoin_addr = litecoin_a.addresses.create.string
+      dogecoin_addr = dogecoin_a.addresses.create.string
       puts testnet_addr
       puts bitcoin_addr
       puts litecoin_addr
-      binding.pry
-      puts 'hello'
+      puts dogecoin_addr
     end
 
     it 'should view users' do
