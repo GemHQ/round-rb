@@ -70,10 +70,8 @@ In this step you will learn how to instantiate the API client for the given netw
 
 [[top]](README.md#getting-started-tutorial)
 
-### 2. Configure your applicaiton and API Token
+### 2. Configure your application and API Token
 In this step your application and you will retrieve the API Token for the application and set your applications redirect url.  The url is used to push the user back to your app after they complete an out of band challenge.
-
-1. Set the redirect url by clicking in the options gear and selecting `add redirect url`
 
 1. In the [console](https://sandbox.gem.co) copy your `api_token` by clicking on show
 
@@ -89,11 +87,17 @@ In this step your application and you will retrieve the API Token for the applic
 ### 3. Create your User and Wallet
 In this step you will create your own personal Gem user and wallet authorized on your application.  This is an end-user account, which will have a 2-of-3 multisig bitcoin wallet.
 
+1. Authenticate your client
+
+	```ruby
+	client.authenticate_identify(api_token: api_token)
+	```
+
 1. Create your user and wallet:
 
 	```ruby
 	#  Store the device token for future authentication
-	device_token, user = client.users.create(
+	device_token = client.users.create(
                       first_name: 'YOUR FIRST NAME',
                       last_name: 'YOUR LAST NAME',
                       email: 'YOUR EMAIL ADDRESS',
@@ -103,8 +107,8 @@ In this step you will create your own personal Gem user and wallet authorized on
                     )
 	```
 
-2. Your application should **store the device_token permanently** as this will be required to authenticate from your app as this user.
-3. You (acting as a user) will receive an email from Gem asking you to confirm your account and finish setup.  Please follow the instructions. At the end of the User sign up flow, you'll be redirected to the redirect_uri provided in users.create (if you provided one).
+1. Your application should **store the device_token permanently** as this will be required to authenticate from your app as this user.
+1. You (acting as a user) will receive an email from Gem asking you to confirm your account and finish setup.  Please follow the instructions. At the end of the User sign up flow, you'll be redirected to the redirect_uri provided in users.create (if you provided one).
 
 [[top]](README.md#getting-started-tutorial)
 
@@ -161,12 +165,13 @@ In this section you’ll learn how to create a payment a multi-signature payment
 1. Unlock the wallet:
 
 	```ruby
-	wallet.unlock(<YOUR PASSWORD>)
+	my_account.wallet.unlock(<YOUR PASSWORD>)
 	```
 1. Make a payment
 
 	```ruby
-	transaction = account.pay([{address: 'mxzdT4ShBudVtZbMqPMh9NVM3CS56Fp11s', amount: 25000}], 1, 'http://some-redirect-uri.com/)
+	transaction = my_account.pay([{address: 'mxzdT4ShBudVtZbMqPMh9NVM3CS56Fp11s', amount: 25000}], 1, 'http://some-redirect-uri.com/')
+  puts transaction.mfa_uri # redirect your user to this URI to complete payment!
 	```
 
 The pay call takes a list of payee objects.  A payee is a hash of `{address: ADDRESS, amount: amount}` where address is the bitcoin address and amount is the number of satoshis.  `utxo_confirmations` default to 6 and represents the number of confirmations an unspent output needs to have in order to be selected for the transaction.  

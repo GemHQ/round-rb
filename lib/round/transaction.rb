@@ -14,7 +14,12 @@ module Round
            inputs: wallet.signatures(transaction)
          }
       )
-      return @resource.mfa_uri, self
+      self
+    end
+
+    def approve(mfa_token)
+      @client.context.mfa_token = mfa_token
+      @resource.approve({})
     end
 
     def transaction_hash

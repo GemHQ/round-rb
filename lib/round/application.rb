@@ -11,6 +11,14 @@ module Round
       @resource.authorize_instance(name: name)
     end
 
+    def wallets
+      Round::WalletCollection.new(
+        resource: @resource.wallets,
+        client: @client,
+        application: self
+      )
+    end
+
     def user_from_key(key)
       users.detect { |u| u.key == key }
     end
@@ -48,7 +56,10 @@ module Round
       params = { name: name }
       params.merge!(callback_url: callback_url) if callback_url
       app_resource = @resource.create(params)
-      app = Round::Application.new(resource: app_resource, client: @client)
+      app = Round::Application.new(
+        resource: app_resource,
+        client: @client
+      )
       add(app)
       app
     end
