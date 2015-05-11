@@ -75,8 +75,8 @@ module Round
 
       @resource.create(
         name: name,
-        backup_public_seed: multiwallet.trees[:backup].to_serialized_address,
-        primary_public_seed: multiwallet.trees[:primary].to_serialized_address,
+        backup_public_seed: multiwallet.trees[:backup].to_bip32,
+        primary_public_seed: multiwallet.trees[:primary].to_bip32,
         primary_private_seed: encrypted_seed
       )
     end
