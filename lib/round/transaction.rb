@@ -4,6 +4,7 @@ module Round
     def sign(wallet, network:)
       raise 'transaction is already signed' unless @resource['status'] == 'unsigned'
       raise 'a wallet is required to sign a transaction' unless wallet
+      network = :testnet3 if network == :bitcoin_testnet
 
       transaction = CoinOp::Bit::Transaction.data(@resource, network: network)
       raise 'bad change address' unless wallet.valid_output?(transaction.outputs.last)

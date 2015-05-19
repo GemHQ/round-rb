@@ -21,7 +21,7 @@ describe Round::Application do
 
     it 'should create bitcoin and testnet accounts' do
       wallet = app.wallets.create('name', 'p2')
-      testnet_a = wallet.accounts.create(name: 'test', network: :testnet)
+      testnet_a = wallet.accounts.create(name: 'test', network: :bitcoin_testnet)
       bitcoin_a = wallet.accounts.create(name: 'bit', network: :bitcoin)
       litecoin_a = wallet.accounts.create(name: 'lite', network: :litecoin)
       dogecoin_a = wallet.accounts.create(name: 'doge', network: :dogecoin)

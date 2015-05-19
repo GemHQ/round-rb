@@ -52,7 +52,7 @@ module Round
     end
 
     def create(name:, network:)
-      unless [:testnet, :bitcoin, :litecoin, :dogecoin].include?(network)
+      unless [:bitcoin_testnet, :bitcoin, :litecoin, :dogecoin].include?(network)
         raise ArgumentError, 'Network must be :testnet, :litecoin, :bitcoin.'
       end
       resource = @resource.create(name: name, network: network)
