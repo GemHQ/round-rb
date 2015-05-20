@@ -58,14 +58,10 @@ In this step you will learn how to instantiate the API client for the given netw
 	> require 'round'
 	```
 
-1. Create the client object using the sandbox stack
+1. Create the client object. 
 
 	```ruby
-	# the default client is set to sandbox the testnet stack
-	client = Round.client
-
-	# if you want to configure the client for production mainnet
-  client = Round.client(:mainnet)
+  client = Round.client
 	```
 
 [[top]](README.md#getting-started-tutorial)
@@ -99,7 +95,7 @@ In this step you will create your own personal Gem user and wallet authorized on
                       email: 'YOUR EMAIL ADDRESS',
                       passphrase: 'aReallyStrongPassphrase',
                       device_name: 'SOME DEVICE NAME',
-                      redirect_uri: 'http://something/user-device-approved')
+                      redirect_uri: 'http://something.com/user-device-approved')
                     )
 	```
 
@@ -161,7 +157,7 @@ In this section you’ll learn how to create a payment a multi-signature payment
 1. Unlock the wallet:
 
 	```ruby
-	wallet.unlock(<YOUR PASSWORD>)
+	my_account.wallet.unlock(<YOUR PASSWORD>)
 	```
 1. Make a payment
 

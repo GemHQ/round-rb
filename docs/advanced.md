@@ -74,11 +74,11 @@ unsigned['fee']
 [[top]](README.md#round-rb-advanced-topics) [[back]](../README.md)
 
 ### Canceling Unsigned Transaction
-You can accomplish this by calling `tx.cancel()` on a transaction.  If you have a lot of transactions you can loop over the collection and cancel.
+You can accomplish this by calling `tx.cancel` on a transaction.  If you have a lot of transactions you can loop over the collection and cancel.
 
 ```ruby
 account.transactions(type: 'outgoing').each do |tx|
-  tx.cancel if tx.attributes['status'] == 'unsigned'
+  tx.cancel if tx.status == 'unsigned'
 end
 ```
 
@@ -97,8 +97,8 @@ puts account.attributes
 To access a particular attribute:
 
 ```ruby
-fee = tx.attributes['fee']
-user_email = user.attributes['email']
+fee = tx.fee
+user_email = user.email
 ```
 
 __If there are no convenience methods for attributes you use often, please file an issue with what you need or make a pr if you build it in yourself.__
@@ -209,7 +209,7 @@ In this section you’ll learn how to make a payment for an operational/custodia
 1. Unlock the wallet.
 	1. `wallet.unlock(passphrase)`
 1. make a payment
-	1. `account.pay(payee,4, 'http://some-redirect-uri/')`
+	1. `account.pay(payee, 4, 'http://some-redirect-uri/')`
 
 The Gem client will use the top_secret to generate an MFA token that will be sent as part of the payment calls and verify on the Gem API side.
 

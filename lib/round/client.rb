@@ -7,30 +7,16 @@ module Round
   MAINNET_URL = 'https://api.gem.co'
   SANDBOX_URL = 'https://api-sandbox.gem.co'
 
-  NETWORKS = {
-    testnet: :bitcoin_testnet,
-    bitcoin_testnet: :bitcoin_testnet,
-    testnet3: :bitcoin_testnet,
-    bitcoin: :bitcoin,
-    mainnet: :bitcoin,
-  }
-
-  def self.client(network = :bitcoin_testnet, url = nil)
-    network = NETWORKS.fetch(network, :bitcoin_testnet)
-    url ||= network == :bitcoin_testnet ? SANDBOX_URL : MAINNET_URL
-
+  def self.client(url = MAINNET_URL)
     @patchboard ||= ::Patchboard.discover(url) { Client::Context.new }
-    Client.new(@patchboard.spawn, network)
+    Client.new(@patchboard.spawn)
   end
 
   class Client
     include Round::Helpers
 
-    attr_reader :network
-
-    def initialize(patchboard_client, network)
+    def initialize(patchboard_client)
       @patchboard_client = patchboard_client
-      @network = network
     end
 
     def authenticate_application(api_token:, admin_token:)
