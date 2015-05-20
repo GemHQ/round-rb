@@ -16,15 +16,23 @@ Gem::Specification.new do |s|
   ]
   s.homepage = 'https://github.com/GemHQ/round-rb'
   s.summary = 'Ruby client for the Gem API'
+  s.description = 'Gem is a full-stack Bitcoin API that makes it easy to build powerful blockchain apps with beautiful, elegant code.'
 
   s.files = %w[
     LICENSE
     README.md
   ] + Dir['lib/**/*.rb']
   s.require_path = 'lib'
-  s.cert_chain = ['certs/jvergeldedios.pem']
 
-  s.add_dependency('patchboard', '~> 0.5.2')
+    # used with gem i coin-op -P HighSecurity
+  s.cert_chain  = ["certs/jvergeldedios.pem"]
+  # Sign gem when evaluating spec with `gem` command
+  #  unless ENV has set a SKIP_GEM_SIGNING
+  if ($0 =~ /gem\z/) and not ENV.include?("SKIP_GEM_SIGNING")
+    s.signing_key = File.join(Gem.user_home, ".ssh", "gem-private_key.pem")
+  end
+
+  s.add_dependency('patchboard', '~> 0.5')
   s.add_dependency('http', '0.6.0')
   s.add_dependency('rotp', '2.1.0')
   s.add_dependency('rbnacl', '~> 3.1.0')
@@ -34,8 +42,8 @@ Gem::Specification.new do |s|
   # RSpec test suite deps
   s.add_development_dependency('rspec', '~> 3.0')
   s.add_development_dependency('webmock', '~> 1.18')
-  s.add_development_dependency('vcr', '~> 2.9.3')
-  s.add_development_dependency('pry')
+  s.add_development_dependency('vcr', '~> 2.9')
+  s.add_development_dependency('pry', '~> 0')
 
   # Demo script deps
   s.add_development_dependency('term-ansicolor', '~> 1.3')

@@ -10,7 +10,7 @@
 1. Install system dependencies (*this is the only time you need sudo!*)
 
   ```bash
-  $ sudo apt-get install gcc make libffi-dev 
+  $ sudo apt-get install gcc make 
   ```
 
 2. Install the client
@@ -23,22 +23,7 @@
 
 ### Mac OSX:
 
-1.  Install Xcode Command Line Tools
-  ```bash
-  $ xcode-select --install
-  ```
-
-2. Install libffi and libsodium
-  ```bash
-  $ brew install libffi libsodium
-  ```
-
-3. Add libffi to your `PKG_CONFIG_PATH`
-  ```bash
-  $ export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig/
-  ```
-
-4. Gem install the client
+1. Gem install the client & rejoice!
   ```bash
   $ gem install round
   ```
