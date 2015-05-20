@@ -24,7 +24,8 @@ module Round
     end
 
     def backup_key
-      @multiwallet.private_seed(:backup) 
+      # TODO: Gem format
+      @multiwallet.private_seed(:backup, network: :bitcoin) 
     end
 
     def accounts
@@ -53,7 +54,7 @@ module Round
 
     def create(name, passphrase, network: 'bitcoin_testnet',
                multiwallet: CoinOp::Bit::MultiWallet.generate([:primary, :backup]))
-      wallet_resource = create_wallet_resource(multiwallet, passphrase, name, network)
+      wallet_resource = create_wallet_resource(multiwallet, passphrase, name)
       multiwallet.import(
         cosigner_public_seed: wallet_resource.cosigner_public_seed
       )
@@ -67,16 +68,15 @@ module Round
       wallet
     end
 
-    def create_wallet_resource(multiwallet, passphrase, name, network)
+    def create_wallet_resource(multiwallet, passphrase, name)
       primary_seed = CoinOp::Encodings.hex(multiwallet.trees[:primary].seed)
       ## Encrypt the primary seed using a passphrase-derived key
       encrypted_seed = CoinOp::Crypto::PassphraseBox.encrypt(passphrase, primary_seed)
 
       @resource.create(
         name: name,
-        network: network,
-        backup_public_seed: multiwallet.trees[:backup].to_serialized_address,
-        primary_public_seed: multiwallet.trees[:primary].to_serialized_address,
+        backup_public_seed: multiwallet.trees[:backup].to_bip32,
+        primary_public_seed: multiwallet.trees[:primary].to_bip32,
         primary_private_seed: encrypted_seed
       )
     end

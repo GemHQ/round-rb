@@ -20,8 +20,7 @@ module Round::TestHelpers::Auth
   end
 
   def identify_auth_client
-    #client = Round.client(:bitcoin_testnet)
-    client = Round.client(:bitcoin_testnet, 'https://api-sandbox.gem.co/')
+    client = Round.client('http://api-develop.gem.co/')
     client.authenticate_identify(
       api_token: TestCreds::API_TOKEN
     )

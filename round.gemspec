@@ -35,9 +35,9 @@ Gem::Specification.new do |s|
   s.add_dependency('patchboard', '~> 0.5')
   s.add_dependency('http', '0.6.0')
   s.add_dependency('rotp', '2.1.0')
-  s.add_dependency('rbnacl', '~> 3.1')
-  s.add_dependency('rbnacl-libsodium', '~> 1.0')
-  s.add_dependency('coin-op', '~> 0.3')
+  s.add_dependency('rbnacl', '~> 3.1.0')
+  s.add_dependency('rbnacl-libsodium', '~> 1.0.0')
+  s.add_dependency('coin-op', '0.4.1')
 
   # RSpec test suite deps
   s.add_development_dependency('rspec', '~> 3.0')

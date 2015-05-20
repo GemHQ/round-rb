@@ -20,11 +20,10 @@ module Round
     end
 
     def pay(payees, confirmations, redirect_uri = nil, mfa_token: nil)
-      raise ArgumentError, 'Payees must be specified' unless payees
       raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 
       payment = self.transactions.create(payees, confirmations, redirect_uri: redirect_uri)
-      signed = payment.sign(@wallet.multiwallet)
+      signed = payment.sign(@wallet.multiwallet, network: network.to_sym)
       if wallet.application
         mfa_token = mfa_token || @wallet.application.get_mfa
         signed.approve(mfa_token)
@@ -51,8 +50,11 @@ module Round
       Round::Account
     end
 
-    def create(name)
-      resource = @resource.create(name: name)
+    def create(name:, network:)
+      unless [:bitcoin_testnet, :bitcoin, :litecoin, :dogecoin].include?(network)
+        raise ArgumentError, 'Network must be :testnet, :litecoin, :bitcoin.'
+      end
+      resource = @resource.create(name: name, network: network)
       account = Round::Account.new(resource: resource, wallet: @wallet, client: @client)
       add(account)
       account

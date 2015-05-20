@@ -17,8 +17,9 @@ describe Round::UserCollection do
 
       it 'can unlock your wallet' do
         wallet = @user.wallet
-        expect { wallet.unlock(Round::TestHelpers::Auth::TestCreds::PASSPHRASE) }
-          .to_not raise_error
+        expect do
+          wallet.unlock(Round::TestHelpers::Auth::TestCreds::PASSPHRASE)
+        end.to_not raise_error
       end
 
       it 'can try to unlock a wallet unsuccessfully' do
@@ -28,8 +29,30 @@ describe Round::UserCollection do
       context 'that users account' do
         it 'should query transactions' do
           account = @user.wallet.accounts.first
-          expect { account.transactions(type: 'outgoing', status: ['unsigned', 'unconfirmed']) }
-            .to_not raise_error
+          expect do
+            account.transactions(type: 'outgoing', status: ['unsigned', 'unconfirmed'])
+          end.to_not raise_error
+        end
+
+        it 'should create different kinds of addresses' do
+          @user.wallet.unlock(Round::TestHelpers::Auth::TestCreds::PASSPHRASE)
+          bitcoin_account = @user.wallet.accounts.create(name: 'bitcoin', network: :bitcoin)
+          testnet_account = @user.wallet.accounts.create(name: 'testnet', network: :bitcoin_testnet)
+          litecoin_account = @user.wallet.accounts.create(name: 'litecoin', network: :litecoin)
+          dogecoin_account = @user.wallet.accounts.create(name: 'dogecoin', network: :dogecoin)
+          bitcoin_address = bitcoin_account.addresses.create.string
+          testnet_address = testnet_account.addresses.create.string
+          litecoin_address = litecoin_account.addresses.create.string
+          dogecoin_address = dogecoin_account.addresses.create.string
+          expect(bitcoin_address[0]).to eq '3'
+          expect(testnet_address[0]).to eq '2'
+          #puts @user.email
+          #puts Round::TestHelpers::Auth::TestCreds::PASSPHRASE
+          #puts 'ahhhh'
+          #puts bitcoin_address
+          #puts testnet_address
+          #binding.pry
+          #puts 2
         end
       end
     end

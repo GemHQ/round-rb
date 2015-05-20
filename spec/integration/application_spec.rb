@@ -19,6 +19,24 @@ describe Round::Application do
       expect(wallet.backup_key).to_not be_nil
     end
 
+    it 'should create bitcoin and testnet accounts' do
+      wallet = app.wallets.create('name', 'p2')
+      testnet_a = wallet.accounts.create(name: 'test', network: :bitcoin_testnet)
+      bitcoin_a = wallet.accounts.create(name: 'bit', network: :bitcoin)
+      litecoin_a = wallet.accounts.create(name: 'lite', network: :litecoin)
+      dogecoin_a = wallet.accounts.create(name: 'doge', network: :dogecoin)
+      testnet_addr = testnet_a.addresses.create.string
+      expect(testnet_addr[0]).to eq '2'
+      bitcoin_addr = bitcoin_a.addresses.create.string
+      expect(bitcoin_addr[0]).to eq '3'
+      litecoin_addr = litecoin_a.addresses.create.string
+      dogecoin_addr = dogecoin_a.addresses.create.string
+      puts testnet_addr
+      puts bitcoin_addr
+      puts litecoin_addr
+      puts dogecoin_addr
+    end
+
     it 'should view users' do
       size = app.users.size
       identify_auth_user
