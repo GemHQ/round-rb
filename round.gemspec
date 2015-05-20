@@ -6,11 +6,13 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
   s.authors = [
     'Matthew King',
-    'Julian Vergel de Dios'
+    'Julian Vergel de Dios',
+    'James Larisch'
   ]
   s.email = [
     'matthew@pandastrike.com',
-    'julian@gem.co'
+    'julian@gem.co',
+    'james@gem.co'
   ]
   s.homepage = 'https://github.com/GemHQ/round-rb'
   s.summary = 'Ruby client for the Gem API'
@@ -27,7 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency('rotp', '2.1.0')
   s.add_dependency('rbnacl', '~> 3.1.0')
   s.add_dependency('rbnacl-libsodium', '~> 1.0.0')
-  #s.add_dependency('coin-op', '~> 0.2')
+  s.add_dependency('coin-op', '0.4.1')
 
   # RSpec test suite deps
   s.add_development_dependency('rspec', '~> 3.0')

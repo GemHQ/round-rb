@@ -1,26 +1,8 @@
-GIT
-  remote: https://github.com/GemHQ/coin-op
-  revision: 2a9b0c6aff9f8dc220fe4f23a0205bf8a4de128b
-  branch: vendor
-  specs:
-    coin-op (0.2.4)
-      bitcoin-ruby (= 0.0.6)
-      hashie (~> 2.0)
-      pry
-      rbnacl-libsodium (~> 1.0)
-
-GIT
-  remote: https://github.com/GemHQ/money-tree
-  revision: d72b971afca783befa6943660ed205b0423fd194
-  branch: remove-network-state
-  specs:
-    money-tree (0.8.9)
-      ffi
-
 PATH
   remote: .
   specs:
     round (0.7.0)
+      coin-op (= 0.4.1)
       http (= 0.6.0)
       patchboard (~> 0.5.2)
       rbnacl (~> 3.1.0)
@@ -33,6 +15,11 @@ GEM
     addressable (2.3.8)
     bitcoin-ruby (0.0.6)
     coderay (1.1.0)
+    coin-op (0.4.1)
+      bitcoin-ruby (= 0.0.6)
+      hashie (~> 2.0)
+      money-tree (~> 0.9)
+      rbnacl-libsodium (~> 1.0)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)
@@ -43,6 +30,8 @@ GEM
     http_parser.rb (0.6.0)
     json (1.8.2)
     method_source (0.8.2)
+    money-tree (0.9.0)
+      ffi
     patchboard (0.5.2)
       hashie (~> 2.0)
       http (~> 0.5)
@@ -53,7 +42,7 @@ GEM
       slop (~> 3.4)
     rbnacl (3.1.2)
       ffi
-    rbnacl-libsodium (1.0.2)
+    rbnacl-libsodium (1.0.3)
       rbnacl (~> 3.0, >= 3.0.1)
     rotp (2.1.0)
     rspec (3.2.0)
@@ -83,8 +72,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  coin-op!
-  money-tree!
   pry
   round!
   rspec (~> 3.0)
