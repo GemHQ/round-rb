@@ -35,11 +35,13 @@ describe Round::UserCollection do
         end
 
         it 'should create different kinds of addresses' do
-          @user.wallet.unlock(Round::TestHelpers::Auth::TestCreds::PASSPHRASE)
           bitcoin_account = @user.wallet.accounts.create(name: 'bitcoin', network: :bitcoin)
           testnet_account = @user.wallet.accounts.create(name: 'testnet', network: :bitcoin_testnet)
           litecoin_account = @user.wallet.accounts.create(name: 'litecoin', network: :litecoin)
           dogecoin_account = @user.wallet.accounts.create(name: 'dogecoin', network: :dogecoin)
+          [bitcoin_account, testnet_account, litecoin_account, dogecoin_account].map do |acc|
+            acc.wallet.unlock(Round::TestHelpers::Auth::TestCreds::PASSPHRASE)
+          end
           bitcoin_address = bitcoin_account.addresses.create.string
           testnet_address = testnet_account.addresses.create.string
           litecoin_address = litecoin_account.addresses.create.string

@@ -1,10 +1,9 @@
 module Round
   class Wallet < Round::Base
 
-    attr_reader :multiwallet, :application
+    attr_reader :application
 
     def initialize(options = {})
-      @multiwallet = options[:multiwallet]
       @application = options[:application]
       super(options)
     end
@@ -60,12 +59,11 @@ module Round
       )
       wallet = Round::Wallet.new(
         resource: wallet_resource,
-        multiwallet: multiwallet,
         application: @application,
         client: @client
       )
       add(wallet)
-      wallet
+      [multiwallet.private_seed(:backup, network: :bitcoin), wallet]
     end
 
     def create_wallet_resource(multiwallet, passphrase, name)
