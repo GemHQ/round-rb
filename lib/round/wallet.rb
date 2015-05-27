@@ -1,9 +1,10 @@
 module Round
   class Wallet < Round::Base
 
-    attr_reader :application
+    attr_reader :multiwallet, :application
 
     def initialize(options = {})
+      @multiwallet = options[:multiwallet]
       @application = options[:application]
       super(options)
     end
@@ -20,11 +21,6 @@ module Round
           backup: @resource.backup_public_seed
         }
       )
-    end
-
-    def backup_key
-      # TODO: Gem format
-      @multiwallet.private_seed(:backup, network: :bitcoin) 
     end
 
     def accounts
@@ -53,17 +49,23 @@ module Round
 
     def create(name, passphrase, network: 'bitcoin_testnet',
                multiwallet: CoinOp::Bit::MultiWallet.generate([:primary, :backup]))
+      backup = multiwallet.private_seed(:backup, network: :bitcoin)
+      multiwallet.drop_private(:backup)
+      backup_master = multiwallet.trees[:backup]
+      new_bmaster = MoneyTree::Master.new(public_key: backup_master.public_key, chain_code: backup_master.chain_code)
+      multiwallet.trees[:backup] = new_bmaster
       wallet_resource = create_wallet_resource(multiwallet, passphrase, name)
       multiwallet.import(
         cosigner_public_seed: wallet_resource.cosigner_public_seed
       )
       wallet = Round::Wallet.new(
         resource: wallet_resource,
+        multiwallet: multiwallet,
         application: @application,
         client: @client
       )
       add(wallet)
-      [multiwallet.private_seed(:backup, network: :bitcoin), wallet]
+      [backup, wallet]
     end
 
     def create_wallet_resource(multiwallet, passphrase, name)
