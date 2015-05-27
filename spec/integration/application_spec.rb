@@ -7,20 +7,20 @@ describe Round::Application do
 
   describe 'application auth' do
     it 'should create wallets' do
-      wallet = app.wallets.create('name', 'password')
+      _, wallet = app.wallets.create('name', 'password')
       expect { wallet.unlock('password') }.to_not raise_error
       expect { wallet.unlock('wrong') }.to raise_error
     end
 
     it 'should have accounts' do
-      wallet = app.wallets.create('name', 'p2')
+      backup, wallet = app.wallets.create('name', 'p2')
       account = wallet.accounts['default']
+      expect(backup.class).to eq String
       expect(account.respond_to?(:pay)).to eq true
-      expect(wallet.backup_key).to_not be_nil
     end
 
     it 'should create bitcoin and testnet accounts' do
-      wallet = app.wallets.create('name', 'p2')
+      _, wallet = app.wallets.create('name', 'p2')
       testnet_a = wallet.accounts.create(name: 'test', network: :bitcoin_testnet)
       bitcoin_a = wallet.accounts.create(name: 'bit', network: :bitcoin)
       litecoin_a = wallet.accounts.create(name: 'lite', network: :litecoin)

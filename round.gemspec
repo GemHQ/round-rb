@@ -37,7 +37,7 @@ Gem::Specification.new do |s|
   s.add_dependency('rotp', '2.1.0')
   s.add_dependency('rbnacl', '~> 3.1.0')
   s.add_dependency('rbnacl-libsodium', '~> 1.0.0')
-  s.add_dependency('coin-op', '0.4.1')
+  s.add_dependency('coin-op', '0.4.3')
 
   # RSpec test suite deps
   s.add_development_dependency('rspec', '~> 3.0')
