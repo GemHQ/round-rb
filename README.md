@@ -40,8 +40,8 @@ The round client is designed to interact with Gem's API to make building blockch
 	* [More about Transactions](docs/advanced.md#transactions-and-payments)
 	* [Subscriptions](docs/advanced.md#subscriptions)
 	* [Integrated 2FA](docs/advanced.md#integrated-2fa)
-	* [Operational/Custodail wallet models](docs/advanced.md#operationalcustodial-wallets)
-	* [Operational/Custodial payments](docs/advanced.md#payments)
+	* [Operational/Custodial/Business wallet models](docs/advanced.md#operationalcustodial-wallets)
+	* [Operational/Custodial/Business payments](docs/advanced.md#payments)
 
 ### Introduction
 This tutorial will have you run through setting up your application and creating your own wallet as a user of your application.  By the end of the tutorial, you will have created your User, wallet, account, an address as well as fund it and then make a payment using the bitcoin testnet network.
