@@ -1,6 +1,5 @@
 module Round
   class User < Round::Base
-    association :wallets, 'Round::WalletCollection'
     association :default_wallet, 'Round::Wallet'
 
     def self.hash_identifier
@@ -18,7 +17,7 @@ module Round
     end
     
     def wallet
-      wallets.first
+      default_wallet
     end
   end
 

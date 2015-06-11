@@ -16,12 +16,13 @@ module Round
         content = self.content_type.new(options.merge(resource: resource, client: @client))
         yield content if block
         self.add(content)
-      end if @resource.list
+      end if @resource.list rescue nil
     end
 
     def refresh(options = {})
       @collection = []
       populate_data(options)
+      self
     end
 
     def add(content)
