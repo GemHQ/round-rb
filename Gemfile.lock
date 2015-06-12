@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    round (0.7.0)
+    round (0.8.1)
       coin-op (= 0.4.3)
       http (= 0.6.0)
-      patchboard (~> 0.5.2)
+      patchboard (~> 0.5)
       rbnacl (~> 3.1.0)
       rbnacl-libsodium (~> 1.0.0)
       rotp (= 2.1.0)
@@ -28,7 +28,7 @@ GEM
     http (0.6.0)
       http_parser.rb (~> 0.6.0)
     http_parser.rb (0.6.0)
-    json (1.8.2)
+    json (1.8.3)
     method_source (0.8.2)
     money-tree (0.9.0)
       ffi
@@ -40,6 +40,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
+    rake (0.9.6)
     rbnacl (3.1.2)
       ffi
     rbnacl-libsodium (1.0.3)
@@ -72,9 +73,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  pry
+  pry (~> 0)
+  rake (~> 0)
   round!
   rspec (~> 3.0)
   term-ansicolor (~> 1.3)
-  vcr (~> 2.9.3)
+  vcr (~> 2.9)
   webmock (~> 1.18)
