@@ -30,7 +30,7 @@ module Round
 
     def self.association(name, klass)
       define_method(name) do
-        Kernel.const_get(klass).new(resource: @resource.send(name), client: @client)
+        Kernel.const_get(klass).new(resource: @resource.send(name), client: @client).refresh
       end
     end
 

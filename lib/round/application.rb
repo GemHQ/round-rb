@@ -23,6 +23,10 @@ module Round
       users.detect { |u| u.key == key }
     end
 
+    def account_from_key(user_key, account_key)
+      user_from_key(user_key).accounts.detect { |a| a.key == account_key }
+    end
+
     def self.hash_identifier
       'name'
     end
