@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    round (0.8.1)
+    round (0.8.2)
       coin-op (= 0.4.3)
       http (= 0.6.0)
       patchboard (~> 0.5)
