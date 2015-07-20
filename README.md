@@ -12,10 +12,9 @@ The round client is designed to interact with Gem's API to make building blockch
 
 ## Support information
 * __Support email__: [support@gem.co](mailto:support@gem.co)
-* __Support IRC chat__: `#gemhq` on `irc.freenode.net`
 * __Issues__:  Use github issues
-* __Slack room__:  Send email to support requesting access to the slack room for this client
-* __Detailed API Docs__:  http://guide.gem.co
+* __Support Slack room__:  [![](https://chat.gem.co/badge.svg)](https://chat.gem.co)
+* __Detailed API Docs__:  [Gem API Docs](http://guide.gem.co)
 
 ## Installing round-rb:
 ### Prerequisites:
