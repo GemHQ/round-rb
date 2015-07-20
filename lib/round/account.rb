@@ -22,8 +22,10 @@ module Round
     def pay(payees, confirmations, redirect_uri = nil, mfa_token: nil)
       raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 
-      payment = self.transactions.create(payees, confirmations, redirect_uri: redirect_uri)
-      signed = payment.sign(@wallet.multiwallet, network: network.to_sym)
+      payment = self.transactions.create(payees, confirmations)
+      signed = payment.sign(@wallet.multiwallet, 
+                            redirect_uri: redirect_uri, 
+                            network: network.to_sym)
       if wallet.application
         mfa_token = mfa_token || @wallet.application.get_mfa
         signed.approve(mfa_token)

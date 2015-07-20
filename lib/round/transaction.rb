@@ -1,7 +1,7 @@
 module Round
   class Transaction < Round::Base
 
-    def sign(wallet, network:)
+    def sign(wallet, redirect_uri: nil, network:)
       raise 'transaction is already signed' unless @resource['status'] == 'unsigned'
       raise 'a wallet is required to sign a transaction' unless wallet
       network = :testnet3 if network == :bitcoin_testnet
@@ -13,7 +13,8 @@ module Round
          signatures: {
            transaction_hash: transaction.hex_hash,
            inputs: wallet.signatures(transaction)
-         }
+         },
+         redirect_uri: redirect_uri
       )
       self
     end
@@ -39,13 +40,12 @@ module Round
       Round::Transaction
     end
 
-    def create(payees, confirmations = 6, redirect_uri: nil)
+    def create(payees, confirmations = 6)
       raise 'Must have list of payees' unless payees
 
       payment_resource = @resource.create(
         utxo_confirmations: confirmations,
         payees: payees,
-        redirect_uri: redirect_uri
       )
 
       Round::Transaction.new(resource: payment_resource, client: @client)
