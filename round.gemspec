@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   # Sign gem when evaluating spec with `gem` command
   #  unless ENV has set a SKIP_GEM_SIGNING
   if ($0 =~ /gem\z/) and not ENV.include?("SKIP_GEM_SIGNING")
-    s.signing_key = File.join(Gem.user_home, ".ssh", "gem-private_key.pem")
+    s.signing_key = File.join("/Volumes/IRONKEY/gem-private_key.pem")
   end
 
   s.add_dependency('patchboard', '~> 0.5')
@@ -37,7 +37,7 @@ Gem::Specification.new do |s|
   s.add_dependency('rotp', '2.1.0')
   s.add_dependency('rbnacl', '~> 3.1.0')
   s.add_dependency('rbnacl-libsodium', '~> 1.0.0')
-  s.add_dependency('coin-op', '0.4.3')
+  s.add_dependency('coin-op', '0.4.4')
 
   # RSpec test suite deps
   s.add_development_dependency('rspec', '~> 3.0')
