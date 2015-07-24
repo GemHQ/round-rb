@@ -22,7 +22,7 @@ module Round
     def authenticate_application(api_token:, admin_token:)
       @patchboard_client
         .context
-        .authorize(Context::Scheme::APPLICATION, 
+        .authorize(Context::Scheme::APPLICATION,
           api_token: api_token, admin_token: admin_token)
       authenticate_identify(api_token: api_token)
 
@@ -42,11 +42,11 @@ module Round
     def authenticate_device(email:, api_token:, device_token:)
       @patchboard_client
         .context
-        .authorize(Context::Scheme::DEVICE, 
+        .authorize(Context::Scheme::DEVICE,
           api_token: api_token, device_token: device_token)
       @patchboard_client
         .context
-        .authorize(Context::Scheme::IDENTIFY, 
+        .authorize(Context::Scheme::IDENTIFY,
           api_token: api_token)
       self.user(email).refresh
     end
@@ -64,7 +64,7 @@ module Round
     end
 
     def user(email)
-      User.new(resource: resources.user_query(email: email), client: self)
+      User.new(resource: resources.user_query(email: email), client: self, email: email)
     end
 
     class Context

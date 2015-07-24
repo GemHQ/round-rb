@@ -6,16 +6,21 @@ module Round
       'email'
     end
 
+    def initialize(resource:, client:, **kwargs)
+      super
+      @resource.attributes.merge! kwargs
+    end
+
     def devices
       resource = @client.resources.devices_query(
-        email: self.refresh.email
+        email: self.email
       )
       Round::DeviceCollection.new(
         resource: resource,
         client: @client
       )
     end
-    
+
     def wallet
       default_wallet
     end
