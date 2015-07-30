@@ -2,7 +2,7 @@ module Round
   class Base
     attr_reader :resource
 
-    def initialize(resource:, client:, **kwargs)
+    def initialize(resource:, client:, **options)
       @resource = resource
       @client = client
     end
@@ -28,9 +28,20 @@ module Round
       "key"
     end
 
+    def self.is_pageable?
+      false
+    end
+
     def self.association(name, klass)
-      define_method(name) do
-        Kernel.const_get(klass).new(resource: @resource.send(name), client: @client).refresh
+      define_method(name) do |page: 0, fetch: true|
+        if Kernel.const_get(klass).is_pageable?
+          res = Proc.new { |options = {}| @resource.send(name, **options) }
+        end
+        res ||= @resource.send(name)
+
+        obj = Kernel.const_get(klass).new(
+          resource: res, client: @client, page: page, populate: fetch)
+        fetch ? obj.refresh : obj
       end
     end
 

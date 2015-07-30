@@ -1,19 +1,23 @@
 module Round
   class Collection < Round::Base
     include Enumerable
+    include Round::Pageable
     attr_reader :collection
 
     def initialize(options = {}, &block)
+      populate = options.delete(:populate)
       super(options)
       options.delete(:resource)
-      populate_data(options, &block)
+      populate_data(options, &block) unless populate == false
     end
 
     def populate_data(options = {}, &block)
       @collection = []
       @hash = {}
+      @_page = options.delete(:page) || 0
       @resource.list.each do |resource|
-        content = self.content_type.new(options.merge(resource: resource, client: @client))
+        content = self.content_type.new(
+          options.merge(resource: resource, client: @client))
         yield content if block
         self.add(content)
       end if @resource.list rescue nil
@@ -33,7 +37,7 @@ module Round
     def content_type
       Round::Base
     end
-    
+
     def [](key)
       if key.is_a?(Fixnum)
         @collection[key]
