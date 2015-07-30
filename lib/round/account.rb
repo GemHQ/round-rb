@@ -14,8 +14,10 @@ module Round
     def transactions(**query)
       query[:status] = query[:status].join(',') if query[:status]
       Round::TransactionCollection.new(
-        resource: @resource.transactions(query),
-        client: @client
+        resource: Proc.new { |options = {}|
+          @resource.transactions(**query.merge(options)) },
+        client: @client,
+        populate: query[:fetch]
       )
     end
 
@@ -23,8 +25,8 @@ module Round
       raise 'You must unlock the wallet before attempting a transaction' unless @wallet.multiwallet
 
       payment = self.transactions.create(payees, confirmations)
-      signed = payment.sign(@wallet.multiwallet, 
-                            redirect_uri: redirect_uri, 
+      signed = payment.sign(@wallet.multiwallet,
+                            redirect_uri: redirect_uri,
                             network: network.to_sym)
       if wallet.application
         mfa_token = mfa_token || @wallet.application.get_mfa

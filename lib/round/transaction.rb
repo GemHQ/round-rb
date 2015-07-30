@@ -8,8 +8,8 @@ module Round
 
       transaction = CoinOp::Bit::Transaction.data(@resource, network: network)
       raise 'bad change address' unless wallet.valid_output?(transaction.outputs.last)
-      
-      @resource = @resource.update( 
+
+      @resource = @resource.update(
          signatures: {
            transaction_hash: transaction.hex_hash,
            inputs: wallet.signatures(transaction)
