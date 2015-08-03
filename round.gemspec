@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   ] + Dir['lib/**/*.rb']
   s.require_path = 'lib'
 
-    # used with gem i coin-op -P HighSecurity
+  # used with gem i coin-op -P HighSecurity
   s.cert_chain  = ["certs/jvergeldedios.pem"]
   # Sign gem when evaluating spec with `gem` command
   #  unless ENV has set a SKIP_GEM_SIGNING
@@ -35,9 +35,7 @@ Gem::Specification.new do |s|
   s.add_dependency('patchboard', '~> 0.5')
   s.add_dependency('http', '0.6.0')
   s.add_dependency('rotp', '2.1.0')
-  s.add_dependency('rbnacl', '~> 3.1.0')
-  s.add_dependency('rbnacl-libsodium', '~> 1.0.0')
-  s.add_dependency('coin-op', '0.4.4')
+  s.add_dependency('coin-op', '0.4.5')
 
   # RSpec test suite deps
   s.add_development_dependency('rspec', '~> 3.0')
