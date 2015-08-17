@@ -46,6 +46,4 @@ Gem::Specification.new do |s|
   s.add_development_dependency('pry', '~> 0')
   s.add_development_dependency('rake', '~> 0')
 
-  # Demo script deps
-  s.add_development_dependency('term-ansicolor', '~> 1.3')
 end
