@@ -11,11 +11,12 @@ module Round
       @resource.authorize_instance(name: name)
     end
 
-    def wallets
+    def wallets(fetch: true)
       Round::WalletCollection.new(
-        resource: @resource.wallets,
+        resource: Proc.new { |options = {}| @resource.wallets(**options) },
         client: @client,
-        application: self
+        application: self,
+        populate: fetch
       )
     end
 

@@ -2,7 +2,7 @@ module Round
   class Address < Round::Base
     def self.hash_identifier
       "string"
-    end 
+    end
   end
 
   class AddressCollection < Round::Collection

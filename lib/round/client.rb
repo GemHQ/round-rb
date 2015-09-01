@@ -5,7 +5,6 @@ require 'date'
 module Round
 
   MAINNET_URL = 'https://api.gem.co'
-  SANDBOX_URL = 'https://api-sandbox.gem.co'
 
   def self.client(url = MAINNET_URL)
     @patchboard ||= ::Patchboard.discover(url) { Client::Context.new }
@@ -47,7 +46,8 @@ module Round
       @patchboard_client
         .context
         .authorize(Context::Scheme::IDENTIFY,
-          api_token: api_token)
+                   api_token: api_token)
+
       self.user(email).refresh
     end
 

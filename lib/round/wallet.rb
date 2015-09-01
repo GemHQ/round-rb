@@ -23,11 +23,12 @@ module Round
       )
     end
 
-    def accounts
+    def accounts(fetch: true)
       Round::AccountCollection.new(
-        resource: @resource.accounts,
+        resource:  Proc.new { |options = {}| @resource.accounts(**options) },
         wallet: self,
-        client: @client
+        client: @client,
+        populate: fetch
       )
     end
 

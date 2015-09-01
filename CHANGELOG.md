@@ -1,4 +1,11 @@
 
+0.9.0 / 2015-08-03
+==================
+
+  * Introduced the Pageable module, which handles the logic for paging through
+  * Support false 'fetch' param to avoid listing the contents of a collection if it is only needed for creating new members
+  * Minor bug fixes and improvements
+
 0.7.1 / 2015-04-20
 ==================
 
