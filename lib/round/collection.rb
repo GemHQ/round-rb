@@ -2,9 +2,11 @@ module Round
   class Collection < Round::Base
     include Enumerable
     attr_reader :collection
+    attr_reader :hash
 
     def initialize(options = {}, &block)
       super(options)
+      options[:fetch] ||= false
       options.delete(:resource)
       populate_data(options, &block)
     end
@@ -12,17 +14,21 @@ module Round
     def populate_data(options = {}, &block)
       @collection = []
       @hash = {}
-      @resource.list.each do |resource|
+      @resource.send(fetch_action).each do |resource|
         content = self.content_type.new(options.merge(resource: resource, client: @client))
         yield content if block
         self.add(content)
-      end if @resource.list
+      end if options[:fetch]
     end
 
     def refresh(options = {})
-      @collection = []
+      options[:fetch] = true
       populate_data(options)
       self
+    end
+
+    def fetch_action
+      :list
     end
 
     def add(content)

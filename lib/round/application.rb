@@ -5,18 +5,17 @@ module Round
 
   class Application < Round::Base
     association :users, 'Round::UserCollection'
-    association :wallets, 'Round::WalletCollection'
 
     def authorize_instance(name)
       @resource.authorize_instance(name: name)
     end
 
-    def wallets
-      Round::WalletCollection.new(
+    def wallets(options = {})
+      options.merge!(
         resource: @resource.wallets,
         client: @client,
-        application: self
-      )
+        application: self)
+      Round::WalletCollection.new(options)
     end
 
     def wallet(name)

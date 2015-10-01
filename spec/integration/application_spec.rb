@@ -7,7 +7,7 @@ describe Round::Application do
 
   describe 'application auth' do
     let(:wallet_name) { "wallet-#{rand(1000..1000000)}" }
-    let(:wallet) { app.wallets.create(wallet_name, 'password')[1] }
+    let!(:wallet) { app.wallets.create(wallet_name, 'password')[1] }
     it 'should create wallets' do
       expect { wallet.unlock('password') }.to_not raise_error
       expect { wallet.unlock('wrong') }.to raise_error
@@ -32,7 +32,7 @@ describe Round::Application do
 
     it 'should have accounts' do
       backup, wallet = app.wallets.create('name', 'p2')
-      account = wallet.accounts['default']
+      account = wallet.accounts(fetch: true)['default']
       expect(backup.class).to eq String
       expect(account.respond_to?(:pay)).to eq true
     end
@@ -56,9 +56,9 @@ describe Round::Application do
     end
 
     it 'should view users' do
-      size = app.users.size
+      size = app.users(fetch: true).size
       identify_auth_user
-      expect(app.users.size).to eq size + 1
+      expect(app.users(fetch: true).size).to eq size + 1
     end
 
     # Uncomment this if you'd like to test resetting tokens.
@@ -76,3 +76,4 @@ describe Round::Application do
     #end
   end
 end
+

@@ -23,12 +23,12 @@ module Round
       )
     end
 
-    def accounts
-      Round::AccountCollection.new(
+    def accounts(options = {})
+      options.merge!(
         resource: @resource.accounts,
         wallet: self,
-        client: @client
-      )
+        client: @client)
+      Round::AccountCollection.new(options)
     end
 
     def account(name)
