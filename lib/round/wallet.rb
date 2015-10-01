@@ -31,6 +31,14 @@ module Round
       )
     end
 
+    def account(name)
+      Round::Account.new(
+        resource: @resource.account_query(name: name).get,
+        wallet: self,
+        client: @client
+      )
+    end
+
     def self.hash_identifier
       'name'
     end

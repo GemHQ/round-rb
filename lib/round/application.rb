@@ -19,6 +19,14 @@ module Round
       )
     end
 
+    def wallet(name)
+      Round::Wallet.new(
+        resource: @resource.wallet_query(name: name).get,
+        client: @client,
+        application: self
+      )
+    end
+
     def user_from_key(key)
       users.detect { |u| u.key == key }
     end

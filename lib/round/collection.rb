@@ -16,7 +16,7 @@ module Round
         content = self.content_type.new(options.merge(resource: resource, client: @client))
         yield content if block
         self.add(content)
-      end if @resource.list rescue nil
+      end if @resource.list
     end
 
     def refresh(options = {})
@@ -33,7 +33,7 @@ module Round
     def content_type
       Round::Base
     end
-    
+
     def [](key)
       if key.is_a?(Fixnum)
         @collection[key]

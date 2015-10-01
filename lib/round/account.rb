@@ -3,7 +3,7 @@ module Round
     association :addresses, 'Round::AddressCollection'
     association :subscriptions, 'Round::SubscriptionCollection'
 
-    attr_reader :wallet
+    attr_accessor :wallet
 
     def initialize(options = {})
       raise ArgumentError, 'Account must be associated with a wallet' unless options[:wallet]

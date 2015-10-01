@@ -20,7 +20,7 @@ module Round::TestHelpers::Auth
   end
 
   def identify_auth_client
-    client = Round.client('http://api-develop.gem.co/')
+    client = Round.client('http://localhost:8999')
     client.authenticate_identify(
       api_token: TestCreds::API_TOKEN
     )

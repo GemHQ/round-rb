@@ -6,10 +6,28 @@ describe Round::Application do
   let!(:client) { app_and_client[1] }
 
   describe 'application auth' do
+    let(:wallet_name) { "wallet-#{rand(1000..1000000)}" }
+    let(:wallet) { app.wallets.create(wallet_name, 'password')[1] }
     it 'should create wallets' do
-      _, wallet = app.wallets.create('name', 'password')
       expect { wallet.unlock('password') }.to_not raise_error
       expect { wallet.unlock('wrong') }.to raise_error
+    end
+
+    it 'should query wallets' do
+      expect(app.wallet(wallet_name).key).to eql(wallet.key)
+    end
+
+    describe 'querying accounts' do
+      it 'should query accounts' do
+        expect(wallet.account('default')).to_not be_nil
+      end
+
+      context "the account doesn't exist" do
+        it 'should raise an error' do
+          expect { wallet.account('somethingrandom') }.to raise_error
+        end
+      end
+
     end
 
     it 'should have accounts' do
