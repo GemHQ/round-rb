@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   end
 
   s.add_dependency('patchboard', '~> 0.5')
-  s.add_dependency('http', '0.6.0')
+  s.add_dependency('http', '~>  0.6')
   s.add_dependency('rotp', '2.1.0')
   s.add_dependency('rbnacl', '~> 3.1.0')
   s.add_dependency('rbnacl-libsodium', '~> 1.0.0')
@@ -44,6 +44,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency('webmock', '~> 1.18')
   s.add_development_dependency('vcr', '~> 2.9')
   s.add_development_dependency('pry', '~> 0')
-  s.add_development_dependency('rake', '~> 0')
+  s.add_development_dependency('rake', '~> 12')
 
 end
